@@ -8,7 +8,7 @@ import {createTripEventTemplate} from './view/trip-event.js';
 import {createEditEventTemplate} from './view/edit-event.js';
 import {generateEvent} from './mock/event.js';
 
-const EVENT_COUNT = 15;
+const EVENT_COUNT = 1;
 
 const events = new Array(EVENT_COUNT).fill().map(generateEvent);
 

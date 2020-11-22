@@ -37,13 +37,13 @@ const generateDestination = () => {
 const generateOffers = (type) => {
 
   const offers = [
-    {type: `taxi`, title: `Order Uber`, price: 20},
-    {type: `flight`, title: `Add luggage`, price: 50},
-    {type: `flight`, title: `Switch to comfort`, price: 80},
-    {type: `drive`, title: `Rent a car`, price: 200},
-    {type: `check-in`, title: `Add breakfast`, price: 50},
-    {type: `sightseeing`, title: `Book tickets`, price: 40},
-    {type: `sightseeing`, title: `Lunch in city`, price: 30},
+    {type: `taxi`, key: `uber`, title: `Order Uber`, price: 20},
+    {type: `flight`, key: `luggage`, title: `Add luggage`, price: 50},
+    {type: `flight`, key: `comfort`, title: `Switch to comfort`, price: 80},
+    {type: `drive`, key: `car`, title: `Rent a car`, price: 200},
+    {type: `check-in`, key: `brekfast`, title: `Add breakfast`, price: 50},
+    {type: `sightseeing`, key: `tickets`, title: `Book tickets`, price: 40},
+    {type: `sightseeing`, key: `lunch`, title: `Lunch in city`, price: 30},
   ];
 
   const filteredOffers = offers.filter((offer) => type === offer.type);
