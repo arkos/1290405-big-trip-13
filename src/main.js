@@ -6,6 +6,7 @@ import {createSortTemplate} from './view/sort.js';
 import {createTripEventsTemplate} from './view/trip-events.js';
 import {createTripEventTemplate} from './view/trip-event.js';
 import {createEditEventTemplate} from './view/edit-event.js';
+import {generateEvent} from './mock/event.js';
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
@@ -34,4 +35,6 @@ render(tripEventsListElement, createEditEventTemplate(), `beforeend`);
 render(tripEventsListElement, createTripEventTemplate(), `beforeend`);
 render(tripEventsListElement, createTripEventTemplate(), `beforeend`);
 render(tripEventsListElement, createTripEventTemplate(), `beforeend`);
+
+const newEvent = generateEvent();
 

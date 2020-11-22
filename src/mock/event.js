@@ -34,8 +34,19 @@ const generateDestination = () => {
   return destinations[randomIndex];
 };
 
-const generateOffers = () => {
+const generateOffers = (type) => {
 
+  const offers = [
+    {type: `taxi`, title: `Order Uber`, price: 20},
+    {type: `flight`, title: `Add luggage`, price: 50},
+    {type: `flight`, title: `Switch to comfort`, price: 80},
+    {type: `drive`, title: `Rent a car`, price: 200},
+    {type: `check-in`, title: `Add breakfast`, price: 50},
+    {type: `sightseeing`, title: `Book tickets`, price: 40},
+    {type: `sightseeing`, title: `Lunch in city`, price: 30},
+  ];
+
+  return offers.filter((offer) => type === offer.type);
 };
 
 const generatePhotos = () => {
@@ -80,10 +91,12 @@ const generateDestinationInfo = () => {
 };
 
 export const generateEvent = () => {
+  const type = generateType();
+
   return {
-    type: generateType(),
+    type,
     destination: generateDestination(),
-    offers: generateOffers(),
+    offers: generateOffers(type.toLowerCase()),
     destinationInfo: generateDestinationInfo()
   };
 };
