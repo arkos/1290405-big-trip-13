@@ -58,7 +58,7 @@ const generateOffers = (type) => {
 
 const generatePhotos = () => {
   const randomSize = getRandomInteger(1, 3);
-  const photos = new Array(randomSize).fill(`http://picsum.photos/248/152?r=${Math.random()}`);
+  const photos = new Array(randomSize).fill().map(() => `http://picsum.photos/248/152?r=${Math.random()}`);
   return photos;
 };
 
