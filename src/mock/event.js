@@ -46,7 +46,14 @@ const generateOffers = (type) => {
     {type: `sightseeing`, title: `Lunch in city`, price: 30},
   ];
 
-  return offers.filter((offer) => type === offer.type);
+  const filteredOffers = offers.filter((offer) => type === offer.type);
+
+  if (filteredOffers.length > 0) {
+    const randomSize = getRandomInteger(1, filteredOffers.length);
+    filteredOffers.length = randomSize;
+  }
+
+  return filteredOffers;
 };
 
 const generatePhotos = () => {
@@ -83,6 +90,13 @@ const generateDescription = () => {
   return selectedDescriptions.join(` `);
 };
 
+const generatePrice = () => {
+  const upper = 1000;
+  const lower = 100;
+  const price = getRandomInteger(lower, upper);
+  return price;
+};
+
 const generateDestinationInfo = () => {
   return {
     description: generateDescription(),
@@ -96,6 +110,7 @@ export const generateEvent = () => {
   return {
     type,
     destination: generateDestination(),
+    price: generatePrice(),
     offers: generateOffers(type.toLowerCase()),
     destinationInfo: generateDestinationInfo()
   };

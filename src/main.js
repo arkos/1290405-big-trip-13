@@ -8,6 +8,10 @@ import {createTripEventTemplate} from './view/trip-event.js';
 import {createEditEventTemplate} from './view/edit-event.js';
 import {generateEvent} from './mock/event.js';
 
+const EVENT_COUNT = 15;
+
+const events = new Array(EVENT_COUNT).fill().map(generateEvent);
+
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
 };
@@ -30,11 +34,9 @@ render(tripEventsElement, createSortTemplate(), `beforeend`);
 render(tripEventsElement, createTripEventsTemplate(), `beforeend`);
 const tripEventsListElement = tripEventsElement.querySelector(`.trip-events__list`);
 
-render(tripEventsListElement, createEditEventTemplate(), `beforeend`);
+render(tripEventsListElement, createEditEventTemplate(events[0]), `beforeend`);
 
-render(tripEventsListElement, createTripEventTemplate(), `beforeend`);
-render(tripEventsListElement, createTripEventTemplate(), `beforeend`);
-render(tripEventsListElement, createTripEventTemplate(), `beforeend`);
-
-const newEvent = generateEvent();
+for (let i = 0; i < events.length; i++) {
+  render(tripEventsListElement, createTripEventTemplate(events[i]), `beforeend`);
+}
 
