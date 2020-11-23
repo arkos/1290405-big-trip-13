@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
@@ -62,6 +64,10 @@ const generatePhotos = () => {
   return photos;
 };
 
+const generateDate = (offsetFromNow = 0, offsetUnit = `h`) => {
+  return dayjs().add(offsetFromNow, offsetUnit);
+};
+
 const generateDescription = () => {
   const allDescriptions = [
     `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
@@ -107,8 +113,16 @@ const generateDestinationInfo = () => {
 export const generateEvent = () => {
   const type = generateType();
 
+  const offsetFromNow = 4;
+  const offsetUnit = `h`;
+
+  const startDate = generateDate();
+  const finishDate = generateDate(offsetFromNow, offsetUnit);
+
   return {
     type,
+    startDate,
+    finishDate,
     destination: generateDestination(),
     price: generatePrice(),
     offers: generateOffers(type.toLowerCase()),

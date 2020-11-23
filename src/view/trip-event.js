@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 const createTripEventOfferTemplate = ({title, price}) => {
   return `<li class="event__offer">
     <span class="event__offer-title">${title}</span>
@@ -15,22 +17,22 @@ const createTripEventOffersTemplate = (offers) => {
 
 export const createTripEventTemplate = (tripEvent) => {
 
-  const {type, destination, price, offers} = tripEvent;
+  const {type, destination, startDate, finishDate, price, offers} = tripEvent;
 
   const offersTemplate = createTripEventOffersTemplate(offers);
 
   return `<li class="trip-events__item">
     <div class="event">
-      <time class="event__date" datetime="2019-03-18">MAR 18</time>
+      <time class="event__date" datetime="${dayjs(startDate).format(`YYYY-MM-DD`)}">${dayjs(startDate).format(`MMM D`).toUpperCase()}</time>
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
       </div>
       <h3 class="event__title">${type} ${destination}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="2019-03-18T10:30">10:30</time>
+          <time class="event__start-time" datetime="${dayjs(startDate).format(`YYYY-MM-DDTHH:mm`)}">${dayjs(startDate).format(`HH:mm`)}</time>
           &mdash;
-          <time class="event__end-time" datetime="2019-03-18T11:00">11:00</time>
+          <time class="event__end-time" datetime="${dayjs(finishDate).format(`YYYY-MM-DDTHH:mm`)}">${dayjs(finishDate).format(`HH:mm`)}</time>
         </p>
         <p class="event__duration">30M</p>
       </div>

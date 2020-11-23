@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 const createOffersTemplate = (offers) => {
   return offers && (offers.length > 0) ? `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
@@ -88,8 +90,13 @@ const createTypesMenuTemplate = () => {
 
 export const createEditEventTemplate = (tripEvent = {}) => {
 
+  const offsetFromNow = 4;
+  const offsetUnit = `h`;
+
   const {
     type = ``,
+    startDate = dayjs().toDate(),
+    finishDate = dayjs().add(offsetFromNow, offsetUnit).toDate(),
     destination = ``,
     price = ``,
     offers = {},
@@ -133,10 +140,10 @@ export const createEditEventTemplate = (tripEvent = {}) => {
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 12:25">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(startDate).format(`DD/MM/YY HH:mm`)}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="18/03/19 13:35">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(finishDate).format(`DD/MM/YY HH:mm`)}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
