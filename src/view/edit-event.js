@@ -1,5 +1,5 @@
 const createOffersTemplate = (offers) => {
-  return offers.length > 0 ? `<section class="event__section  event__section--offers">
+  return offers && (offers.length > 0) ? `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
     <div class="event__available-offers">
@@ -16,16 +16,16 @@ const createOffersTemplate = (offers) => {
 };
 
 const createDestinationInfoTemplate = ({description, photos}) => {
-  return `<section class="event__section  event__section--destination">
+  return description ? `<section class="event__section  event__section--destination">
   <h3 class="event__section-title  event__section-title--destination">Destination</h3>
   <p class="event__destination-description">${description}</p>
 
-  ${photos.length > 0 ? `<div class="event__photos-container">
+  ${photos && (photos.length > 0) ? `<div class="event__photos-container">
     <div class="event__photos-tape">
     ${photos.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``)}
     </div>
   </div>` : ``}
-</section>`;
+</section>` : ``;
 };
 
 const createTypesMenuTemplate = () => {
@@ -86,9 +86,18 @@ const createTypesMenuTemplate = () => {
   </div>`;
 };
 
-export const createEditEventTemplate = (tripEvent) => {
+export const createEditEventTemplate = (tripEvent = {}) => {
 
-  const {type, destination, price, offers, destinationInfo} = tripEvent;
+  const {
+    type = ``,
+    destination = ``,
+    price = ``,
+    offers = {},
+    destinationInfo = {
+      description: ``,
+      photos: []
+    }
+  } = tripEvent;
 
   const typesMenuTemplate = createTypesMenuTemplate();
 
@@ -96,13 +105,15 @@ export const createEditEventTemplate = (tripEvent) => {
 
   const destinationInfoTemplate = createDestinationInfoTemplate(destinationInfo);
 
+  const imgSrc = type ? `img/icons/${type.toLowerCase()}.png` : ``;
+
   return `<li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="${imgSrc}" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
           ${typesMenuTemplate}

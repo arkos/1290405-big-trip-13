@@ -34,7 +34,7 @@ render(tripEventsElement, createSortTemplate(), `beforeend`);
 render(tripEventsElement, createTripEventsTemplate(), `beforeend`);
 const tripEventsListElement = tripEventsElement.querySelector(`.trip-events__list`);
 
-render(tripEventsListElement, createEditEventTemplate(events[0]), `beforeend`);
+render(tripEventsListElement, createEditEventTemplate({}), `beforeend`);
 
 for (let i = 0; i < events.length; i++) {
   render(tripEventsListElement, createTripEventTemplate(events[i]), `beforeend`);
