@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import {humanizeDate} from '../util.js';
 
 const createTripEventOfferTemplate = ({title, price}) => {
   return `<li class="event__offer">
@@ -23,16 +23,16 @@ export const createTripEventTemplate = (tripEvent) => {
 
   return `<li class="trip-events__item">
     <div class="event">
-      <time class="event__date" datetime="${dayjs(startDate).format(`YYYY-MM-DD`)}">${dayjs(startDate).format(`MMM D`).toUpperCase()}</time>
+      <time class="event__date" datetime="${humanizeDate(startDate, `YYYY-MM-DD`)}">${humanizeDate(startDate, `MMM D`).toUpperCase()}</time>
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
       </div>
       <h3 class="event__title">${type} ${destination}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="${dayjs(startDate).format(`YYYY-MM-DDTHH:mm`)}">${dayjs(startDate).format(`HH:mm`)}</time>
+          <time class="event__start-time" datetime="${humanizeDate(startDate, `YYYY-MM-DDTHH:mm`)}">${humanizeDate(startDate, `HH:mm`)}</time>
           &mdash;
-          <time class="event__end-time" datetime="${dayjs(finishDate).format(`YYYY-MM-DDTHH:mm`)}">${dayjs(finishDate).format(`HH:mm`)}</time>
+          <time class="event__end-time" datetime="${humanizeDate(finishDate, `YYYY-MM-DDTHH:mm`)}">${humanizeDate(finishDate, `HH:mm`)}</time>
         </p>
         <p class="event__duration">30M</p>
       </div>
