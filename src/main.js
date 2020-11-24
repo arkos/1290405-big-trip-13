@@ -8,6 +8,7 @@ import {createTripEventTemplate} from './view/trip-event.js';
 import {createEditEventTemplate} from './view/edit-event.js';
 import {generateEvent} from './mock/event.js';
 import {generateFilter} from './mock/filter.js';
+import {generateSort} from './mock/sort.js';
 
 const EVENT_COUNT = 1;
 
@@ -32,7 +33,8 @@ const filter = generateFilter();
 render(tripControlsElement, createFilterTemplate(filter), `beforeend`);
 
 const tripEventsElement = document.querySelector(`.trip-events`);
-render(tripEventsElement, createSortTemplate(), `beforeend`);
+const sort = generateSort();
+render(tripEventsElement, createSortTemplate(sort), `beforeend`);
 
 render(tripEventsElement, createTripEventsTemplate(), `beforeend`);
 const tripEventsListElement = tripEventsElement.querySelector(`.trip-events__list`);
