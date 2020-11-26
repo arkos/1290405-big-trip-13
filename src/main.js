@@ -19,7 +19,10 @@ const render = (container, template, place) => {
 };
 
 const tripMainElement = document.querySelector(`.trip-main`);
-render(tripMainElement, createTripInfoTemplate(), `afterbegin`);
+
+const tripInfo = {startDate: events[0].startDate, finishDate: events[events.length - 1].finishDate};
+
+render(tripMainElement, createTripInfoTemplate(tripInfo), `afterbegin`);
 
 const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
 
