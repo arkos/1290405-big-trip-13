@@ -113,17 +113,23 @@ const generateDestinationInfo = () => {
 export const generateEvent = () => {
   const type = generateType();
 
-  const randomOffset = getRandomInteger(-10, 10);
-  const randomOffsetUnit = `d`;
+  const maxDaysOffset = 3;
+  const randomOffsetDays = getRandomInteger(-maxDaysOffset, maxDaysOffset);
+
+  const maxHoursOffset = 23;
+  const randomOffsetHours = getRandomInteger(0, maxHoursOffset);
+
+  const maxMinutesOffset = 59;
+  const randomOffsetMinutes = getRandomInteger(0, maxMinutesOffset);
 
   const generatedDate = generateDate();
-  const startOfDay = dayjs(generatedDate).startOf(`day`);
 
-  const offsetFromStart = getRandomInteger(1, 23);
-  const offsetFromStartUnit = `h`;
+  const startDate = dayjs(generatedDate)
+    .add(randomOffsetDays, `d`)
+    .add(randomOffsetHours, `h`)
+    .add(randomOffsetMinutes, `m`);
 
-  const startDate = dayjs(startOfDay).add(randomOffset, randomOffsetUnit);
-  const finishDate = dayjs(startDate).add(offsetFromStart, offsetFromStartUnit);
+  const finishDate = dayjs(startDate).add(Math.abs(randomOffsetDays), `d`).add(Math.abs(randomOffsetHours), `h`).add(Math.abs(randomOffsetMinutes), `m`);
 
   return {
     type,
