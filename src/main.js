@@ -20,13 +20,19 @@ const render = (container, template, place) => {
 
 const tripMainElement = document.querySelector(`.trip-main`);
 
-const tripInfo = {startDate: events[0].startDate, finishDate: events[events.length - 1].finishDate};
+const sortedByDateEvents = [...events];
+sortedByDateEvents.sort((a, b) => b.startDate - a.startDate);
+
+const tripInfo = {
+  startDate: sortedByDateEvents[sortedByDateEvents.length - 1].startDate,
+  finishDate: sortedByDateEvents[0].finishDate
+};
 
 render(tripMainElement, createTripInfoTemplate(tripInfo), `afterbegin`);
 
 const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
 
-const totalPrice = events.reduce((sum, current) => current.price + sum, 0);
+const totalPrice = sortedByDateEvents.reduce((sum, current) => current.price + sum, 0);
 render(tripInfoElement, createTripPriceTemplate(totalPrice), `beforeend`);
 
 const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
@@ -41,15 +47,12 @@ const tripEventsElement = document.querySelector(`.trip-events`);
 const sort = generateSort();
 render(tripEventsElement, createSortTemplate(sort), `beforeend`);
 
-const sortedByDateEvents = [...events];
-sortedByDateEvents.sort((a, b) => b.startDate - a.startDate);
-
 render(tripEventsElement, createTripEventsTemplate(), `beforeend`);
 const tripEventsListElement = tripEventsElement.querySelector(`.trip-events__list`);
 
 render(tripEventsListElement, createEditEventTemplate(sortedByDateEvents[0]), `beforeend`);
 
-for (let i = 1; i < events.length; i++) {
+for (let i = 1; i < sortedByDateEvents.length; i++) {
   render(tripEventsListElement, createTripEventTemplate(sortedByDateEvents[i]), `beforeend`);
 }
 
