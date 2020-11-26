@@ -10,7 +10,7 @@ import {generateEvent} from './mock/event.js';
 import {generateFilter} from './mock/filter.js';
 import {generateSort} from './mock/sort.js';
 
-const EVENT_COUNT = 20;
+const EVENT_COUNT = 2;
 
 const events = new Array(EVENT_COUNT).fill().map(generateEvent);
 
@@ -22,7 +22,9 @@ const tripMainElement = document.querySelector(`.trip-main`);
 render(tripMainElement, createTripInfoTemplate(), `afterbegin`);
 
 const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
-render(tripInfoElement, createTripPriceTemplate(), `beforeend`);
+
+const totalPrice = events.reduce((sum, current) => current.price + sum, 0);
+render(tripInfoElement, createTripPriceTemplate(totalPrice), `beforeend`);
 
 const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
 const tripMenuTitleElement = tripControlsElement.querySelector(`h2`);
@@ -44,7 +46,7 @@ const tripEventsListElement = tripEventsElement.querySelector(`.trip-events__lis
 
 render(tripEventsListElement, createEditEventTemplate(sortedByDateEvents[0]), `beforeend`);
 
-for (let i = 0; i < events.length; i++) {
+for (let i = 1; i < events.length; i++) {
   render(tripEventsListElement, createTripEventTemplate(sortedByDateEvents[i]), `beforeend`);
 }
 
