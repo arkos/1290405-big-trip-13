@@ -3,7 +3,7 @@ const createSortItemsTemplate = (sortItems) => {
   <input id="sort-${sortName}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort"
     value="sort-${sortName}" ${index === 0 ? `checked` : ``} ${sortName === `event` || sortName === `offer` ? `disabled` : ``}>
   <label class="trip-sort__btn" for="sort-${sortName}">${sortText}</label>
-</div>`);
+</div>`).join(``);
 };
 
 
