@@ -10,7 +10,7 @@ import {generateEvent} from './mock/event.js';
 import {generateFilter} from './mock/filter.js';
 import {generateSort} from './mock/sort.js';
 
-const EVENT_COUNT = 1;
+const EVENT_COUNT = 20;
 
 const events = new Array(EVENT_COUNT).fill().map(generateEvent);
 
@@ -36,12 +36,15 @@ const tripEventsElement = document.querySelector(`.trip-events`);
 const sort = generateSort();
 render(tripEventsElement, createSortTemplate(sort), `beforeend`);
 
+const sortedByDateEvents = [...events];
+sortedByDateEvents.sort((a, b) => b.startDate - a.startDate);
+
 render(tripEventsElement, createTripEventsTemplate(), `beforeend`);
 const tripEventsListElement = tripEventsElement.querySelector(`.trip-events__list`);
 
-render(tripEventsListElement, createEditEventTemplate({}), `beforeend`);
+render(tripEventsListElement, createEditEventTemplate(sortedByDateEvents[0]), `beforeend`);
 
 for (let i = 0; i < events.length; i++) {
-  render(tripEventsListElement, createTripEventTemplate(events[i]), `beforeend`);
+  render(tripEventsListElement, createTripEventTemplate(sortedByDateEvents[i]), `beforeend`);
 }
 
