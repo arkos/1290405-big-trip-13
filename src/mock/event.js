@@ -138,6 +138,7 @@ export const generateEvent = () => {
     destination: generateDestination(),
     price: generatePrice(),
     offers: generateOffers(type.toLowerCase()),
-    destinationInfo: generateDestinationInfo()
+    destinationInfo: generateDestinationInfo(),
+    isFavorite: Boolean(getRandomInteger(0, 1))
   };
 };
