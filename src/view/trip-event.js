@@ -1,3 +1,8 @@
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(duration);
+
 import {humanizeDate} from '../util.js';
 
 const createTripEventOfferTemplate = ({title, price}) => {
@@ -21,6 +26,26 @@ export const createTripEventTemplate = (tripEvent) => {
 
   const offersTemplate = createTripEventOffersTemplate(offers);
 
+  const durationBetweenDates = dayjs.duration(finishDate.diff(startDate));
+
+  const days = durationBetweenDates.days();
+  const hours = durationBetweenDates.hours();
+  const minutes = durationBetweenDates.minutes();
+
+  const daysString = String(days).padStart(2, `0`);
+  const hoursString = String(hours).padStart(2, `0`);
+  const minutesString = String(minutes).padStart(2, `0`);
+
+  let formattedDuration;
+
+  if (days > 0) {
+    formattedDuration = `${daysString}D ${hoursString}H ${minutesString}M`;
+  } else if (hours > 0) {
+    formattedDuration = `${hoursString}H ${minutesString}M`;
+  } else {
+    formattedDuration = `${minutesString}M`;
+  }
+
   return `<li class="trip-events__item">
     <div class="event">
       <time class="event__date" datetime="${humanizeDate(startDate, `YYYY-MM-DD`)}">${humanizeDate(startDate, `MMM D`).toUpperCase()}</time>
@@ -34,7 +59,7 @@ export const createTripEventTemplate = (tripEvent) => {
           &mdash;
           <time class="event__end-time" datetime="${humanizeDate(finishDate, `YYYY-MM-DDTHH:mm`)}">${humanizeDate(finishDate, `HH:mm`)}</time>
         </p>
-        <p class="event__duration">30M</p>
+        <p class="event__duration">${formattedDuration}</p>
       </div>
       <p class="event__price">
         &euro;&nbsp;<span class="event__price-value">${price}</span>
