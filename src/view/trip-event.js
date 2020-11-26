@@ -28,23 +28,25 @@ export const createTripEventTemplate = (tripEvent) => {
 
   const durationBetweenDates = dayjs.duration(finishDate.diff(startDate));
 
-  const days = durationBetweenDates.days();
-  const hours = durationBetweenDates.hours();
-  const minutes = durationBetweenDates.minutes();
+  // const days = durationBetweenDates.days();
+  // const hours = durationBetweenDates.hours();
+  // const minutes = durationBetweenDates.minutes();
 
-  const daysString = String(days).padStart(2, `0`);
-  const hoursString = String(hours).padStart(2, `0`);
-  const minutesString = String(minutes).padStart(2, `0`);
+  // const daysString = String(days).padStart(2, `0`);
+  // const hoursString = String(hours).padStart(2, `0`);
+  // const minutesString = String(minutes).padStart(2, `0`);
 
   let formattedDuration;
 
-  if (days > 0) {
-    formattedDuration = `${daysString}D ${hoursString}H ${minutesString}M`;
-  } else if (hours > 0) {
-    formattedDuration = `${hoursString}H ${minutesString}M`;
-  } else {
-    formattedDuration = `${minutesString}M`;
-  }
+  // if (days > 0) {
+  //   formattedDuration = `${daysString}D ${hoursString}H ${minutesString}M`;
+  // } else if (hours > 0) {
+  //   formattedDuration = `${hoursString}H ${minutesString}M`;
+  // } else {
+  //   formattedDuration = `${minutesString}M`;
+  // }
+
+  formattedDuration = dayjs(durationBetweenDates).format(`${durationBetweenDates.asDays() ? `DD[D] HH[H] mm[M]` : durationBetweenDates.asHours() ? `HH[H] mm[M]` : `mm[M]`}`);
 
   return `<li class="trip-events__item">
     <div class="event">
