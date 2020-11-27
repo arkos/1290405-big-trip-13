@@ -10,7 +10,7 @@ import {generateEvent} from './mock/event.js';
 import {generateFilter} from './mock/filter.js';
 import {generateSort} from './mock/sort.js';
 
-const EVENT_COUNT = 2;
+const EVENT_COUNT = 4;
 
 const events = new Array(EVENT_COUNT).fill().map(generateEvent);
 
@@ -21,11 +21,16 @@ const render = (container, template, place) => {
 const tripMainElement = document.querySelector(`.trip-main`);
 
 const sortedByDateEvents = [...events];
-sortedByDateEvents.sort((a, b) => b.startDate - a.startDate);
+sortedByDateEvents.sort((a, b) => a.startDate - b.startDate);
+
+let destinations = [];
+
+sortedByDateEvents.forEach((evt) => destinations.push(evt.destination));
 
 const tripInfo = {
-  startDate: sortedByDateEvents[sortedByDateEvents.length - 1].startDate,
-  finishDate: sortedByDateEvents[0].finishDate
+  startDate: sortedByDateEvents[0].startDate,
+  finishDate: sortedByDateEvents[sortedByDateEvents.length - 1].finishDate,
+  destinations
 };
 
 render(tripMainElement, createTripInfoTemplate(tripInfo), `afterbegin`);
@@ -50,9 +55,9 @@ render(tripEventsElement, createSortTemplate(sort), `beforeend`);
 render(tripEventsElement, createTripEventsTemplate(), `beforeend`);
 const tripEventsListElement = tripEventsElement.querySelector(`.trip-events__list`);
 
-render(tripEventsListElement, createEditEventTemplate(sortedByDateEvents[0]), `beforeend`);
+render(tripEventsListElement, createEditEventTemplate(sortedByDateEvents[sortedByDateEvents.length - 1]), `beforeend`);
 
-for (let i = 1; i < sortedByDateEvents.length; i++) {
+for (let i = sortedByDateEvents.length - 2; i >= 0; i--) {
   render(tripEventsListElement, createTripEventTemplate(sortedByDateEvents[i]), `beforeend`);
 }
 
