@@ -1,6 +1,6 @@
 import MenuView from './view/menu.js';
 import TripPriceView from './view/trip-price.js';
-import {createTripInfoTemplate} from './view/trip-info.js';
+import TripInfoView from './view/trip-info.js';
 import {createFilterTemplate} from './view/filter.js';
 import {createSortTemplate} from './view/sort.js';
 import {createTripEventsTemplate} from './view/trip-events.js';
@@ -30,7 +30,7 @@ const tripInfo = {
   destinations
 };
 
-renderTemplate(tripMainElement, createTripInfoTemplate(tripInfo), `afterbegin`);
+renderElement(tripMainElement, new TripInfoView(tripInfo).getElement(), RenderPosition.AFTERBEGIN);
 
 const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
 
