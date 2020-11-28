@@ -3,7 +3,7 @@ import TripPriceView from './view/trip-price.js';
 import TripInfoView from './view/trip-info.js';
 import FilterView from './view/filter.js';
 import SortView from './view/sort.js';
-import {createTripEventsTemplate} from './view/trip-events.js';
+import {createTripEventListTemplate} from './view/trip-event-list.js';
 import {createTripEventTemplate} from './view/trip-event.js';
 import {createEditEventTemplate} from './view/edit-event.js';
 import {generateEvent} from './mock/event.js';
@@ -53,7 +53,7 @@ const tripEventsElement = document.querySelector(`.trip-events`);
 const sort = generateSort();
 renderElement(tripEventsElement, new SortView(sort).getElement(), RenderPosition.BEFOREEND);
 
-renderTemplate(tripEventsElement, createTripEventsTemplate(), `beforeend`);
+renderTemplate(tripEventsElement, createTripEventListTemplate(), `beforeend`);
 const tripEventsListElement = tripEventsElement.querySelector(`.trip-events__list`);
 
 renderTemplate(tripEventsListElement, createEditEventTemplate(sortedByDateEvents[sortedByDateEvents.length - 1]), `beforeend`);
