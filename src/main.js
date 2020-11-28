@@ -2,7 +2,7 @@ import MenuView from './view/menu.js';
 import TripPriceView from './view/trip-price.js';
 import TripInfoView from './view/trip-info.js';
 import FilterView from './view/filter.js';
-import {createSortTemplate} from './view/sort.js';
+import SortView from './view/sort.js';
 import {createTripEventsTemplate} from './view/trip-events.js';
 import {createTripEventTemplate} from './view/trip-event.js';
 import {createEditEventTemplate} from './view/edit-event.js';
@@ -51,7 +51,7 @@ renderElement(tripControlsElement, new FilterView(filter).getElement(), RenderPo
 
 const tripEventsElement = document.querySelector(`.trip-events`);
 const sort = generateSort();
-renderTemplate(tripEventsElement, createSortTemplate(sort), `beforeend`);
+renderElement(tripEventsElement, new SortView(sort).getElement(), RenderPosition.BEFOREEND);
 
 renderTemplate(tripEventsElement, createTripEventsTemplate(), `beforeend`);
 const tripEventsListElement = tripEventsElement.querySelector(`.trip-events__list`);
