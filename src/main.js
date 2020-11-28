@@ -1,6 +1,6 @@
 import MenuView from './view/menu.js';
+import TripPriceView from './view/trip-price.js';
 import {createTripInfoTemplate} from './view/trip-info.js';
-import {createTripPriceTemplate} from './view/trip-price.js';
 import {createFilterTemplate} from './view/filter.js';
 import {createSortTemplate} from './view/sort.js';
 import {createTripEventsTemplate} from './view/trip-events.js';
@@ -39,7 +39,7 @@ const totalPriceForEvents = sortedByDateEvents.reduce((total, event) => {
   return event.price + priceForEventOffers + total;
 }, 0);
 
-renderTemplate(tripInfoElement, createTripPriceTemplate(totalPriceForEvents), `beforeend`);
+renderElement(tripInfoElement, new TripPriceView(totalPriceForEvents).getElement(), RenderPosition.BEFOREEND);
 
 const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
 const tripMenuTitleElement = tripControlsElement.querySelector(`h2`);
