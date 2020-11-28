@@ -9,14 +9,11 @@ import {createEditEventTemplate} from './view/edit-event.js';
 import {generateEvent} from './mock/event.js';
 import {generateFilter} from './mock/filter.js';
 import {generateSort} from './mock/sort.js';
+import {renderTemplate} from './util.js';
 
 const EVENT_COUNT = 20;
 
 const events = new Array(EVENT_COUNT).fill().map(generateEvent);
-
-const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
 
 const tripMainElement = document.querySelector(`.trip-main`);
 
@@ -33,7 +30,7 @@ const tripInfo = {
   destinations
 };
 
-render(tripMainElement, createTripInfoTemplate(tripInfo), `afterbegin`);
+renderTemplate(tripMainElement, createTripInfoTemplate(tripInfo), `afterbegin`);
 
 const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
 
@@ -42,26 +39,26 @@ const totalPriceForEvents = sortedByDateEvents.reduce((total, event) => {
   return event.price + priceForEventOffers + total;
 }, 0);
 
-render(tripInfoElement, createTripPriceTemplate(totalPriceForEvents), `beforeend`);
+renderTemplate(tripInfoElement, createTripPriceTemplate(totalPriceForEvents), `beforeend`);
 
 const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
 const tripMenuTitleElement = tripControlsElement.querySelector(`h2`);
 
-render(tripMenuTitleElement, createMenuTemplate(), `afterend`);
+renderTemplate(tripMenuTitleElement, createMenuTemplate(), `afterend`);
 
 const filter = generateFilter();
-render(tripControlsElement, createFilterTemplate(filter), `beforeend`);
+renderTemplate(tripControlsElement, createFilterTemplate(filter), `beforeend`);
 
 const tripEventsElement = document.querySelector(`.trip-events`);
 const sort = generateSort();
-render(tripEventsElement, createSortTemplate(sort), `beforeend`);
+renderTemplate(tripEventsElement, createSortTemplate(sort), `beforeend`);
 
-render(tripEventsElement, createTripEventsTemplate(), `beforeend`);
+renderTemplate(tripEventsElement, createTripEventsTemplate(), `beforeend`);
 const tripEventsListElement = tripEventsElement.querySelector(`.trip-events__list`);
 
-render(tripEventsListElement, createEditEventTemplate(sortedByDateEvents[sortedByDateEvents.length - 1]), `beforeend`);
+renderTemplate(tripEventsListElement, createEditEventTemplate(sortedByDateEvents[sortedByDateEvents.length - 1]), `beforeend`);
 
 for (let i = sortedByDateEvents.length - 2; i >= 0; i--) {
-  render(tripEventsListElement, createTripEventTemplate(sortedByDateEvents[i]), `beforeend`);
+  renderTemplate(tripEventsListElement, createTripEventTemplate(sortedByDateEvents[i]), `beforeend`);
 }
 
