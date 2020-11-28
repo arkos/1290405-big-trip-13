@@ -46,7 +46,16 @@ export const createTripEventTemplate = (tripEvent) => {
   //   formattedDuration = `${minutesString}M`;
   // }
 
-  formattedDuration = dayjs(durationBetweenDates).format(`${durationBetweenDates.asDays() ? `DD[D] HH[H] mm[M]` : durationBetweenDates.asHours() ? `HH[H] mm[M]` : `mm[M]`}`);
+
+  // Probably doesn't work because of older version of dayjs (1.9.5)
+
+  if (durationBetweenDates.asDays()) {
+    formattedDuration = `DD[D] HH[H] mm[M]`;
+  } else if (durationBetweenDates.asHours()) {
+    formattedDuration = `HH[H] mm[M]`;
+  } else {
+    formattedDuration = `mm[M]`;
+  }
 
   const favoriteClassName = isFavorite ? `event__favorite-btn event__favorite-btn--active` : `event__favorite-btn`;
 
