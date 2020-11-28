@@ -69,6 +69,19 @@ const renderTripEvent = (tripEventListElement, tripEvent) => {
     tripEventListElement.replaceChild(tripEventComponent.getElement(), tripEventEditComponent.getElement());
   };
 
+  tripEventComponent.getElement()
+    .querySelector(`.event__rollup-btn`)
+    .addEventListener(`click`, () => {
+      switchToEdit();
+    });
+
+  tripEventEditComponent.getElement()
+    .querySelector(`form`)
+    .addEventListener(`submit`, (evt) => {
+      evt.preventDefault();
+      switchToDisplay();
+    });
+
   render(tripEventListElement, tripEventComponent.getElement(), RenderPosition.AFTERBEGIN);
 };
 
