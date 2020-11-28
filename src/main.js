@@ -57,9 +57,20 @@ render(tripEventsElement, new TripEventListView().getElement(), RenderPosition.B
 
 const tripEventsListElement = tripEventsElement.querySelector(`.trip-events__list`);
 
-render(tripEventsListElement, new EditEventView(sortedByDateEvents[sortedByDateEvents.length - 1]).getElement(), RenderPosition.BEFOREEND);
+const renderTripEvent = (tripEventListElement, tripEvent) => {
+  const tripEventComponent = new TripEventView(tripEvent);
+  const tripEventEditComponent = new EditEventView(tripEvent);
 
-for (let i = sortedByDateEvents.length - 2; i >= 0; i--) {
-  render(tripEventsListElement, new TripEventView(sortedByDateEvents[i]).getElement(), RenderPosition.BEFOREEND);
-}
+  const switchToEdit = () => {
+    tripEventListElement.replaceChild(tripEventEditComponent.getElement(), tripEventComponent.getElement());
+  };
 
+  const switchToDisplay = () => {
+    tripEventListElement.replaceChild(tripEventComponent.getElement(), tripEventEditComponent.getElement());
+  };
+
+  render(tripEventListElement, tripEventComponent.getElement(), RenderPosition.AFTERBEGIN);
+};
+
+sortedByDateEvents.forEach((tripEvent) =>
+  renderTripEvent(tripEventsListElement, tripEvent));
