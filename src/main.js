@@ -1,6 +1,6 @@
+import MenuView from './view/menu.js';
 import {createTripInfoTemplate} from './view/trip-info.js';
 import {createTripPriceTemplate} from './view/trip-price.js';
-import {createMenuTemplate} from './view/menu.js';
 import {createFilterTemplate} from './view/filter.js';
 import {createSortTemplate} from './view/sort.js';
 import {createTripEventsTemplate} from './view/trip-events.js';
@@ -9,7 +9,7 @@ import {createEditEventTemplate} from './view/edit-event.js';
 import {generateEvent} from './mock/event.js';
 import {generateFilter} from './mock/filter.js';
 import {generateSort} from './mock/sort.js';
-import {renderTemplate} from './util.js';
+import {renderTemplate, renderElement, RenderPosition} from './util.js';
 
 const EVENT_COUNT = 20;
 
@@ -44,7 +44,7 @@ renderTemplate(tripInfoElement, createTripPriceTemplate(totalPriceForEvents), `b
 const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
 const tripMenuTitleElement = tripControlsElement.querySelector(`h2`);
 
-renderTemplate(tripMenuTitleElement, createMenuTemplate(), `afterend`);
+renderElement(tripMenuTitleElement, new MenuView().getElement(), RenderPosition.AFTEREND);
 
 const filter = generateFilter();
 renderTemplate(tripControlsElement, createFilterTemplate(filter), `beforeend`);
