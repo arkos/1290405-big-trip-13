@@ -9,7 +9,7 @@ import EditEventView from './view/edit-event.js';
 import {generateEvent} from './mock/event.js';
 import {generateFilter} from './mock/filter.js';
 import {generateSort} from './mock/sort.js';
-import {renderElement, RenderPosition} from './util.js';
+import {render, RenderPosition} from './util.js';
 
 const EVENT_COUNT = 20;
 
@@ -30,7 +30,7 @@ const tripInfo = {
   destinations
 };
 
-renderElement(tripMainElement, new TripInfoView(tripInfo).getElement(), RenderPosition.AFTERBEGIN);
+render(tripMainElement, new TripInfoView(tripInfo).getElement(), RenderPosition.AFTERBEGIN);
 
 const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
 
@@ -39,27 +39,27 @@ const totalPriceForEvents = sortedByDateEvents.reduce((total, event) => {
   return event.price + priceForEventOffers + total;
 }, 0);
 
-renderElement(tripInfoElement, new TripPriceView(totalPriceForEvents).getElement(), RenderPosition.BEFOREEND);
+render(tripInfoElement, new TripPriceView(totalPriceForEvents).getElement(), RenderPosition.BEFOREEND);
 
 const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
 const tripMenuTitleElement = tripControlsElement.querySelector(`h2`);
 
-renderElement(tripMenuTitleElement, new MenuView().getElement(), RenderPosition.AFTEREND);
+render(tripMenuTitleElement, new MenuView().getElement(), RenderPosition.AFTEREND);
 
 const filter = generateFilter();
-renderElement(tripControlsElement, new FilterView(filter).getElement(), RenderPosition.BEFOREEND);
+render(tripControlsElement, new FilterView(filter).getElement(), RenderPosition.BEFOREEND);
 
 const tripEventsElement = document.querySelector(`.trip-events`);
 const sort = generateSort();
-renderElement(tripEventsElement, new SortView(sort).getElement(), RenderPosition.BEFOREEND);
+render(tripEventsElement, new SortView(sort).getElement(), RenderPosition.BEFOREEND);
 
-renderElement(tripEventsElement, new TripEventListView().getElement(), RenderPosition.BEFOREEND);
+render(tripEventsElement, new TripEventListView().getElement(), RenderPosition.BEFOREEND);
 
 const tripEventsListElement = tripEventsElement.querySelector(`.trip-events__list`);
 
-renderElement(tripEventsListElement, new EditEventView(sortedByDateEvents[sortedByDateEvents.length - 1]).getElement(), RenderPosition.BEFOREEND);
+render(tripEventsListElement, new EditEventView(sortedByDateEvents[sortedByDateEvents.length - 1]).getElement(), RenderPosition.BEFOREEND);
 
 for (let i = sortedByDateEvents.length - 2; i >= 0; i--) {
-  renderElement(tripEventsListElement, new TripEventView(sortedByDateEvents[i]).getElement(), RenderPosition.BEFOREEND);
+  render(tripEventsListElement, new TripEventView(sortedByDateEvents[i]).getElement(), RenderPosition.BEFOREEND);
 }
 
