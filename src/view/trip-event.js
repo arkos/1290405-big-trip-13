@@ -36,8 +36,6 @@ export const createTripEventTemplate = (tripEvent) => {
   // const hoursString = String(hours).padStart(2, `0`);
   // const minutesString = String(minutes).padStart(2, `0`);
 
-  let formattedDuration;
-
   // if (days > 0) {
   //   formattedDuration = `${daysString}D ${hoursString}H ${minutesString}M`;
   // } else if (hours > 0) {
@@ -46,16 +44,18 @@ export const createTripEventTemplate = (tripEvent) => {
   //   formattedDuration = `${minutesString}M`;
   // }
 
-
-  // Probably doesn't work because of older version of dayjs (1.9.5)
+  let formatter;
 
   if (durationBetweenDates.asDays()) {
-    formattedDuration = `DD[D] HH[H] mm[M]`;
+    formatter = `DD[D] HH[H] mm[M]`;
   } else if (durationBetweenDates.asHours()) {
-    formattedDuration = `HH[H] mm[M]`;
+    formatter = `HH[H] mm[M]`;
   } else {
-    formattedDuration = `mm[M]`;
+    formatter = `mm[M]`;
   }
+
+  // Probably won't work because of older version of dayjs (1.9.5)
+  const formattedDuration = dayjs(durationBetweenDates).format(formatter);
 
   const favoriteClassName = isFavorite ? `event__favorite-btn event__favorite-btn--active` : `event__favorite-btn`;
 
