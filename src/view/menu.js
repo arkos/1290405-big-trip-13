@@ -7,7 +7,7 @@ export const createMenuTemplate = () => {
   </nav>`;
 };
 
-export default class MenuView {
+export default class Menu {
   constructor() {
     this._element = null;
   }
