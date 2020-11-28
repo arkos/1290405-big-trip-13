@@ -4,12 +4,12 @@ import TripInfoView from './view/trip-info.js';
 import FilterView from './view/filter.js';
 import SortView from './view/sort.js';
 import TripEventListView from './view/trip-event-list.js';
-import {createTripEventTemplate} from './view/trip-event.js';
+import TripEventView from './view/trip-event.js';
 import EditEventView from './view/edit-event.js';
 import {generateEvent} from './mock/event.js';
 import {generateFilter} from './mock/filter.js';
 import {generateSort} from './mock/sort.js';
-import {renderTemplate, renderElement, RenderPosition} from './util.js';
+import {renderElement, RenderPosition} from './util.js';
 
 const EVENT_COUNT = 20;
 
@@ -60,6 +60,6 @@ const tripEventsListElement = tripEventsElement.querySelector(`.trip-events__lis
 renderElement(tripEventsListElement, new EditEventView(sortedByDateEvents[sortedByDateEvents.length - 1]).getElement(), RenderPosition.BEFOREEND);
 
 for (let i = sortedByDateEvents.length - 2; i >= 0; i--) {
-  renderTemplate(tripEventsListElement, createTripEventTemplate(sortedByDateEvents[i]), `beforeend`);
+  renderElement(tripEventsListElement, new TripEventView(sortedByDateEvents[i]).getElement(), RenderPosition.BEFOREEND);
 }
 
