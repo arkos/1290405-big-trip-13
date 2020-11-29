@@ -28,34 +28,22 @@ export const createTripEventTemplate = (tripEvent) => {
 
   const durationBetweenDates = dayjs.duration(finishDate.diff(startDate));
 
-  // const days = durationBetweenDates.days();
-  // const hours = durationBetweenDates.hours();
-  // const minutes = durationBetweenDates.minutes();
-
-  // const daysString = String(days).padStart(2, `0`);
-  // const hoursString = String(hours).padStart(2, `0`);
-  // const minutesString = String(minutes).padStart(2, `0`);
-
-  // if (days > 0) {
-  //   formattedDuration = `${daysString}D ${hoursString}H ${minutesString}M`;
-  // } else if (hours > 0) {
-  //   formattedDuration = `${hoursString}H ${minutesString}M`;
-  // } else {
-  //   formattedDuration = `${minutesString}M`;
-  // }
+  const days = durationBetweenDates.days();
+  const hours = durationBetweenDates.hours();
+  const minutes = durationBetweenDates.minutes();
 
   let formatter;
 
-  if (durationBetweenDates.asDays()) {
+  if (days) {
     formatter = `DD[D] HH[H] mm[M]`;
-  } else if (durationBetweenDates.asHours()) {
+  } else if (hours) {
     formatter = `HH[H] mm[M]`;
   } else {
     formatter = `mm[M]`;
   }
 
-  // Probably won't work because of older version of dayjs (1.9.5)
-  const formattedDuration = dayjs(durationBetweenDates).format(formatter);
+  const durationBeforeFormat = `0000-00-${days} ${hours}:${minutes}`;
+  const formattedDuration = dayjs(durationBeforeFormat).format(formatter);
 
   const favoriteClassName = isFavorite ? `event__favorite-btn event__favorite-btn--active` : `event__favorite-btn`;
 
