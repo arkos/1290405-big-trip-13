@@ -23,7 +23,7 @@ const tripMainElement = document.querySelector(`.trip-main`);
 const sortedByDateEvents = [...events];
 sortedByDateEvents.sort((a, b) => a.startDate - b.startDate);
 
-let destinations = [];
+const destinations = [];
 
 sortedByDateEvents.forEach((evt) => destinations.push(evt.destination));
 
