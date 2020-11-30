@@ -16,7 +16,18 @@ const EVENT_COUNT = 20;
 const generatedEvents = new Array(EVENT_COUNT).fill().map(generateEvent);
 
 const renderMainPage = (events) => {
+
+  const tripMainElement = document.querySelector(`.trip-main`);
+
   const tripEventsElement = document.querySelector(`.trip-events`);
+
+  const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
+  const tripMenuTitleElement = tripControlsElement.querySelector(`h2`);
+
+  render(tripMenuTitleElement, new MenuView().getElement(), RenderPosition.AFTEREND);
+
+  const filter = generateFilter();
+  render(tripControlsElement, new FilterView(filter).getElement(), RenderPosition.BEFOREEND);
 
   if (events.length === 0) {
     render(tripEventsElement, new NoEventView().getElement(), RenderPosition.AFTERBEGIN);
@@ -28,8 +39,6 @@ const renderMainPage = (events) => {
 
   const destinations = [];
   sortedByDateEvents.forEach((evt) => destinations.push(evt.destination));
-
-  const tripMainElement = document.querySelector(`.trip-main`);
 
   const tripInfo = {
     startDate: sortedByDateEvents[0].startDate,
@@ -48,13 +57,7 @@ const renderMainPage = (events) => {
 
   render(tripInfoElement, new TripPriceView(totalPriceForEvents).getElement(), RenderPosition.BEFOREEND);
 
-  const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
-  const tripMenuTitleElement = tripControlsElement.querySelector(`h2`);
 
-  render(tripMenuTitleElement, new MenuView().getElement(), RenderPosition.AFTEREND);
-
-  const filter = generateFilter();
-  render(tripControlsElement, new FilterView(filter).getElement(), RenderPosition.BEFOREEND);
 
   const sort = generateSort();
   render(tripEventsElement, new SortView(sort).getElement(), RenderPosition.BEFOREEND);
