@@ -13,13 +13,16 @@ import {generateSort} from './mock/sort.js';
 import {render, RenderPosition, isEscEvent} from './util.js';
 
 const EVENT_COUNT = 20;
-const events = new Array(EVENT_COUNT).fill().map(generateEvent);
+const generatedEvents = new Array(EVENT_COUNT).fill().map(generateEvent);
 
-const tripEventsElement = document.querySelector(`.trip-events`);
+const renderMainPage = (events) => {
+  const tripEventsElement = document.querySelector(`.trip-events`);
 
-if (events.length === 0) {
-  render(tripEventsElement, new NoEventView().getElement(), RenderPosition.AFTERBEGIN);
-} else {
+  if (events.length === 0) {
+    render(tripEventsElement, new NoEventView().getElement(), RenderPosition.AFTERBEGIN);
+    return;
+  }
+
   const sortedByDateEvents = [...events];
   sortedByDateEvents.sort((a, b) => a.startDate - b.startDate);
 
@@ -53,7 +56,6 @@ if (events.length === 0) {
   const filter = generateFilter();
   render(tripControlsElement, new FilterView(filter).getElement(), RenderPosition.BEFOREEND);
 
-  // const tripEventsElement = document.querySelector(`.trip-events`);
   const sort = generateSort();
   render(tripEventsElement, new SortView(sort).getElement(), RenderPosition.BEFOREEND);
 
@@ -61,56 +63,57 @@ if (events.length === 0) {
 
   const tripEventsListElement = tripEventsElement.querySelector(`.trip-events__list`);
 
-  const renderTripEvent = (tripEventListElement, tripEvent) => {
-    const tripEventComponent = new TripEventView(tripEvent);
-    const tripEventEditComponent = new EditEventView(tripEvent);
-
-    const switchToEdit = () => {
-      tripEventListElement.replaceChild(tripEventEditComponent.getElement(), tripEventComponent.getElement());
-    };
-
-    const switchToDisplay = () => {
-      tripEventListElement.replaceChild(tripEventComponent.getElement(), tripEventEditComponent.getElement());
-    };
-
-    const onClickRollupButtonUp = () => {
-      switchToDisplay();
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    };
-
-    const onClickRollupButtonDown = () => {
-      switchToEdit();
-      document.addEventListener(`keydown`, onEscKeyDown);
-    };
-
-    const onEscKeyDown = (evt) => {
-      isEscEvent(evt, () => {
-        switchToDisplay();
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      });
-    };
-
-    tripEventComponent.getElement()
-      .querySelector(`.event__rollup-btn`)
-      .addEventListener(`click`, onClickRollupButtonDown);
-
-    tripEventEditComponent.getElement()
-      .querySelector(`.event__rollup-btn`)
-      .addEventListener(`click`, onClickRollupButtonUp);
-
-    tripEventEditComponent.getElement()
-      .querySelector(`form`)
-      .addEventListener(`submit`, (evt) => {
-        evt.preventDefault();
-        switchToDisplay();
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      });
-
-    render(tripEventListElement, tripEventComponent.getElement(), RenderPosition.AFTERBEGIN);
-  };
-
   sortedByDateEvents.forEach((tripEvent) =>
     renderTripEvent(tripEventsListElement, tripEvent));
-}
+};
 
 
+const renderTripEvent = (tripEventListElement, tripEvent) => {
+  const tripEventComponent = new TripEventView(tripEvent);
+  const tripEventEditComponent = new EditEventView(tripEvent);
+
+  const switchToEdit = () => {
+    tripEventListElement.replaceChild(tripEventEditComponent.getElement(), tripEventComponent.getElement());
+  };
+
+  const switchToDisplay = () => {
+    tripEventListElement.replaceChild(tripEventComponent.getElement(), tripEventEditComponent.getElement());
+  };
+
+  const onClickRollupButtonUp = () => {
+    switchToDisplay();
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  };
+
+  const onClickRollupButtonDown = () => {
+    switchToEdit();
+    document.addEventListener(`keydown`, onEscKeyDown);
+  };
+
+  const onEscKeyDown = (evt) => {
+    isEscEvent(evt, () => {
+      switchToDisplay();
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    });
+  };
+
+  tripEventComponent.getElement()
+    .querySelector(`.event__rollup-btn`)
+    .addEventListener(`click`, onClickRollupButtonDown);
+
+  tripEventEditComponent.getElement()
+    .querySelector(`.event__rollup-btn`)
+    .addEventListener(`click`, onClickRollupButtonUp);
+
+  tripEventEditComponent.getElement()
+    .querySelector(`form`)
+    .addEventListener(`submit`, (evt) => {
+      evt.preventDefault();
+      switchToDisplay();
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    });
+
+  render(tripEventListElement, tripEventComponent.getElement(), RenderPosition.AFTERBEGIN);
+};
+
+renderMainPage(generatedEvents);
