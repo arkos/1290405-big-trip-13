@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {humanizeDate} from '../util.js';
+import {humanizeDate, createElement} from '../util.js';
 
 const createOffersTemplate = (offers) => {
   return offers && (offers.length > 0) ? `<section class="event__section  event__section--offers">
@@ -45,7 +45,7 @@ const createTypesMenuTemplate = (availableTypes) => {
   </div>`;
 };
 
-export const createEditEventTemplate = (tripEvent) => {
+const createEditEventTemplate = (tripEvent) => {
 
   const offsetFinishDate = 4;
   const offsetFinishDateUnit = `h`;
@@ -133,3 +133,26 @@ export const createEditEventTemplate = (tripEvent) => {
     </form>
   </li>`;
 };
+
+export default class EditEvent {
+  constructor(event) {
+    this._event = event;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEditEventTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

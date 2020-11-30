@@ -1,3 +1,5 @@
+import {createElement} from '../util.js';
+
 const createSortItemsTemplate = (sortItems) => {
   return sortItems.map(([sortName, sortText], index) => `<div class="trip-sort__item  trip-sort__item--${sortName}">
   <input id="sort-${sortName}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort"
@@ -7,7 +9,7 @@ const createSortItemsTemplate = (sortItems) => {
 };
 
 
-export const createSortTemplate = (sort) => {
+const createSortTemplate = (sort) => {
   const sortItems = Object.entries(sort);
   const sortItemsTemplate = createSortItemsTemplate(sortItems);
 
@@ -16,3 +18,25 @@ export const createSortTemplate = (sort) => {
   </form>`;
 };
 
+export default class Sort {
+  constructor(sort) {
+    this._sort = sort;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createSortTemplate(this._sort);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

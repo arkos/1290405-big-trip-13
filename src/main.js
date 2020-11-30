@@ -1,22 +1,19 @@
-import {createTripInfoTemplate} from './view/trip-info.js';
-import {createTripPriceTemplate} from './view/trip-price.js';
-import {createMenuTemplate} from './view/menu.js';
-import {createFilterTemplate} from './view/filter.js';
-import {createSortTemplate} from './view/sort.js';
-import {createTripEventsTemplate} from './view/trip-events.js';
-import {createTripEventTemplate} from './view/trip-event.js';
-import {createEditEventTemplate} from './view/edit-event.js';
+import MenuView from './view/menu.js';
+import TripPriceView from './view/trip-price.js';
+import TripInfoView from './view/trip-info.js';
+import FilterView from './view/filter.js';
+import SortView from './view/sort.js';
+import TripEventListView from './view/trip-event-list.js';
+import TripEventView from './view/trip-event.js';
+import EditEventView from './view/edit-event.js';
 import {generateEvent} from './mock/event.js';
 import {generateFilter} from './mock/filter.js';
 import {generateSort} from './mock/sort.js';
+import {render, RenderPosition} from './util.js';
 
 const EVENT_COUNT = 20;
 
 const events = new Array(EVENT_COUNT).fill().map(generateEvent);
-
-const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
 
 const tripMainElement = document.querySelector(`.trip-main`);
 
@@ -33,7 +30,7 @@ const tripInfo = {
   destinations
 };
 
-render(tripMainElement, createTripInfoTemplate(tripInfo), `afterbegin`);
+render(tripMainElement, new TripInfoView(tripInfo).getElement(), RenderPosition.AFTERBEGIN);
 
 const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
 
@@ -42,26 +39,51 @@ const totalPriceForEvents = sortedByDateEvents.reduce((total, event) => {
   return event.price + priceForEventOffers + total;
 }, 0);
 
-render(tripInfoElement, createTripPriceTemplate(totalPriceForEvents), `beforeend`);
+render(tripInfoElement, new TripPriceView(totalPriceForEvents).getElement(), RenderPosition.BEFOREEND);
 
 const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
 const tripMenuTitleElement = tripControlsElement.querySelector(`h2`);
 
-render(tripMenuTitleElement, createMenuTemplate(), `afterend`);
+render(tripMenuTitleElement, new MenuView().getElement(), RenderPosition.AFTEREND);
 
 const filter = generateFilter();
-render(tripControlsElement, createFilterTemplate(filter), `beforeend`);
+render(tripControlsElement, new FilterView(filter).getElement(), RenderPosition.BEFOREEND);
 
 const tripEventsElement = document.querySelector(`.trip-events`);
 const sort = generateSort();
-render(tripEventsElement, createSortTemplate(sort), `beforeend`);
+render(tripEventsElement, new SortView(sort).getElement(), RenderPosition.BEFOREEND);
 
-render(tripEventsElement, createTripEventsTemplate(), `beforeend`);
+render(tripEventsElement, new TripEventListView().getElement(), RenderPosition.BEFOREEND);
+
 const tripEventsListElement = tripEventsElement.querySelector(`.trip-events__list`);
 
-render(tripEventsListElement, createEditEventTemplate(sortedByDateEvents[sortedByDateEvents.length - 1]), `beforeend`);
+const renderTripEvent = (tripEventListElement, tripEvent) => {
+  const tripEventComponent = new TripEventView(tripEvent);
+  const tripEventEditComponent = new EditEventView(tripEvent);
 
-for (let i = sortedByDateEvents.length - 2; i >= 0; i--) {
-  render(tripEventsListElement, createTripEventTemplate(sortedByDateEvents[i]), `beforeend`);
-}
+  const switchToEdit = () => {
+    tripEventListElement.replaceChild(tripEventEditComponent.getElement(), tripEventComponent.getElement());
+  };
 
+  const switchToDisplay = () => {
+    tripEventListElement.replaceChild(tripEventComponent.getElement(), tripEventEditComponent.getElement());
+  };
+
+  tripEventComponent.getElement()
+    .querySelector(`.event__rollup-btn`)
+    .addEventListener(`click`, () => {
+      switchToEdit();
+    });
+
+  tripEventEditComponent.getElement()
+    .querySelector(`form`)
+    .addEventListener(`submit`, (evt) => {
+      evt.preventDefault();
+      switchToDisplay();
+    });
+
+  render(tripEventListElement, tripEventComponent.getElement(), RenderPosition.AFTERBEGIN);
+};
+
+sortedByDateEvents.forEach((tripEvent) =>
+  renderTripEvent(tripEventsListElement, tripEvent));

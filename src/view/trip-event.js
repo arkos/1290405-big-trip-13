@@ -3,7 +3,7 @@ import duration from 'dayjs/plugin/duration';
 
 dayjs.extend(duration);
 
-import {humanizeDate} from '../util.js';
+import {humanizeDate, createElement} from '../util.js';
 
 const createTripEventOfferTemplate = ({title, price}) => {
   return `<li class="event__offer">
@@ -20,7 +20,7 @@ const createTripEventOffersTemplate = (offers) => {
   </ul>` : ``;
 };
 
-export const createTripEventTemplate = (tripEvent) => {
+const createTripEventTemplate = (tripEvent) => {
 
   const {type, destination, startDate, finishDate, price, offers, isFavorite} = tripEvent;
 
@@ -80,3 +80,26 @@ export const createTripEventTemplate = (tripEvent) => {
     </div>
   </li>`;
 };
+
+export default class TripEvent {
+  constructor(event) {
+    this._event = event;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripEventTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

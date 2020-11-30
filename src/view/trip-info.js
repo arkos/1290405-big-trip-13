@@ -1,6 +1,6 @@
-import {humanizeDate} from '../util.js';
+import {humanizeDate, createElement} from '../util.js';
 
-export const createTripInfoTemplate = ({startDate, finishDate, destinations}) => {
+const createTripInfoTemplate = ({startDate, finishDate, destinations}) => {
   if (destinations.length > 3) {
     destinations.splice(1, destinations.length - 2, `...`);
   }
@@ -15,3 +15,26 @@ export const createTripInfoTemplate = ({startDate, finishDate, destinations}) =>
       </div>
     </section>`;
 };
+
+export default class TripInfo {
+  constructor(tripInfo) {
+    this._tripInfo = tripInfo;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripInfoTemplate(this._tripInfo);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
