@@ -1,5 +1,7 @@
 import dayjs from 'dayjs';
 
+const ESC_KEY_CODE = 27;
+
 export const humanizeDate = (date, formatter = `YYYY-MM-DD`) => {
   return dayjs(date).format(formatter);
 };
@@ -61,4 +63,10 @@ export const createElement = (template) => {
   newElement.innerHTML = template;
 
   return newElement.firstChild;
+};
+
+export const isEscEvent = (evt, action) => {
+  if (evt.keyCode === ESC_KEY_CODE) {
+    action();
+  }
 };
