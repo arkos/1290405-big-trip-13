@@ -9,7 +9,7 @@ import EditEventView from './view/edit-event.js';
 import {generateEvent} from './mock/event.js';
 import {generateFilter} from './mock/filter.js';
 import {generateSort} from './mock/sort.js';
-import {render, RenderPosition} from './util.js';
+import {render, RenderPosition, isEscEvent} from './util.js';
 
 const EVENT_COUNT = 20;
 
@@ -69,10 +69,19 @@ const renderTripEvent = (tripEventListElement, tripEvent) => {
     tripEventListElement.replaceChild(tripEventComponent.getElement(), tripEventEditComponent.getElement());
   };
 
+  const onEscKeyDown = (evt) => {
+    isEscEvent(evt, () => {
+      evt.preventDefault();
+      switchToDisplay();
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    });
+  };
+
   tripEventComponent.getElement()
     .querySelector(`.event__rollup-btn`)
     .addEventListener(`click`, () => {
       switchToEdit();
+      document.addEventListener(`keydown`, onEscKeyDown);
     });
 
   tripEventEditComponent.getElement()
@@ -80,6 +89,7 @@ const renderTripEvent = (tripEventListElement, tripEvent) => {
     .addEventListener(`submit`, (evt) => {
       evt.preventDefault();
       switchToDisplay();
+      document.removeEventListener(`keydown`, onEscKeyDown);
     });
 
   render(tripEventListElement, tripEventComponent.getElement(), RenderPosition.AFTERBEGIN);
