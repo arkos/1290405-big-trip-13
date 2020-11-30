@@ -57,8 +57,6 @@ const renderMainPage = (events) => {
 
   render(tripInfoElement, new TripPriceView(totalPriceForEvents).getElement(), RenderPosition.BEFOREEND);
 
-
-
   const sort = generateSort();
   render(tripEventsElement, new SortView(sort).getElement(), RenderPosition.BEFOREEND);
 
