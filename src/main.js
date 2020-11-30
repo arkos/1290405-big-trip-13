@@ -69,9 +69,18 @@ const renderTripEvent = (tripEventListElement, tripEvent) => {
     tripEventListElement.replaceChild(tripEventComponent.getElement(), tripEventEditComponent.getElement());
   };
 
+  const onClickRollupButtonUp = () => {
+    switchToDisplay();
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  };
+
+  const onClickRollupButtonDown = () => {
+    switchToEdit();
+    document.addEventListener(`keydown`, onEscKeyDown);
+  };
+
   const onEscKeyDown = (evt) => {
     isEscEvent(evt, () => {
-      evt.preventDefault();
       switchToDisplay();
       document.removeEventListener(`keydown`, onEscKeyDown);
     });
@@ -79,10 +88,11 @@ const renderTripEvent = (tripEventListElement, tripEvent) => {
 
   tripEventComponent.getElement()
     .querySelector(`.event__rollup-btn`)
-    .addEventListener(`click`, () => {
-      switchToEdit();
-      document.addEventListener(`keydown`, onEscKeyDown);
-    });
+    .addEventListener(`click`, onClickRollupButtonDown);
+
+  tripEventEditComponent.getElement()
+    .querySelector(`.event__rollup-btn`)
+    .addEventListener(`click`, onClickRollupButtonUp);
 
   tripEventEditComponent.getElement()
     .querySelector(`form`)
