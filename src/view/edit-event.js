@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
-import {humanizeDate, createElement} from '../util.js';
+import {humanizeDate} from '../util.js';
+import AbstractView from '../view/abstract.js';
 
 const createOffersTemplate = (offers) => {
   return offers && (offers.length > 0) ? `<section class="event__section  event__section--offers">
@@ -134,25 +135,13 @@ const createEditEventTemplate = (tripEvent) => {
   </li>`;
 };
 
-export default class EditEvent {
+export default class EditEvent extends AbstractView {
   constructor(event) {
+    super();
     this._event = event;
-    this._element = null;
   }
 
   getTemplate() {
     return createEditEventTemplate(this._event);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
