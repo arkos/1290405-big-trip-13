@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import {humanizeDate} from '../util.js';
+import {humanizeDate} from '../utils/event.js';
 import AbstractView from '../view/abstract.js';
 
 const createOffersTemplate = (offers) => {

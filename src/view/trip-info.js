@@ -1,4 +1,4 @@
-import {humanizeDate} from '../util.js';
+import {humanizeDate} from '../utils/event.js';
 import AbstractView from '../view/abstract.js';
 
 const createTripInfoTemplate = ({startDate, finishDate, destinations}) => {

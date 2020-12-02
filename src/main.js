@@ -10,7 +10,8 @@ import NoEventView from './view/no-event.js';
 import {generateEvent} from './mock/event.js';
 import {generateFilter} from './mock/filter.js';
 import {generateSort} from './mock/sort.js';
-import {render, RenderPosition, isEscEvent} from './util.js';
+import {isEscEvent} from './utils/common.js';
+import {render, RenderPosition} from './utils/render.js';
 
 const EVENT_COUNT = 20;
 const generatedEvents = new Array(EVENT_COUNT).fill().map(generateEvent);
