@@ -98,9 +98,7 @@ const renderTripEvent = (tripEventListElement, tripEvent) => {
     });
   };
 
-  tripEventComponent.getElement()
-    .querySelector(`.event__rollup-btn`)
-    .addEventListener(`click`, onClickRollupButtonDown);
+  tripEventComponent.setClickHandler(onClickRollupButtonDown);
 
   tripEventEditComponent.getElement()
     .querySelector(`.event__rollup-btn`)
