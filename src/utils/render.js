@@ -1,3 +1,5 @@
+import Abstract from '../view/abstract.js';
+
 export const RenderPosition = {
   BEFOREBEGIN: `beforebegin`,
   AFTERBEGIN: `afterbegin`,
@@ -5,19 +7,28 @@ export const RenderPosition = {
   AFTEREND: `afterend`
 };
 
-export const render = (container, element, place) => {
+export const render = (container, child, place) => {
+
+  if (container instanceof Abstract) {
+    container = container.getElement();
+  }
+
+  if (child instanceof Abstract) {
+    child = child.getElement();
+  }
+
   switch (place) {
     case RenderPosition.BEFOREBEGIN:
-      container.before(element);
+      container.before(child);
       break;
     case RenderPosition.AFTERBEGIN:
-      container.prepend(element);
+      container.prepend(child);
       break;
     case RenderPosition.BEFOREEND:
-      container.append(element);
+      container.append(child);
       break;
     case RenderPosition.AFTEREND:
-      container.after(element);
+      container.after(child);
       break;
   }
 };
@@ -27,4 +38,22 @@ export const createElement = (template) => {
   newElement.innerHTML = template;
 
   return newElement.firstChild;
+};
+
+export const replace = (newChild, oldChild) => {
+  if (oldChild instanceof Abstract) {
+    oldChild = oldChild.getElement();
+  }
+
+  if (newChild instanceof Abstract) {
+    newChild = newChild.getElement();
+  }
+
+  const parent = oldChild.parentElement;
+
+  if (parent === null || oldChild === null || newChild === null) {
+    throw new Error(`Can't replace empty elements`);
+  }
+
+  parent.replaceChild(newChild, oldChild);
 };
