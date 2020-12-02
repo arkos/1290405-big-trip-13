@@ -102,13 +102,10 @@ const renderTripEvent = (tripEventListElement, tripEvent) => {
 
   tripEventEditComponent.setClickHandler(onClickRollupButtonUp);
 
-  tripEventEditComponent.getElement()
-    .querySelector(`form`)
-    .addEventListener(`submit`, (evt) => {
-      evt.preventDefault();
-      switchToDisplay();
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    });
+  tripEventEditComponent.setFormSubmitHandler(() => {
+    switchToDisplay();
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
 
   render(tripEventListElement, tripEventComponent.getElement(), RenderPosition.AFTERBEGIN);
 };
