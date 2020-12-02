@@ -1,9 +1,9 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import {humanizeDate} from '../util.js';
+import AbstractView from '../view/abstract.js';
 
 dayjs.extend(duration);
-
-import {humanizeDate, createElement} from '../util.js';
 
 const createTripEventOfferTemplate = ({title, price}) => {
   return `<li class="event__offer">
@@ -81,25 +81,13 @@ const createTripEventTemplate = (tripEvent) => {
   </li>`;
 };
 
-export default class TripEvent {
+export default class TripEvent extends AbstractView {
   constructor(event) {
+    super();
     this._event = event;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripEventTemplate(this._event);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
