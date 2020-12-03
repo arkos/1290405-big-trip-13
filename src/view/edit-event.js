@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
-import {humanizeDate, createElement} from '../util.js';
+import {humanizeDate} from '../utils/event.js';
+import AbstractView from '../view/abstract.js';
 
 const createOffersTemplate = (offers) => {
   return offers && (offers.length > 0) ? `<section class="event__section  event__section--offers">
@@ -134,25 +135,42 @@ const createEditEventTemplate = (tripEvent) => {
   </li>`;
 };
 
-export default class EditEvent {
+export default class EditEvent extends AbstractView {
   constructor(event) {
+    super();
     this._event = event;
-    this._element = null;
+
+    this._clickHandler = this._clickHandler.bind(this);
+    this._submitHandler = this._submitHandler.bind(this);
   }
 
   getTemplate() {
     return createEditEventTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _clickHandler(evt) {
+    evt.preventDefault();
+    this._callback.click();
   }
 
-  removeElement() {
-    this._element = null;
+  _submitHandler(evt) {
+    evt.preventDefault();
+    this._callback.submit();
+  }
+
+  setClickHandler(callback) {
+    this._callback.click = callback;
+
+    this.getElement()
+      .querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, this._clickHandler);
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.submit = callback;
+
+    this.getElement()
+      .querySelector(`form`)
+      .addEventListener(`submit`, this._submitHandler);
   }
 }

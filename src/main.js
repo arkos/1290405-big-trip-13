@@ -10,7 +10,8 @@ import NoEventView from './view/no-event.js';
 import {generateEvent} from './mock/event.js';
 import {generateFilter} from './mock/filter.js';
 import {generateSort} from './mock/sort.js';
-import {render, RenderPosition, isEscEvent} from './util.js';
+import {isEscEvent} from './utils/common.js';
+import {render, RenderPosition, replace} from './utils/render.js';
 
 const EVENT_COUNT = 20;
 const generatedEvents = new Array(EVENT_COUNT).fill().map(generateEvent);
@@ -24,13 +25,13 @@ const renderMainPage = (events) => {
   const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
   const tripMenuTitleElement = tripControlsElement.querySelector(`h2`);
 
-  render(tripMenuTitleElement, new MenuView().getElement(), RenderPosition.AFTEREND);
+  render(tripMenuTitleElement, new MenuView(), RenderPosition.AFTEREND);
 
   const filter = generateFilter();
-  render(tripControlsElement, new FilterView(filter).getElement(), RenderPosition.BEFOREEND);
+  render(tripControlsElement, new FilterView(filter), RenderPosition.BEFOREEND);
 
   if (events.length === 0) {
-    render(tripEventsElement, new NoEventView().getElement(), RenderPosition.AFTERBEGIN);
+    render(tripEventsElement, new NoEventView(), RenderPosition.AFTERBEGIN);
     return;
   }
 
@@ -46,7 +47,7 @@ const renderMainPage = (events) => {
     destinations
   };
 
-  render(tripMainElement, new TripInfoView(tripInfo).getElement(), RenderPosition.AFTERBEGIN);
+  render(tripMainElement, new TripInfoView(tripInfo), RenderPosition.AFTERBEGIN);
 
   const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
 
@@ -55,12 +56,12 @@ const renderMainPage = (events) => {
     return event.price + priceForEventOffers + total;
   }, 0);
 
-  render(tripInfoElement, new TripPriceView(totalPriceForEvents).getElement(), RenderPosition.BEFOREEND);
+  render(tripInfoElement, new TripPriceView(totalPriceForEvents), RenderPosition.BEFOREEND);
 
   const sort = generateSort();
-  render(tripEventsElement, new SortView(sort).getElement(), RenderPosition.BEFOREEND);
+  render(tripEventsElement, new SortView(sort), RenderPosition.BEFOREEND);
 
-  render(tripEventsElement, new TripEventListView().getElement(), RenderPosition.BEFOREEND);
+  render(tripEventsElement, new TripEventListView(), RenderPosition.BEFOREEND);
 
   const tripEventsListElement = tripEventsElement.querySelector(`.trip-events__list`);
 
@@ -74,11 +75,11 @@ const renderTripEvent = (tripEventListElement, tripEvent) => {
   const tripEventEditComponent = new EditEventView(tripEvent);
 
   const switchToEdit = () => {
-    tripEventListElement.replaceChild(tripEventEditComponent.getElement(), tripEventComponent.getElement());
+    replace(tripEventEditComponent, tripEventComponent);
   };
 
   const switchToDisplay = () => {
-    tripEventListElement.replaceChild(tripEventComponent.getElement(), tripEventEditComponent.getElement());
+    replace(tripEventComponent, tripEventEditComponent);
   };
 
   const onClickRollupButtonUp = () => {
@@ -98,23 +99,16 @@ const renderTripEvent = (tripEventListElement, tripEvent) => {
     });
   };
 
-  tripEventComponent.getElement()
-    .querySelector(`.event__rollup-btn`)
-    .addEventListener(`click`, onClickRollupButtonDown);
+  tripEventComponent.setClickHandler(onClickRollupButtonDown);
 
-  tripEventEditComponent.getElement()
-    .querySelector(`.event__rollup-btn`)
-    .addEventListener(`click`, onClickRollupButtonUp);
+  tripEventEditComponent.setClickHandler(onClickRollupButtonUp);
 
-  tripEventEditComponent.getElement()
-    .querySelector(`form`)
-    .addEventListener(`submit`, (evt) => {
-      evt.preventDefault();
-      switchToDisplay();
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    });
+  tripEventEditComponent.setFormSubmitHandler(() => {
+    switchToDisplay();
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
 
-  render(tripEventListElement, tripEventComponent.getElement(), RenderPosition.AFTERBEGIN);
+  render(tripEventListElement, tripEventComponent, RenderPosition.AFTERBEGIN);
 };
 
 renderMainPage(generatedEvents);
