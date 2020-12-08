@@ -3,11 +3,9 @@ import NoEventView from '../view/no-event.js';
 import TripInfoView from '../view/trip-info.js';
 import TripPriceView from '../view/trip-price.js';
 import TripEventListView from '../view/trip-event-list.js';
-import TripEventView from '../view/trip-event.js';
-import EditEventView from '../view/edit-event.js';
-import {render, RenderPosition, replace} from '../utils/render.js';
-import {isEscEvent} from '../utils/common.js';
+import {render, RenderPosition} from '../utils/render.js';
 import {generateSort} from '../mock/sort.js';
+import EventPresenter from '../presenter/event.js';
 
 
 export default class Trip {
@@ -34,44 +32,8 @@ export default class Trip {
   }
 
   _renderEvent(tripEvent) {
-    const tripEventComponent = new TripEventView(tripEvent);
-    const tripEventEditComponent = new EditEventView(tripEvent);
-
-    const switchToEdit = () => {
-      replace(tripEventEditComponent, tripEventComponent);
-    };
-
-    const switchToDisplay = () => {
-      replace(tripEventComponent, tripEventEditComponent);
-    };
-
-    const onClickRollupButtonUp = () => {
-      switchToDisplay();
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    };
-
-    const onClickRollupButtonDown = () => {
-      switchToEdit();
-      document.addEventListener(`keydown`, onEscKeyDown);
-    };
-
-    const onEscKeyDown = (evt) => {
-      isEscEvent(evt, () => {
-        switchToDisplay();
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      });
-    };
-
-    tripEventComponent.setClickHandler(onClickRollupButtonDown);
-
-    tripEventEditComponent.setClickHandler(onClickRollupButtonUp);
-
-    tripEventEditComponent.setFormSubmitHandler(() => {
-      switchToDisplay();
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    });
-
-    render(this._eventListComponent, tripEventComponent, RenderPosition.AFTERBEGIN);
+    const eventPresenter = new EventPresenter(this._eventListComponent);
+    eventPresenter.init(tripEvent);
   }
 
   _renderEvents() {
