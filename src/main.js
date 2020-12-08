@@ -37,16 +37,15 @@ const renderTrip = (events) => {
     destinations
   };
 
-  render(tripMainElement, new TripInfoView(tripInfo), RenderPosition.AFTERBEGIN);
-
-  const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
+  const tripInfoComponent = new TripInfoView(tripInfo);
+  render(tripMainElement, tripInfoComponent, RenderPosition.AFTERBEGIN);
 
   const totalPriceForEvents = sortedByDateEvents.reduce((total, event) => {
     const priceForEventOffers = event.offers.reduce((sum, offer) => sum + offer.price, 0);
     return event.price + priceForEventOffers + total;
   }, 0);
 
-  render(tripInfoElement, new TripPriceView(totalPriceForEvents), RenderPosition.BEFOREEND);
+  render(tripInfoComponent, new TripPriceView(totalPriceForEvents), RenderPosition.BEFOREEND);
 
   const sort = generateSort();
   render(tripEventsElement, new SortView(sort), RenderPosition.BEFOREEND);
