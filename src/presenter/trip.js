@@ -1,5 +1,3 @@
-import MenuView from '../view/menu.js';
-import FilterView from './view/filter.js';
 import SortView from './view/sort.js';
 import NoEventView from './view/no-event.js';
 import TripInfoView from './view/trip-info.js';
@@ -12,10 +10,10 @@ import {isEscEvent} from './utils/common.js';
 
 
 export default class Trip {
-  constructor() {
+  constructor(tripContainer, eventContainer) {
+    this._tripContainer = tripContainer;
+    this._eventContainer = eventContainer;
 
-    this._menuComponent = new MenuView();
-    this._filterComponent = new FilterView();
     this._sortComponent = new SortView();
     this._noEventComponent = new NoEventView();
     this._tripInfoComponent = new TripInfoView();
@@ -27,14 +25,6 @@ export default class Trip {
     this._tripEvents = tripEvents;
 
     this._renderTrip();
-  }
-
-  _renderMenu() {
-
-  }
-
-  _renderFilter() {
-
   }
 
   _renderSort() {
@@ -99,10 +89,6 @@ export default class Trip {
   }
 
   _renderTrip() {
-
-    this._renderMenu();
-    this._renderFilter();
-
     if (this._tripEvents.length === 0) {
       this._renderNoEvents();
       return;
