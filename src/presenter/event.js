@@ -8,6 +8,11 @@ export default class Event {
     this._eventListContainer = eventListContainer;
     this._tripEventComponent = null;
     this._tripEventEditComponent = null;
+
+    this._handleClickRollupButtonUp = this._handleClickRollupButtonUp.bind(this);
+    this._handleClickRollupButtonDown = this._handleClickRollupButtonDown.bind(this);
+    this._handleEscKeyDown = this._handleEscKeyDown.bind(this);
+    this._handleFormSubmit = this._handleFormSubmit.bind(this);
   }
 
   init(tripEvent) {
@@ -16,40 +21,36 @@ export default class Event {
     this._tripEventComponent = new TripEventView(tripEvent);
     this._tripEventEditComponent = new EditEventView(tripEvent);
 
-    const switchToEdit = () => {
-      replace(this._tripEventEditComponent, this._tripEventComponent);
-    };
-
-    const switchToDisplay = () => {
-      replace(this._tripEventComponent, this._tripEventEditComponent);
-    };
-
-    const onClickRollupButtonUp = () => {
-      switchToDisplay();
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    };
-
-    const onClickRollupButtonDown = () => {
-      switchToEdit();
-      document.addEventListener(`keydown`, onEscKeyDown);
-    };
-
-    const onEscKeyDown = (evt) => {
-      isEscEvent(evt, () => {
-        switchToDisplay();
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      });
-    };
-
-    this._tripEventComponent.setClickHandler(onClickRollupButtonDown);
-
-    this._tripEventEditComponent.setClickHandler(onClickRollupButtonUp);
-
-    this._tripEventEditComponent.setFormSubmitHandler(() => {
-      switchToDisplay();
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    });
+    this._tripEventComponent.setClickHandler(this._handleClickRollupButtonDown);
+    this._tripEventEditComponent.setClickHandler(this._handleClickRollupButtonUp);
+    this._tripEventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
 
     render(this._eventListContainer, this._tripEventComponent, RenderPosition.AFTERBEGIN);
+  }
+
+  _handleClickRollupButtonUp() {
+    this._switchToDisplay();
+  }
+
+  _handleClickRollupButtonDown() {
+    this._switchToEdit();
+  }
+
+  _handleEscKeyDown(evt) {
+    isEscEvent(evt, this._switchToDisplay);
+  }
+
+  _handleFormSubmit() {
+    this._switchToDisplay();
+  }
+
+  _switchToEdit() {
+    replace(this._tripEventEditComponent, this._tripEventComponent);
+    document.addEventListener(`keydown`, this._handleEscKeyDown);
+  }
+
+  _switchToDisplay() {
+    replace(this._tripEventComponent, this._tripEventEditComponent);
+    document.removeEventListener(`keydown`, this._handleEscKeyDown);
   }
 }
