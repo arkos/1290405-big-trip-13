@@ -80,7 +80,7 @@ export default class Trip {
   }
 
   _renderEventList() {
-
+    this._renderEvents();
   }
 
   _renderNoEvents() {
@@ -118,7 +118,6 @@ export default class Trip {
     this._renderTripInfo();
     this._renderTripPrice();
     this._renderSort();
-    this._renderEventList();
-    this._renderEvents();
+    this._renderEventList(); // TODO: Probably obsolete, need to decide later
   }
 }
