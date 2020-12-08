@@ -1,13 +1,13 @@
-import SortView from './view/sort.js';
-import NoEventView from './view/no-event.js';
-import TripInfoView from './view/trip-info.js';
-import TripPriceView from './view/trip-price.js';
-import TripEventListView from './view/trip-event-list.js';
-import TripEventView from './view/trip-event.js';
-import EditEventView from './view/edit-event.js';
-import {render, RenderPosition, replace} from './utils/render.js';
-import {isEscEvent} from './utils/common.js';
-import {generateSort} from './mock/sort.js';
+import SortView from '../view/sort.js';
+import NoEventView from '../view/no-event.js';
+import TripInfoView from '../view/trip-info.js';
+import TripPriceView from '../view/trip-price.js';
+import TripEventListView from '../view/trip-event-list.js';
+import TripEventView from '../view/trip-event.js';
+import EditEventView from '../view/edit-event.js';
+import {render, RenderPosition, replace} from '../utils/render.js';
+import {isEscEvent} from '../utils/common.js';
+import {generateSort} from '../mock/sort.js';
 
 
 export default class Trip {
@@ -19,7 +19,6 @@ export default class Trip {
     this._sortComponent = new SortView(sort);
 
     this._noEventComponent = new NoEventView();
-    this._tripInfoComponent = new TripInfoView();
     this._tripPriceComponent = new TripPriceView();
     this._eventListComponent = new TripEventListView();
   }
@@ -99,7 +98,8 @@ export default class Trip {
       destinations
     };
 
-    render(this._tripContainer, new TripInfoView(tripInfo), RenderPosition.AFTERBEGIN);
+    this._tripInfoComponent = new TripInfoView(tripInfo); // TODO: Need to enable to replace the component on update
+    render(this._tripContainer, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
   }
 
   _renderTripPrice() {
