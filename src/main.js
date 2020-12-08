@@ -51,12 +51,11 @@ const renderTrip = (events) => {
   const sort = generateSort();
   render(tripEventsElement, new SortView(sort), RenderPosition.BEFOREEND);
 
-  render(tripEventsElement, new TripEventListView(), RenderPosition.BEFOREEND);
-
-  const tripEventsListElement = tripEventsElement.querySelector(`.trip-events__list`);
+  const tripEventListComponent = new TripEventListView();
+  render(tripEventsElement, tripEventListComponent, RenderPosition.BEFOREEND);
 
   sortedByDateEvents.forEach((tripEvent) =>
-    renderTripEvent(tripEventsListElement, tripEvent));
+    renderTripEvent(tripEventListComponent, tripEvent));
 };
 
 
