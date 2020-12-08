@@ -16,20 +16,10 @@ import {render, RenderPosition, replace} from './utils/render.js';
 const EVENT_COUNT = 20;
 const generatedEvents = new Array(EVENT_COUNT).fill().map(generateEvent);
 
-const renderMainPage = (events) => {
+const tripMainElement = document.querySelector(`.trip-main`);
+const tripEventsElement = document.querySelector(`.trip-events`);
 
-  const tripMainElement = document.querySelector(`.trip-main`);
-
-  const tripEventsElement = document.querySelector(`.trip-events`);
-
-  const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
-  const tripMenuTitleElement = tripControlsElement.querySelector(`h2`);
-
-  render(tripMenuTitleElement, new MenuView(), RenderPosition.AFTEREND);
-
-  const filter = generateFilter();
-  render(tripControlsElement, new FilterView(filter), RenderPosition.BEFOREEND);
-
+const renderTrip = (events) => {
   if (events.length === 0) {
     render(tripEventsElement, new NoEventView(), RenderPosition.AFTERBEGIN);
     return;
@@ -111,4 +101,11 @@ const renderTripEvent = (tripEventListElement, tripEvent) => {
   render(tripEventListElement, tripEventComponent, RenderPosition.AFTERBEGIN);
 };
 
-renderMainPage(generatedEvents);
+// Site Menu rendering
+const filter = generateFilter();
+const siteMenuTitleElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
+const siteMenuElements = [new MenuView(), new FilterView(filter)];
+siteMenuElements.forEach((element, index) => render(siteMenuTitleElements[index], element, RenderPosition.AFTEREND));
+
+// Trip rendering
+renderTrip(generatedEvents);
