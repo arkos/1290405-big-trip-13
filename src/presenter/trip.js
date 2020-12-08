@@ -7,6 +7,7 @@ import TripEventView from './view/trip-event.js';
 import EditEventView from './view/edit-event.js';
 import {render, RenderPosition, replace} from './utils/render.js';
 import {isEscEvent} from './utils/common.js';
+import {generateSort} from './mock/sort.js';
 
 
 export default class Trip {
@@ -14,7 +15,9 @@ export default class Trip {
     this._tripContainer = tripContainer;
     this._eventContainer = eventContainer;
 
-    this._sortComponent = new SortView();
+    const sort = generateSort(); // TODO: Replace mock data with real data
+    this._sortComponent = new SortView(sort);
+
     this._noEventComponent = new NoEventView();
     this._tripInfoComponent = new TripInfoView();
     this._tripPriceComponent = new TripPriceView();
@@ -28,7 +31,7 @@ export default class Trip {
   }
 
   _renderSort() {
-
+    render(this._eventContainer, this._sortComponent, RenderPosition.BEFOREEND);
   }
 
   _renderEvent(tripEvent) {
@@ -69,10 +72,14 @@ export default class Trip {
       document.removeEventListener(`keydown`, onEscKeyDown);
     });
 
-    render(tripEventListElement, tripEventComponent, RenderPosition.AFTERBEGIN);
+    render(this._eventListComponent, tripEventComponent, RenderPosition.AFTERBEGIN);
   }
 
   _renderEvents() {
+
+  }
+
+  _renderEventList() {
 
   }
 
@@ -81,7 +88,16 @@ export default class Trip {
   }
 
   _renderTripInfo() {
+    const destinations = [];
+    this._tripEvents.forEach((evt) => destinations.push(evt.destination));
 
+    const tripInfo = {
+      startDate: this._tripEvents[0].startDate,
+      finishDate: this._tripEvents[this._tripEvents.length - 1].finishDate,
+      destinations
+    };
+
+    render(this._tripContainer, new TripInfoView(tripInfo), RenderPosition.AFTERBEGIN);
   }
 
   _renderTripPrice() {
@@ -97,7 +113,7 @@ export default class Trip {
     this._renderTripInfo();
     this._renderTripPrice();
     this._renderSort();
+    this._renderEventList();
     this._renderEvents();
-
   }
 }
