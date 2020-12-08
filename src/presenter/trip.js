@@ -101,7 +101,12 @@ export default class Trip {
   }
 
   _renderTripPrice() {
+    const totalPriceForEvents = this._tripEvents.reduce((total, event) => {
+      const priceForEventOffers = event.offers.reduce((sum, offer) => sum + offer.price, 0);
+      return event.price + priceForEventOffers + total;
+    }, 0);
 
+    render(this._tripInfoComponent, new TripPriceView(totalPriceForEvents), RenderPosition.BEFOREEND);
   }
 
   _renderTrip() {
