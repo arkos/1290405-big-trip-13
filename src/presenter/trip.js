@@ -5,6 +5,7 @@ import NoEventView from './view/no-event.js';
 import TripInfoView from './view/trip-info.js';
 import TripPriceView from './view/trip-price.js';
 import TripEventListView from './view/trip-event-list.js';
+import {render, RenderPosition, replace} from './utils/render.js';
 
 
 export default class Trip {
@@ -21,6 +22,8 @@ export default class Trip {
 
   init(tripEvents) {
     this._tripEvents = tripEvents;
+
+    this._renderTrip();
   }
 
   _renderMenu() {
@@ -56,6 +59,19 @@ export default class Trip {
   }
 
   _renderTrip() {
+
+    this._renderMenu();
+    this._renderFilter();
+
+    if (this._tripEvents.length === 0) {
+      this._renderNoEvents();
+      return;
+    }
+
+    this._renderTripInfo();
+    this._renderTripPrice();
+    this._renderSort();
+    this._renderEvents();
 
   }
 }
