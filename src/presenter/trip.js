@@ -76,7 +76,9 @@ export default class Trip {
   }
 
   _renderEvents() {
+    render(this._eventContainer, this._eventListComponent, RenderPosition.BEFOREEND);
 
+    this._tripEvents.forEach((tripEvent) => this._renderEvent(tripEvent));
   }
 
   _renderEventList() {
@@ -84,7 +86,7 @@ export default class Trip {
   }
 
   _renderNoEvents() {
-
+    render(this._eventContainer, new NoEventView(), RenderPosition.AFTERBEGIN);
   }
 
   _renderTripInfo() {
