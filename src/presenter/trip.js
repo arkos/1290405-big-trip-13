@@ -85,7 +85,19 @@ export default class Trip {
       return event.price + priceForEventOffers + total;
     }, 0);
 
-    render(this._tripInfoComponent, new TripPriceView(totalPriceForEvents), RenderPosition.BEFOREEND);
+    const prevTripPriceComponent = this._tripPriceComponent;
+    this._tripPriceComponent = new TripPriceView(totalPriceForEvents);
+
+    if (prevTripPriceComponent === null) {
+      render(this._tripInfoComponent, this._tripPriceComponent, RenderPosition.BEFOREEND);
+      return;
+    }
+
+    if (this._tripInfoComponent.getElement().contains(prevTripPriceComponent.getElement())) {
+      replace(this._tripPriceComponent, prevTripPriceComponent);
+    }
+
+    remove(prevTripPriceComponent);
   }
 
   _clearEventList() {
