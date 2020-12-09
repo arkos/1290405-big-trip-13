@@ -18,6 +18,9 @@ export default class Event {
   init(tripEvent) {
     this._tripEvent = tripEvent;
 
+    const prevEventComponent = this._tripEventComponent;
+    const prevEventEditComponent = this._tripEventEditComponent;
+
     this._tripEventComponent = new TripEventView(tripEvent);
     this._tripEventEditComponent = new EditEventView(tripEvent);
 
@@ -25,7 +28,21 @@ export default class Event {
     this._tripEventEditComponent.setClickHandler(this._handleClickRollupButtonUp);
     this._tripEventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
 
-    render(this._eventListContainer, this._tripEventComponent, RenderPosition.AFTERBEGIN);
+    if ((prevEventComponent === null) || (prevEventEditComponent === null)) {
+      render(this._eventListContainer, this._tripEventComponent, RenderPosition.AFTERBEGIN);
+      return;
+    }
+
+    if (this._eventListContainer.getElement().contains((prevEventComponent.getElement()))) {
+      replace(this._tripEventComponent, prevEventComponent);
+    }
+
+    if (this._eventListContainer.getElement().contains(prevEventEditComponent.getElement())) {
+      replace(this._tripEventEditComponent, prevEventEditComponent);
+    }
+
+    remove(prevEventComponent);
+    remove(prevEventEditComponent);
   }
 
   _handleClickRollupButtonUp() {
