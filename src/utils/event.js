@@ -27,3 +27,16 @@ export const getTripInfo = (tripEvents) => {
     destinations: getDestinationsForTrip(tripEvents)
   };
 };
+
+export const getTripPrice = (tripEvents) => {
+  if (!tripEvents || tripEvents.length === 0) {
+    return 0;
+  }
+
+  const totalPriceForEvents = tripEvents.reduce((total, event) => {
+    const priceForEventOffers = event.offers.reduce((sum, offer) => sum + offer.price, 0);
+    return event.price + priceForEventOffers + total;
+  }, 0);
+
+  return totalPriceForEvents;
+};
