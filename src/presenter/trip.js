@@ -12,6 +12,7 @@ export default class Trip {
   constructor(tripContainer, eventContainer) {
     this._tripContainer = tripContainer;
     this._eventContainer = eventContainer;
+    this._eventPresenterMap = new Map();
 
     const sort = generateSort(); // TODO: Replace mock data with real data
     this._sortComponent = new SortView(sort);
@@ -34,6 +35,7 @@ export default class Trip {
   _renderEvent(tripEvent) {
     const eventPresenter = new EventPresenter(this._eventListComponent);
     eventPresenter.init(tripEvent);
+    this._eventPresenterMap.set(tripEvent.id, eventPresenter);
   }
 
   _renderEvents() {
@@ -71,6 +73,11 @@ export default class Trip {
     }, 0);
 
     render(this._tripInfoComponent, new TripPriceView(totalPriceForEvents), RenderPosition.BEFOREEND);
+  }
+
+  _clearEventList() {
+    this._eventPresenterMap.forEach((presenter) => presenter.destroy());
+    this._eventPresenterMap.clear();
   }
 
   _renderTrip() {
