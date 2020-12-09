@@ -5,7 +5,7 @@ import TripPriceView from '../view/trip-price.js';
 import TripEventListView from '../view/trip-event-list.js';
 import {remove, render, RenderPosition, replace} from '../utils/render.js';
 import {generateSort} from '../mock/sort.js';
-import {getTripInfo} from '../utils/event.js';
+import {getTripInfo, getTripPrice} from '../utils/event.js';
 import {updateItem} from '../utils/common.js';
 import EventPresenter from '../presenter/event.js';
 
@@ -77,10 +77,7 @@ export default class Trip {
   }
 
   _renderTripPrice() {
-    const totalPriceForEvents = this._tripEvents.reduce((total, event) => {
-      const priceForEventOffers = event.offers.reduce((sum, offer) => sum + offer.price, 0);
-      return event.price + priceForEventOffers + total;
-    }, 0);
+    const totalPriceForEvents = getTripPrice(this._tripEvents);
 
     const prevTripPriceComponent = this._tripPriceComponent;
     this._tripPriceComponent = new TripPriceView(totalPriceForEvents);
