@@ -60,7 +60,8 @@ export default class Event {
     isEscEvent(evt, () => this._switchToDisplay());
   }
 
-  _handleFormSubmit() {
+  _handleFormSubmit(tripEvent) {
+    this._changeData(tripEvent);
     this._switchToDisplay();
   }
 
