@@ -26,6 +26,7 @@ export default class Trip {
     this._eventListComponent = new TripEventListView();
 
     this._handleEventChange = this._handleEventChange.bind(this);
+    this._handleModeChange = this._handleModeChange.bind(this);
   }
 
   init(tripEvents) {
@@ -39,7 +40,7 @@ export default class Trip {
   }
 
   _renderEvent(tripEvent) {
-    const eventPresenter = new EventPresenter(this._eventListComponent, this._handleEventChange);
+    const eventPresenter = new EventPresenter(this._eventListComponent, this._handleEventChange, this._handleModeChange);
     eventPresenter.init(tripEvent);
     this._eventPresenterMap.set(tripEvent.id, eventPresenter);
   }
@@ -105,6 +106,10 @@ export default class Trip {
 
     this._renderTripInfo();
     this._renderTripPrice();
+  }
+
+  _handleModeChange() {
+    this._eventPresenterMap.forEach((presenter) => presenter.resetView());
   }
 
   _renderTrip() {

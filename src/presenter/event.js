@@ -3,12 +3,19 @@ import EditEventView from '../view/edit-event.js';
 import {isEscEvent} from '../utils/common.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 
+const Mode = {
+  DEFAULT: `DEFAULT`,
+  EDITING: `EDITING`
+};
+
 export default class Event {
-  constructor(eventListContainer, changeData) {
+  constructor(eventListContainer, changeData, changeMode) {
     this._eventListContainer = eventListContainer;
     this._tripEventComponent = null;
     this._tripEventEditComponent = null;
     this._changeData = changeData;
+    this._changeMode = changeMode;
+    this._mode = Mode.DEFAULT;
 
     this._handleClickRollupButtonUp = this._handleClickRollupButtonUp.bind(this);
     this._handleClickRollupButtonDown = this._handleClickRollupButtonDown.bind(this);
@@ -36,11 +43,11 @@ export default class Event {
       return;
     }
 
-    if (this._eventListContainer.getElement().contains((prevEventComponent.getElement()))) {
+    if (this._mode === Mode.DEFAULT) {
       replace(this._tripEventComponent, prevEventComponent);
     }
 
-    if (this._eventListContainer.getElement().contains(prevEventEditComponent.getElement())) {
+    if (this._mode === Mode.EDITING) {
       replace(this._tripEventEditComponent, prevEventEditComponent);
     }
 
@@ -72,11 +79,20 @@ export default class Event {
   _switchToEdit() {
     replace(this._tripEventEditComponent, this._tripEventComponent);
     document.addEventListener(`keydown`, this._handleEscKeyDown);
+    this._changeMode();
+    this._mode = Mode.EDITING;
   }
 
   _switchToDisplay() {
     replace(this._tripEventComponent, this._tripEventEditComponent);
     document.removeEventListener(`keydown`, this._handleEscKeyDown);
+    this._mode = Mode.DEFAULT;
+  }
+
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._switchToDisplay();
+    }
   }
 
   destroy() {
