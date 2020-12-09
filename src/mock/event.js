@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import {nanoid} from 'nanoid';
 import {getRandomInteger, getRandomItems} from '../utils/common.js';
 
 const generateType = () => {
@@ -106,6 +107,7 @@ export const generateEvent = () => {
   const finishDate = dayjs(startDate).add(Math.abs(randomOffsetDays), `d`).add(Math.abs(randomOffsetHours), `h`).add(Math.abs(randomOffsetMinutes), `m`);
 
   return {
+    id: nanoid(),
     type,
     startDate,
     finishDate,
