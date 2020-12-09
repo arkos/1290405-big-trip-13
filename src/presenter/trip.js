@@ -51,10 +51,6 @@ export default class Trip {
     this._tripEvents.forEach((tripEvent) => this._renderEvent(tripEvent));
   }
 
-  _renderEventList() {
-    this._renderEvents();
-  }
-
   _renderNoEvents() {
     render(this._eventContainer, new NoEventView(), RenderPosition.AFTERBEGIN);
   }
@@ -118,6 +114,6 @@ export default class Trip {
     this._renderTripInfo();
     this._renderTripPrice();
     this._renderSort();
-    this._renderEventList(); // TODO: Probably obsolete, need to decide later
+    this._renderEvents();
   }
 }
