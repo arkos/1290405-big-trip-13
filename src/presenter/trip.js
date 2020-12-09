@@ -6,6 +6,7 @@ import TripEventListView from '../view/trip-event-list.js';
 import {remove, render, RenderPosition, replace} from '../utils/render.js';
 import {generateSort} from '../mock/sort.js';
 import {getTripInfo} from '../utils/event.js';
+import {updateItem} from '../utils/common.js';
 import EventPresenter from '../presenter/event.js';
 
 
@@ -97,6 +98,14 @@ export default class Trip {
   _clearEventList() {
     this._eventPresenterMap.forEach((presenter) => presenter.destroy());
     this._eventPresenterMap.clear();
+  }
+
+  _handleEventChange(updatedEvent) {
+    this._tripEvents = updateItem(this._tripEvents, updatedEvent);
+    this._eventPresenterMap.get(updatedEvent.id).init(updatedEvent);
+
+    this._renderTripInfo();
+    this._renderTripPrice();
   }
 
   _renderTrip() {
