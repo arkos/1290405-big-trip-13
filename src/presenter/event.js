@@ -1,7 +1,7 @@
 import TripEventView from '../view/trip-event.js';
 import EditEventView from '../view/edit-event.js';
 import {isEscEvent} from '../utils/common.js';
-import {render, RenderPosition, replace} from '../utils/render.js';
+import {render, RenderPosition, replace, remove} from '../utils/render.js';
 
 export default class Event {
   constructor(eventListContainer) {
@@ -52,5 +52,10 @@ export default class Event {
   _switchToDisplay() {
     replace(this._tripEventComponent, this._tripEventEditComponent);
     document.removeEventListener(`keydown`, this._handleEscKeyDown);
+  }
+
+  destroy() {
+    remove(this._tripEventComponent);
+    remove(this._tripEventEditComponent);
   }
 }
