@@ -1,16 +1,15 @@
 import AbstractView from '../view/abstract.js';
 
 const createSortItemsTemplate = (sortItems) => {
-  return sortItems.map(([sortName, sortText], index) => `<div class="trip-sort__item  trip-sort__item--${sortName}">
-  <input id="sort-${sortName}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort"
-    value="sort-${sortName}" ${index === 0 ? `checked` : ``} ${sortName === `event` || sortName === `offer` ? `disabled` : ``}>
-  <label class="trip-sort__btn" for="sort-${sortName}">${sortText}</label>
+  return Array.from(sortItems).map(([sortItemKey, sortItemValue]) => `<div class="trip-sort__item  trip-sort__item--${sortItemKey}">
+  <input id="sort-${sortItemKey}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort"
+    value="sort-${sortItemKey}" ${sortItemValue.checked ? `checked` : ``} ${sortItemValue.disabled ? `disabled` : ``}>
+  <label class="trip-sort__btn" for="sort-${sortItemKey}">${sortItemValue.text}</label>
 </div>`).join(``);
 };
 
 
-const createSortTemplate = (sort) => {
-  const sortItems = Object.entries(sort);
+const createSortTemplate = (sortItems) => {
   const sortItemsTemplate = createSortItemsTemplate(sortItems);
 
   return `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
