@@ -24,6 +24,8 @@ export default class Trip {
 
     this._noEventComponent = new NoEventView();
     this._eventListComponent = new TripEventListView();
+
+    this._handleEventChange = this._handleEventChange.bind(this);
   }
 
   init(tripEvents) {
@@ -37,7 +39,7 @@ export default class Trip {
   }
 
   _renderEvent(tripEvent) {
-    const eventPresenter = new EventPresenter(this._eventListComponent);
+    const eventPresenter = new EventPresenter(this._eventListComponent, this._handleEventChange);
     eventPresenter.init(tripEvent);
     this._eventPresenterMap.set(tripEvent.id, eventPresenter);
   }
