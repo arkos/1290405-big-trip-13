@@ -54,7 +54,7 @@ export default class Event {
   }
 
   _handleEscKeyDown(evt) {
-    isEscEvent(evt, this._switchToDisplay);
+    isEscEvent(evt, () => this._switchToDisplay());
   }
 
   _handleFormSubmit() {
