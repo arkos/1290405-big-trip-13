@@ -3,7 +3,7 @@ import NoEventView from '../view/no-event.js';
 import TripInfoView from '../view/trip-info.js';
 import TripPriceView from '../view/trip-price.js';
 import TripEventListView from '../view/trip-event-list.js';
-import {render, RenderPosition} from '../utils/render.js';
+import {remove, render, RenderPosition, replace} from '../utils/render.js';
 import {generateSort} from '../mock/sort.js';
 import EventPresenter from '../presenter/event.js';
 
@@ -17,8 +17,10 @@ export default class Trip {
     const sort = generateSort(); // TODO: Replace mock data with real data
     this._sortComponent = new SortView(sort);
 
+    this._tripPriceComponent = null;
+    this._tripInfoComponent = null;
+
     this._noEventComponent = new NoEventView();
-    this._tripPriceComponent = new TripPriceView();
     this._eventListComponent = new TripEventListView();
   }
 
@@ -62,8 +64,19 @@ export default class Trip {
       destinations
     };
 
-    this._tripInfoComponent = new TripInfoView(tripInfo); // TODO: Need to enable to replace the component on update
-    render(this._tripContainer, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
+    const prevTripInfoComponent = this._tripInfoComponent;
+    this._tripInfoComponent = new TripInfoView(tripInfo);
+
+    if (prevTripInfoComponent === null) {
+      render(this._tripContainer, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
+      return;
+    }
+
+    if (this._tripContainer.contains(prevTripInfoComponent.getElement())) {
+      replace(this._tripInfoComponent, prevTripInfoComponent);
+    }
+
+    remove(prevTripInfoComponent);
   }
 
   _renderTripPrice() {
