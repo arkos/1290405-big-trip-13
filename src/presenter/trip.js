@@ -5,6 +5,7 @@ import TripPriceView from '../view/trip-price.js';
 import TripEventListView from '../view/trip-event-list.js';
 import {remove, render, RenderPosition, replace} from '../utils/render.js';
 import {generateSort} from '../mock/sort.js';
+import {getDestinationsForTrip} from '../utils/event.js';
 import EventPresenter from '../presenter/event.js';
 
 
@@ -55,8 +56,7 @@ export default class Trip {
   }
 
   _renderTripInfo() {
-    const destinations = [];
-    this._tripEvents.forEach((evt) => destinations.push(evt.destination));
+    const destinations = getDestinationsForTrip(this._tripEvents);
 
     const tripInfo = {
       startDate: this._tripEvents[0].startDate,
