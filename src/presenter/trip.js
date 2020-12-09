@@ -27,7 +27,7 @@ export default class Trip {
   }
 
   init(tripEvents) {
-    this._tripEvents = tripEvents;
+    this._tripEvents = tripEvents.slice();
 
     this._renderTrip();
   }
