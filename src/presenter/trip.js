@@ -70,6 +70,7 @@ export default class Trip {
     }
 
     if (this._tripContainer.contains(prevTripInfoComponent.getElement())) {
+      render(this._tripInfoComponent, this._tripPriceComponent, RenderPosition.BEFOREEND);
       replace(this._tripInfoComponent, prevTripInfoComponent);
     }
 
@@ -90,9 +91,11 @@ export default class Trip {
       return;
     }
 
-    if (this._tripInfoComponent.getElement().contains(prevTripPriceComponent.getElement())) {
-      replace(this._tripPriceComponent, prevTripPriceComponent);
-    }
+    // if (this._tripInfoComponent.getElement().contains(prevTripPriceComponent.getElement())) {
+    //   replace(this._tripPriceComponent, prevTripPriceComponent);
+    // }
+
+    replace(this._tripPriceComponent, prevTripPriceComponent);
 
     remove(prevTripPriceComponent);
   }
