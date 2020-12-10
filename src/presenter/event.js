@@ -39,7 +39,7 @@ export default class Event {
     this._tripEventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
 
     if ((prevEventComponent === null) || (prevEventEditComponent === null)) {
-      render(this._eventListContainer, this._tripEventComponent, RenderPosition.AFTERBEGIN);
+      render(this._eventListContainer, this._tripEventComponent, RenderPosition.BEFOREEND);
       return;
     }
 
