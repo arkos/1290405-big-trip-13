@@ -21,10 +21,12 @@ export const getTripInfo = (tripEvents) => {
     return null;
   }
 
+  const eventsByDateAsc = tripEvents.slice().sort(sortEventDateAsc);
+
   return {
-    startDate: tripEvents[0].startDate,
-    finishDate: tripEvents[tripEvents.length - 1].finishDate,
-    destinations: getDestinationsForTrip(tripEvents)
+    startDate: eventsByDateAsc[0].startDate,
+    finishDate: eventsByDateAsc[eventsByDateAsc.length - 1].finishDate,
+    destinations: getDestinationsForTrip(eventsByDateAsc)
   };
 };
 
@@ -39,4 +41,12 @@ export const getTripPrice = (tripEvents) => {
   }, 0);
 
   return totalPriceForEvents;
+};
+
+export const sortEventDateAsc = (lhsEvent, rhsEvent) => {
+  return dayjs(lhsEvent.startDate).diff(dayjs(rhsEvent.startDate));
+};
+
+export const sortEventDateDesc = (lhsEvent, rhsEvent) => {
+  return dayjs(rhsEvent.startDate).diff(dayjs(lhsEvent.startDate));
 };
