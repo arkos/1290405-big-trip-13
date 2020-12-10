@@ -5,7 +5,7 @@ import TripPriceView from '../view/trip-price.js';
 import TripEventListView from '../view/trip-event-list.js';
 import {remove, render, RenderPosition, replace} from '../utils/render.js';
 import {generateSort} from '../mock/sort.js';
-import {getTripInfo, getTripPrice, sortEventDateDesc} from '../utils/event.js';
+import {getTripInfo, getTripPrice, sortEventDateAsc} from '../utils/event.js';
 import {SortType} from '../utils/const.js';
 import {updateItem} from '../utils/common.js';
 import EventPresenter from '../presenter/event.js';
@@ -106,7 +106,7 @@ export default class Trip {
       case SortType.TIME:
       case SortType.PRICE:
       case SortType.OFFER:
-        this._tripEvents.sort(sortEventDateDesc);
+        this._tripEvents.sort(sortEventDateAsc);
         break;
       default:
         throw new Error(`Invalid sort type ${this._currentSortType}`);
