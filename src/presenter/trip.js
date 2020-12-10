@@ -5,7 +5,8 @@ import TripPriceView from '../view/trip-price.js';
 import TripEventListView from '../view/trip-event-list.js';
 import {remove, render, RenderPosition, replace} from '../utils/render.js';
 import {generateSort} from '../mock/sort.js';
-import {getTripInfo, getTripPrice} from '../utils/event.js';
+import {getTripInfo, getTripPrice, sortEventDateDesc} from '../utils/event.js';
+import {SortType} from '../utils/const.js';
 import {updateItem} from '../utils/common.js';
 import EventPresenter from '../presenter/event.js';
 
@@ -16,8 +17,9 @@ export default class Trip {
     this._eventContainer = eventContainer;
     this._eventPresenterMap = new Map();
 
-    const sort = generateSort(); // TODO: Replace mock data with real data
+    const sort = generateSort();
     this._sortComponent = new SortView(sort);
+    this._currentSortType = SortType.DAY;
 
     this._tripPriceComponent = null;
     this._tripInfoComponent = null;
@@ -27,16 +29,19 @@ export default class Trip {
 
     this._handleEventChange = this._handleEventChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init(tripEvents) {
     this._tripEvents = tripEvents.slice();
+    this._sortEvents();
 
     this._renderTrip();
   }
 
   _renderSort() {
     render(this._eventContainer, this._sortComponent, RenderPosition.BEFOREEND);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderEvent(tripEvent) {
@@ -93,6 +98,21 @@ export default class Trip {
     this._eventPresenterMap.clear();
   }
 
+  _sortEvents() {
+    // TODO: Implement other sort types
+    switch (this._currentSortType) {
+      case SortType.DAY:
+      case SortType.EVENT:
+      case SortType.TIME:
+      case SortType.PRICE:
+      case SortType.OFFER:
+        this._tripEvents.sort(sortEventDateDesc);
+        break;
+      default:
+        throw new Error(`Invalid sort type ${this._currentSortType}`);
+    }
+  }
+
   _handleEventChange(updatedEvent) {
     this._tripEvents = updateItem(this._tripEvents, updatedEvent);
     this._eventPresenterMap.get(updatedEvent.id).init(updatedEvent);
@@ -103,6 +123,17 @@ export default class Trip {
 
   _handleModeChange() {
     this._eventPresenterMap.forEach((presenter) => presenter.resetView());
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._currentSortType = sortType;
+    this._sortEvents();
+    this._clearEventList();
+    this._renderEvents();
   }
 
   _renderTrip() {
