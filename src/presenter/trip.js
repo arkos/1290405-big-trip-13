@@ -102,10 +102,8 @@ export default class Trip {
     // TODO: Implement other sort types
     switch (this._currentSortType) {
       case SortType.DAY:
-      case SortType.EVENT:
       case SortType.TIME:
       case SortType.PRICE:
-      case SortType.OFFER:
         this._tripEvents.sort(sortEventDateAsc);
         break;
       default:
