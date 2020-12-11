@@ -57,7 +57,7 @@ export default class Trip {
   }
 
   _renderNoEvents() {
-    render(this._eventContainer, new NoEventView(), RenderPosition.AFTERBEGIN);
+    render(this._eventContainer, this._noEventComponent, RenderPosition.AFTERBEGIN);
   }
 
   _renderTripInfo() {
