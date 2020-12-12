@@ -1,4 +1,7 @@
 import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(duration);
 
 export const humanizeDate = (date, formatter = `YYYY-MM-DD`) => {
   return dayjs(date).format(formatter);
@@ -49,4 +52,15 @@ export const sortEventDateAsc = (lhsEvent, rhsEvent) => {
 
 export const sortEventDateDesc = (lhsEvent, rhsEvent) => {
   return dayjs(rhsEvent.startDate).diff(dayjs(lhsEvent.startDate));
+};
+
+export const sortEventPriceDesc = (lhsEvent, rhsEvent) => {
+  return rhsEvent.price - lhsEvent.price;
+};
+
+export const sortEventDurationDesc = (lhsEvent, rhsEvent) => {
+  const lhsDurationMs = dayjs.duration(dayjs(lhsEvent.finishDate).diff(dayjs(lhsEvent.startDate))).asMilliseconds();
+  const rhsDurationMs = dayjs.duration(dayjs(rhsEvent.finishDate).diff(dayjs(rhsEvent.startDate))).asMilliseconds();
+
+  return rhsDurationMs - lhsDurationMs;
 };
