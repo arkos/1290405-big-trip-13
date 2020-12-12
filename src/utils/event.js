@@ -50,10 +50,6 @@ export const sortEventDateAsc = (lhsEvent, rhsEvent) => {
   return dayjs(lhsEvent.startDate).diff(dayjs(rhsEvent.startDate));
 };
 
-export const sortEventDateDesc = (lhsEvent, rhsEvent) => {
-  return dayjs(rhsEvent.startDate).diff(dayjs(lhsEvent.startDate));
-};
-
 export const sortEventPriceDesc = (lhsEvent, rhsEvent) => {
   return rhsEvent.price - lhsEvent.price;
 };
