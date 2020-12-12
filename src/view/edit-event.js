@@ -40,7 +40,7 @@ const createTypesMenuTemplate = (availableTypes) => {
       ${availableTypes.map(([typeName, typeText]) => `<div class="event__type-item">
       <input id="event-type-${typeName}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeName}">
       <label class="event__type-label  event__type-label--${typeName}" for="event-type-${typeName}-1">${typeText}</label>
-    </div>`)}
+    </div>`).join(``)}
 
     </fieldset>
   </div>`;
