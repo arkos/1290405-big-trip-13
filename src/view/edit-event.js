@@ -130,6 +130,7 @@ export default class EditEvent extends AbstractView {
     this._clickHandler = this._clickHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
+    this._priceInputHandler = this._priceInputHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -160,10 +161,21 @@ export default class EditEvent extends AbstractView {
     });
   }
 
+  _priceInputHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      price: parseInt(evt.target.value, 10)
+    }, true);
+  }
+
   _setInnerHandlers() {
     this.getElement()
     .querySelector(`.event__type-list`)
     .addEventListener(`change`, this._eventTypeChangeHandler);
+
+    this.getElement()
+    .querySelector(`.event__input--price`)
+    .addEventListener(`input`, this._priceInputHandler);
   }
 
   _restoreHandlers() {
