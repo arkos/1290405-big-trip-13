@@ -142,7 +142,7 @@ export default class EditEvent extends AbstractView {
 
   _submitHandler(evt) {
     evt.preventDefault();
-    this._callback.submit(this._event);
+    this._callback.submit(EditEvent.parseStateToEvent(this._state));
   }
 
   setClickHandler(callback) {
@@ -175,5 +175,14 @@ export default class EditEvent extends AbstractView {
           src
         }
     );
+  }
+
+  static parseStateToEvent(state) {
+    const event = Object.assign({}, state);
+
+    delete event.src;
+    delete event.allTypeData;
+
+    return event;
   }
 }
