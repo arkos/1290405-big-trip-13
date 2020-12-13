@@ -161,6 +161,16 @@ export default class EditEvent extends AbstractView {
       .addEventListener(`submit`, this._submitHandler);
   }
 
+  updateElement() {
+    let prevElement = this.getElement();
+
+    const parent = prevElement.parentElement;
+    this.removeElement();
+
+    const newElement = this.getElement();
+    parent.replaceChild(newElement, prevElement);
+  }
+
   static parseEventToState(event) {
     const allTypeData = getDataForAllEventTypes();
     const eventTypeData = allTypeData.get(event.type);
