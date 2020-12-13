@@ -200,7 +200,7 @@ export default class EditEvent extends AbstractView {
     this._restoreHandlers();
   }
 
-  updateData(update) {
+  updateData(update, isStateUpdateOnly) {
     if (!update) {
       return;
     }
@@ -215,6 +215,10 @@ export default class EditEvent extends AbstractView {
         this._state,
         update
     );
+
+    if (isStateUpdateOnly) {
+      return;
+    }
 
     this.updateElement();
   }
