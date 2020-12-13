@@ -131,9 +131,7 @@ export default class EditEvent extends AbstractView {
     this._submitHandler = this._submitHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
 
-    this.getElement()
-    .querySelector(`.event__type-list`)
-    .addEventListener(`change`, this._eventTypeChangeHandler);
+    this._setInnerHandlers();
   }
 
   getTemplate() {
@@ -162,6 +160,18 @@ export default class EditEvent extends AbstractView {
     });
   }
 
+  _setInnerHandlers() {
+    this.getElement()
+    .querySelector(`.event__type-list`)
+    .addEventListener(`change`, this._eventTypeChangeHandler);
+  }
+
+  _restoreHandlers() {
+    this._setInnerHandlers();
+    this.setClickHandler(this._callback.click);
+    this.setFormSubmitHandler(this._callback.submit);
+  }
+
   setClickHandler(callback) {
     this._callback.click = callback;
 
@@ -186,6 +196,8 @@ export default class EditEvent extends AbstractView {
 
     const newElement = this.getElement();
     parent.replaceChild(newElement, prevElement);
+
+    this._restoreHandlers();
   }
 
   updateData(update) {
@@ -195,7 +207,7 @@ export default class EditEvent extends AbstractView {
 
     if (update.hasOwnProperty(`type`)) {
       const allAvailableTypes = getDataForAllEventTypes();
-      update = Object.assign(update, allAvailableTypes.get(update.type).image);
+      update = Object.assign(update, {src: allAvailableTypes.get(update.type).image});
     }
 
     this._state = Object.assign(
