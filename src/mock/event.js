@@ -2,19 +2,110 @@ import dayjs from 'dayjs';
 import {nanoid} from 'nanoid';
 import {getRandomInteger, getRandomItems} from '../utils/common.js';
 
+const eventTypesMap = new Map(
+    [
+      [
+        `taxi`,
+        {
+          title: `Taxi`,
+          image: `img/icons/taxi.png`,
+          offers:
+          [
+            {key: `uber`, title: `Order Uber`, price: 20}
+          ]
+        }
+      ],
+      [
+        `bus`,
+        {
+          title: `Bus`,
+          image: `img/icons/bus.png`,
+          offers: []
+        }
+      ],
+      [
+        `train`,
+        {
+          title: `Train`,
+          image: `img/icons/train.png`,
+          offers: []
+        }
+      ],
+      [
+        `ship`,
+        {
+          title: `Ship`,
+          image: `img/icons/ship.png`,
+          offers: []
+        }
+      ],
+      [
+        `transport`,
+        {
+          title: `Transport`,
+          image: `img/icons/transport.png`,
+          offers: []
+        }
+      ],
+      [
+        `drive`,
+        {
+          title: `Drive`,
+          image: `img/icons/drive.png`,
+          offers:
+          [
+            {key: `car`, title: `Rent a car`, price: 200}
+          ]
+        }
+      ],
+      [
+        `flight`,
+        {
+          title: `Flight`,
+          image: `img/icons/flight.png`,
+          offers:
+          [
+            {key: `luggage`, title: `Add luggage`, price: 50},
+            {key: `comfort`, title: `Switch to comfort`, price: 80}
+          ]
+        }
+      ],
+      [
+        `check-in`,
+        {
+          title: `Check-In`,
+          image: `img/icons/check-in.png`,
+          offers:
+          [
+            {key: `breakfast`, title: `Add breakfast`, price: 50}
+          ]
+        }
+      ],
+      [
+        `sightseeing`,
+        {
+          title: `Sightseeing`,
+          image: `img/icons/sightseeing.png`,
+          offers:
+          [
+            {key: `tickets`, title: `Book tickets`, price: 40},
+            {key: `lunch`, title: `Lunch in city`, price: 30}
+          ]
+        }
+      ],
+      [
+        `restaurant`,
+        {
+          title: `Restaurant`,
+          image: `img/icons/restaurant.png`,
+          offers: []
+        }
+      ],
+    ]
+);
+
 const generateType = () => {
-  const types = [
-    `Taxi`,
-    `Bus`,
-    `Train`,
-    `Ship`,
-    `Transport`,
-    `Drive`,
-    `Flight`,
-    `Check-in`,
-    `Sightseeing`,
-    `Restaurant`
-  ];
+  const types = Array.from(eventTypesMap.keys());
 
   const randomIndex = getRandomInteger(0, types.length - 1);
   return types[randomIndex];
@@ -32,25 +123,14 @@ const generateDestination = () => {
 };
 
 const generateOffers = (type) => {
+  const eventTypeData = getDataForEventType(type);
 
-  const offers = [
-    {type: `taxi`, key: `uber`, title: `Order Uber`, price: 20},
-    {type: `flight`, key: `luggage`, title: `Add luggage`, price: 50},
-    {type: `flight`, key: `comfort`, title: `Switch to comfort`, price: 80},
-    {type: `drive`, key: `car`, title: `Rent a car`, price: 200},
-    {type: `check-in`, key: `brekfast`, title: `Add breakfast`, price: 50},
-    {type: `sightseeing`, key: `tickets`, title: `Book tickets`, price: 40},
-    {type: `sightseeing`, key: `lunch`, title: `Lunch in city`, price: 30},
-  ];
-
-  const filteredOffers = offers.filter((offer) => type === offer.type);
-
-  if (filteredOffers.length > 0) {
-    const randomSize = getRandomInteger(1, filteredOffers.length);
-    filteredOffers.length = randomSize;
+  if (eventTypeData.offers.length > 0) {
+    const randomSize = getRandomInteger(1, eventTypeData.offers.length);
+    eventTypeData.offers.length = randomSize;
   }
 
-  return filteredOffers;
+  return eventTypeData.offers;
 };
 
 const generatePhotos = () => {
@@ -85,6 +165,18 @@ const generateDestinationInfo = () => {
   };
 };
 
+export const getDataForEventType = (type) => {
+  if (!eventTypesMap.has(type)) {
+    return null;
+  }
+
+  return eventTypesMap.get(type);
+};
+
+export const getDataForAllEventTypes = () => {
+  return eventTypesMap;
+};
+
 export const generateEvent = () => {
   const type = generateType();
 
@@ -113,7 +205,7 @@ export const generateEvent = () => {
     finishDate,
     destination: generateDestination(),
     price: generatePrice(),
-    offers: generateOffers(type.toLowerCase()),
+    offers: generateOffers(type),
     destinationInfo: generateDestinationInfo(),
     isFavorite: Boolean(getRandomInteger(0, 1))
   };
