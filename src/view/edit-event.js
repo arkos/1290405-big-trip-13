@@ -1,6 +1,17 @@
 import dayjs from 'dayjs';
 import {humanizeDate} from '../utils/event.js';
+import {getDataForAllEventTypes} from '../mock/event.js';
 import AbstractView from '../view/abstract.js';
+
+const EMPTY_EVENT = {
+  type: ``,
+  startDate: dayjs().startOf(`day`),
+  finishDate: dayjs().endOf(`day`),
+  destination: ``,
+  price: ``,
+  offers: {},
+  destinationInfo: {}
+};
 
 const createOffersTemplate = (offers) => {
   return offers && (offers.length > 0) ? `<section class="event__section  event__section--offers">
@@ -19,7 +30,7 @@ const createOffersTemplate = (offers) => {
   </section>` : ``;
 };
 
-const createDestinationInfoTemplate = ({description = null, photos = null}) => {
+const createDestinationInfoTemplate = ({description, photos}) => {
   return `<section class="event__section  event__section--destination">
   <h3 class="event__section-title  event__section-title--destination">Destination</h3>
   <p class="event__destination-description">${description ? description : ``}</p>
@@ -32,54 +43,29 @@ const createDestinationInfoTemplate = ({description = null, photos = null}) => {
 </section>`;
 };
 
-const createTypesMenuTemplate = (availableTypes) => {
+const createTypesMenuTemplate = (allAvailableTypes) => {
   return `<div class="event__type-list">
     <fieldset class="event__type-group">
       <legend class="visually-hidden">Event type</legend>
 
-      ${availableTypes.map(([typeName, typeText]) => `<div class="event__type-item">
-      <input id="event-type-${typeName}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeName}">
-      <label class="event__type-label  event__type-label--${typeName}" for="event-type-${typeName}-1">${typeText}</label>
+      ${Array.from(allAvailableTypes).map(([typeDataKey, typeDataValue]) => `<div class="event__type-item">
+      <input id="event-type-${typeDataKey}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeDataKey}">
+      <label class="event__type-label  event__type-label--${typeDataKey}" for="event-type-${typeDataKey}-1">${typeDataValue.title}</label>
     </div>`).join(``)}
 
     </fieldset>
   </div>`;
 };
 
-const createEditEventTemplate = (tripEvent) => {
+const createEditEventTemplate = (state) => {
 
-  const offsetFinishDate = 4;
-  const offsetFinishDateUnit = `h`;
+  const {type, startDate, finishDate, offers, destination, destinationInfo, price, src, allTypeData} = state;
 
-  const availableTypes = {
-    taxi: `Taxi`,
-    bus: `Bus`,
-    train: `Ship`,
-    transport: `Transport`,
-    drive: `Drive`,
-    flight: `Flight`,
-    [`check-in`]: `Check-In`,
-    sightseeing: `Sightseeing`,
-    restaurant: `Restaurant`
-  };
-
-  const {
-    type = ``,
-    startDate = dayjs().startOf(`day`),
-    finishDate = dayjs().startOf(`day`).add(offsetFinishDate, offsetFinishDateUnit),
-    destination = ``,
-    price = ``,
-    offers = {},
-    destinationInfo = {}
-  } = tripEvent;
-
-  const typesMenuTemplate = createTypesMenuTemplate(Object.entries(availableTypes));
+  const typesMenuTemplate = createTypesMenuTemplate(allTypeData.entries());
 
   const offersTemplate = createOffersTemplate(offers);
 
   const destinationInfoTemplate = createDestinationInfoTemplate(destinationInfo);
-
-  const imgSrc = type ? `img/icons/${type.toLowerCase()}.png` : `img/icons/${Object.keys(availableTypes)[0]}.png`;
 
   return `<li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
@@ -87,7 +73,7 @@ const createEditEventTemplate = (tripEvent) => {
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="${imgSrc}" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="${src}" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
           ${typesMenuTemplate}
@@ -136,16 +122,17 @@ const createEditEventTemplate = (tripEvent) => {
 };
 
 export default class EditEvent extends AbstractView {
-  constructor(event) {
+  constructor(event = EMPTY_EVENT) {
     super();
     this._event = event;
+    this._state = EditEvent.parseEventToState(event);
 
     this._clickHandler = this._clickHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
   }
 
   getTemplate() {
-    return createEditEventTemplate(this._event);
+    return createEditEventTemplate(this._state);
   }
 
   _clickHandler(evt) {
@@ -172,5 +159,21 @@ export default class EditEvent extends AbstractView {
     this.getElement()
       .querySelector(`form`)
       .addEventListener(`submit`, this._submitHandler);
+  }
+
+  static parseEventToState(event) {
+    const allTypeData = getDataForAllEventTypes();
+    const eventTypeData = allTypeData.get(event.type);
+    const [defaultTypeData] = allTypeData.values();
+    const src = eventTypeData ? eventTypeData.image : defaultTypeData.image;
+
+    return Object.assign(
+        {},
+        event,
+        {
+          allTypeData,
+          src
+        }
+    );
   }
 }
