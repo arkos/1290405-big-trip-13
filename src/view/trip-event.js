@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import {humanizeDate} from '../utils/event.js';
+import {getDataForAllOffers} from '../mock/event.js';
 import AbstractView from '../view/abstract.js';
 
 dayjs.extend(duration);
@@ -13,18 +14,18 @@ const createTripEventOfferTemplate = ({title, price}) => {
   </li>`;
 };
 
-const createTripEventOffersTemplate = (offers) => {
-  return offers.length > 0 ? `<h4 class="visually-hidden">Offers:</h4>
+const createTripEventOffersTemplate = (offers, offersData) => {
+  return offers.size > 0 ? `<h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-    ${offers.map((offer) => createTripEventOfferTemplate(offer)).join(``)}
+    ${Array.from(offers).map((offer) => createTripEventOfferTemplate(offersData.get(offer))).join(``)}
   </ul>` : ``;
 };
 
-const createTripEventTemplate = (tripEvent) => {
+const createTripEventTemplate = (state) => {
 
-  const {type, destination, startDate, finishDate, price, offers, isFavorite} = tripEvent;
+  const {type, destination, startDate, finishDate, price, offers, offersData, isFavorite} = state;
 
-  const offersTemplate = createTripEventOffersTemplate(offers);
+  const offersTemplate = createTripEventOffersTemplate(offers, offersData);
 
   const durationBetweenDates = dayjs.duration(finishDate.diff(startDate));
 
@@ -85,13 +86,14 @@ export default class TripEvent extends AbstractView {
   constructor(event) {
     super();
     this._event = event;
+    this._state = TripEvent._parseEventToState(event);
 
     this._clickHandler = this._clickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
   getTemplate() {
-    return createTripEventTemplate(this._event);
+    return createTripEventTemplate(this._state);
   }
 
   _clickHandler(evt) {
@@ -114,5 +116,15 @@ export default class TripEvent extends AbstractView {
     this._callback.favoriteClick = callback;
     this.getElement().querySelector(`.event__favorite-btn`)
       .addEventListener(`click`, this._favoriteClickHandler);
+  }
+
+  static _parseEventToState(event) {
+    const offersData = getDataForAllOffers();
+
+    return Object.assign(
+        {},
+        event,
+        {offersData}
+    );
   }
 }
