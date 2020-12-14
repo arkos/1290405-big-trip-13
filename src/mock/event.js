@@ -9,10 +9,7 @@ const eventTypesMap = new Map(
         {
           title: `Taxi`,
           image: `img/icons/taxi.png`,
-          offers:
-          [
-            {key: `uber`, title: `Order Uber`, price: 20}
-          ]
+          offers: new Set([`uber`])
         }
       ],
       [
@@ -20,7 +17,7 @@ const eventTypesMap = new Map(
         {
           title: `Bus`,
           image: `img/icons/bus.png`,
-          offers: []
+          offers: new Set()
         }
       ],
       [
@@ -28,7 +25,7 @@ const eventTypesMap = new Map(
         {
           title: `Train`,
           image: `img/icons/train.png`,
-          offers: []
+          offers: new Set()
         }
       ],
       [
@@ -36,7 +33,7 @@ const eventTypesMap = new Map(
         {
           title: `Ship`,
           image: `img/icons/ship.png`,
-          offers: []
+          offers: new Set()
         }
       ],
       [
@@ -44,7 +41,7 @@ const eventTypesMap = new Map(
         {
           title: `Transport`,
           image: `img/icons/transport.png`,
-          offers: []
+          offers: new Set()
         }
       ],
       [
@@ -52,10 +49,7 @@ const eventTypesMap = new Map(
         {
           title: `Drive`,
           image: `img/icons/drive.png`,
-          offers:
-          [
-            {key: `car`, title: `Rent a car`, price: 200}
-          ]
+          offers: new Set([`car`])
         }
       ],
       [
@@ -63,11 +57,7 @@ const eventTypesMap = new Map(
         {
           title: `Flight`,
           image: `img/icons/flight.png`,
-          offers:
-          [
-            {key: `luggage`, title: `Add luggage`, price: 50},
-            {key: `comfort`, title: `Switch to comfort`, price: 80}
-          ]
+          offers: new Set([`luggage`, `comfort`])
         }
       ],
       [
@@ -75,10 +65,7 @@ const eventTypesMap = new Map(
         {
           title: `Check-In`,
           image: `img/icons/check-in.png`,
-          offers:
-          [
-            {key: `breakfast`, title: `Add breakfast`, price: 50}
-          ]
+          offers: new Set([`breakfast`])
         }
       ],
       [
@@ -86,11 +73,7 @@ const eventTypesMap = new Map(
         {
           title: `Sightseeing`,
           image: `img/icons/sightseeing.png`,
-          offers:
-          [
-            {key: `tickets`, title: `Book tickets`, price: 40},
-            {key: `lunch`, title: `Lunch in city`, price: 30}
-          ]
+          offers: new Set([`tickets`, `lunch`])
         }
       ],
       [
@@ -98,9 +81,21 @@ const eventTypesMap = new Map(
         {
           title: `Restaurant`,
           image: `img/icons/restaurant.png`,
-          offers: []
+          offers: new Set()
         }
       ],
+    ]
+);
+
+const offersMap = new Map(
+    [
+      [`uber`, {title: `Order Uber`, price: 20}],
+      [`car`, {title: `Rent a car`, price: 200}],
+      [`luggage`, {title: `Add luggage`, price: 50}],
+      [`comfort`, {title: `Switch to comfort`, price: 80}],
+      [`breakfast`, {title: `Add breakfast`, price: 50}],
+      [`tickets`, {title: `Book tickets`, price: 40}],
+      [`lunch`, {title: `Lunch in city`, price: 30}]
     ]
 );
 
@@ -124,13 +119,14 @@ const generateDestination = () => {
 
 const generateOffers = (type) => {
   const eventTypeData = getDataForEventType(type);
+  const offers = Array.from(eventTypeData.offers);
 
-  if (eventTypeData.offers.length > 0) {
-    const randomSize = getRandomInteger(1, eventTypeData.offers.length);
-    eventTypeData.offers.length = randomSize;
+  if (offers.length > 0) {
+    const randomSize = getRandomInteger(1, offers.length);
+    offers.length = randomSize;
   }
 
-  return eventTypeData.offers;
+  return new Set(offers);
 };
 
 const generatePhotos = () => {
@@ -175,6 +171,10 @@ export const getDataForEventType = (type) => {
 
 export const getDataForAllEventTypes = () => {
   return eventTypesMap;
+};
+
+export const getDataForAllOffers = () => {
+  return offersMap;
 };
 
 export const generateEvent = () => {
