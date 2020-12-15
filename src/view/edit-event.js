@@ -124,7 +124,6 @@ const createEditEventTemplate = (state) => {
 export default class EditEvent extends SmartView {
   constructor(event = EMPTY_EVENT) {
     super();
-    this._event = event;
     this._state = EditEvent.parseEventToState(event);
 
     this._clickHandler = this._clickHandler.bind(this);
