@@ -1,4 +1,4 @@
-import SmartView from '../view/smart.js';
+import SmartView from './smart.js';
 import {getDataForAllEventTypes, getDataForEventType, getDataForAllOffers} from '../mock/event.js';
 import {humanizeDate} from '../utils/event.js';
 import dayjs from 'dayjs';
@@ -57,7 +57,7 @@ const createTypesMenuTemplate = (allAvailableTypes) => {
   </div>`;
 };
 
-const createEditEventTemplate = (state) => {
+const createEventEditTemplate = (state) => {
 
   const {type, startDate, finishDate, offers, offersData, destination, destinationInfo, price, src, allTypeData} = state;
 
@@ -121,10 +121,10 @@ const createEditEventTemplate = (state) => {
   </li>`;
 };
 
-export default class EditEvent extends SmartView {
+export default class EventEdit extends SmartView {
   constructor(event = EMPTY_EVENT) {
     super();
-    this._state = EditEvent.parseEventToState(event);
+    this._state = EventEdit.parseEventToState(event);
 
     this._clickHandler = this._clickHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
@@ -136,7 +136,7 @@ export default class EditEvent extends SmartView {
   }
 
   getTemplate() {
-    return createEditEventTemplate(this._state);
+    return createEventEditTemplate(this._state);
   }
 
   static _parseEventToAvailableOffers(event) {
@@ -161,7 +161,7 @@ export default class EditEvent extends SmartView {
 
   _submitHandler(evt) {
     evt.preventDefault();
-    this._callback.submit(EditEvent.parseStateToEvent(this._state));
+    this._callback.submit(EventEdit.parseStateToEvent(this._state));
   }
 
   _offerToggleHandler(evt) {
@@ -195,7 +195,7 @@ export default class EditEvent extends SmartView {
     this.updateData({
       type: evt.target.value,
       src: allAvailableTypes.get(evt.target.value).image,
-      offers: EditEvent._parseEventToAvailableOffers({type: evt.target.value, offers: new Set()})
+      offers: EventEdit._parseEventToAvailableOffers({type: evt.target.value, offers: new Set()})
     });
   }
 
@@ -222,7 +222,7 @@ export default class EditEvent extends SmartView {
   }
 
   reset(event) {
-    this.updateData(EditEvent.parseEventToState(event));
+    this.updateData(EventEdit.parseEventToState(event));
   }
 
   restoreHandlers() {
@@ -255,7 +255,7 @@ export default class EditEvent extends SmartView {
 
     const offersData = getDataForAllOffers();
 
-    const offers = EditEvent._parseEventToAvailableOffers(event);
+    const offers = EventEdit._parseEventToAvailableOffers(event);
 
     return Object.assign(
         {},

@@ -1,5 +1,5 @@
 import TripEventView from '../view/trip-event.js';
-import EditEventView from '../view/edit-event.js';
+import EventEditView from '../view/edit-event.js';
 import {isEscEvent} from '../utils/common.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 
@@ -31,7 +31,7 @@ export default class Event {
     const prevEventEditComponent = this._tripEventEditComponent;
 
     this._tripEventComponent = new TripEventView(tripEvent);
-    this._tripEventEditComponent = new EditEventView(tripEvent);
+    this._tripEventEditComponent = new EventEditView(tripEvent);
 
     this._tripEventComponent.setClickHandler(this._handleClickRollupButtonDown);
     this._tripEventComponent.setFavoriteClickHandler(this._handleFavoriteClick);
