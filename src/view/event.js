@@ -2,11 +2,11 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import {humanizeDate} from '../utils/event.js';
 import {getDataForAllOffers} from '../mock/event.js';
-import AbstractView from '../view/abstract.js';
+import AbstractView from './abstract.js';
 
 dayjs.extend(duration);
 
-const createTripEventOfferTemplate = ({title, price}) => {
+const createEventOfferTemplate = ({title, price}) => {
   return `<li class="event__offer">
     <span class="event__offer-title">${title}</span>
     &plus;&euro;&nbsp;
@@ -14,18 +14,18 @@ const createTripEventOfferTemplate = ({title, price}) => {
   </li>`;
 };
 
-const createTripEventOffersTemplate = (offers, offersData) => {
+const createEventOffersTemplate = (offers, offersData) => {
   return offers.size > 0 ? `<h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-    ${Array.from(offers).map((offer) => createTripEventOfferTemplate(offersData.get(offer))).join(``)}
+    ${Array.from(offers).map((offer) => createEventOfferTemplate(offersData.get(offer))).join(``)}
   </ul>` : ``;
 };
 
-const createTripEventTemplate = (state) => {
+const createEventTemplate = (state) => {
 
   const {type, destination, startDate, finishDate, price, offers, offersData, isFavorite} = state;
 
-  const offersTemplate = createTripEventOffersTemplate(offers, offersData);
+  const offersTemplate = createEventOffersTemplate(offers, offersData);
 
   const durationBetweenDates = dayjs.duration(finishDate.diff(startDate));
 
@@ -82,18 +82,18 @@ const createTripEventTemplate = (state) => {
   </li>`;
 };
 
-export default class TripEvent extends AbstractView {
+export default class Event extends AbstractView {
   constructor(event) {
     super();
     this._event = event;
-    this._state = TripEvent._parseEventToState(event);
+    this._state = Event._parseEventToState(event);
 
     this._clickHandler = this._clickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
   getTemplate() {
-    return createTripEventTemplate(this._state);
+    return createEventTemplate(this._state);
   }
 
   _clickHandler(evt) {

@@ -32,8 +32,8 @@ export default class Trip {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
-  init(tripEvents) {
-    this._tripEvents = tripEvents.slice();
+  init(events) {
+    this._events = events.slice();
     this._sortEvents();
 
     this._renderTrip();
@@ -44,16 +44,16 @@ export default class Trip {
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
-  _renderEvent(tripEvent) {
+  _renderEvent(event) {
     const eventPresenter = new EventPresenter(this._eventListComponent, this._handleEventChange, this._handleModeChange);
-    eventPresenter.init(tripEvent);
-    this._eventPresenterMap.set(tripEvent.id, eventPresenter);
+    eventPresenter.init(event);
+    this._eventPresenterMap.set(event.id, eventPresenter);
   }
 
   _renderEvents() {
     render(this._eventContainer, this._eventListComponent, RenderPosition.BEFOREEND);
 
-    this._tripEvents.forEach((tripEvent) => this._renderEvent(tripEvent));
+    this._events.forEach((event) => this._renderEvent(event));
   }
 
   _renderNoEvents() {
@@ -61,7 +61,7 @@ export default class Trip {
   }
 
   _renderTripInfo() {
-    const tripInfo = getTripInfo(this._tripEvents);
+    const tripInfo = getTripInfo(this._events);
 
     const prevTripInfoComponent = this._tripInfoComponent;
     this._tripInfoComponent = new TripInfoView(tripInfo);
@@ -78,7 +78,7 @@ export default class Trip {
   }
 
   _renderTripPrice() {
-    const totalPriceForEvents = getTripPrice(this._tripEvents);
+    const totalPriceForEvents = getTripPrice(this._events);
 
     const prevTripPriceComponent = this._tripPriceComponent;
     this._tripPriceComponent = new TripPriceView(totalPriceForEvents);
@@ -101,13 +101,13 @@ export default class Trip {
   _sortEvents() {
     switch (this._currentSortType) {
       case SortType.DAY:
-        this._tripEvents.sort(sortEventDateAsc);
+        this._events.sort(sortEventDateAsc);
         break;
       case SortType.TIME:
-        this._tripEvents.sort(sortEventDurationDesc);
+        this._events.sort(sortEventDurationDesc);
         break;
       case SortType.PRICE:
-        this._tripEvents.sort(sortEventPriceDesc);
+        this._events.sort(sortEventPriceDesc);
         break;
       default:
         throw new Error(`Invalid sort type ${this._currentSortType}`);
@@ -115,7 +115,7 @@ export default class Trip {
   }
 
   _handleEventChange(updatedEvent) {
-    this._tripEvents = updateItem(this._tripEvents, updatedEvent);
+    this._events = updateItem(this._events, updatedEvent);
     this._eventPresenterMap.get(updatedEvent.id).init(updatedEvent);
 
     this._renderTripInfo();
@@ -138,7 +138,7 @@ export default class Trip {
   }
 
   _renderTrip() {
-    if (this._tripEvents.length === 0) {
+    if (this._events.length === 0) {
       this._renderNoEvents();
       return;
     }

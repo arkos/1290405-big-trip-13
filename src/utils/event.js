@@ -8,24 +8,24 @@ export const humanizeDate = (date, formatter = `YYYY-MM-DD`) => {
   return dayjs(date).format(formatter);
 };
 
-const getDestinationsForTrip = (tripEvents) => {
+const getDestinationsForTrip = (events) => {
 
-  if (!tripEvents || tripEvents.length === 0) {
+  if (!events || events.length === 0) {
     return null;
   }
 
   const destinations = [];
-  tripEvents.forEach((evt) => destinations.push(evt.destination));
+  events.forEach((evt) => destinations.push(evt.destination));
   return destinations;
 };
 
-export const getTripInfo = (tripEvents) => {
+export const getTripInfo = (events) => {
 
-  if (!tripEvents || tripEvents.length === 0) {
+  if (!events || events.length === 0) {
     return null;
   }
 
-  const eventsByDateAsc = tripEvents.slice().sort(sortEventDateAsc);
+  const eventsByDateAsc = events.slice().sort(sortEventDateAsc);
 
   return {
     startDate: eventsByDateAsc[0].startDate,
@@ -34,14 +34,14 @@ export const getTripInfo = (tripEvents) => {
   };
 };
 
-export const getTripPrice = (tripEvents) => {
-  if (!tripEvents || tripEvents.length === 0) {
+export const getTripPrice = (events) => {
+  if (!events || events.length === 0) {
     return 0;
   }
 
   const offersData = getDataForAllOffers();
 
-  const totalPriceForEvents = tripEvents.reduce((total, event) => {
+  const totalPriceForEvents = events.reduce((total, event) => {
     const priceForEventOffers = Array.from(event.offers).reduce((sum, offer) => sum + offersData.get(offer).price, 0);
     return event.price + priceForEventOffers + total;
   }, 0);

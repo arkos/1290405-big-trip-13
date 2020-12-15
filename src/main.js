@@ -9,7 +9,7 @@ const EVENT_COUNT = 20;
 const generatedEvents = new Array(EVENT_COUNT).fill().map(generateEvent);
 
 const tripMainElement = document.querySelector(`.trip-main`);
-const tripEventsElement = document.querySelector(`.trip-events`);
+const eventsElement = document.querySelector(`.trip-events`);
 
 // Site Menu rendering
 const filter = generateFilter();
@@ -17,7 +17,7 @@ const siteMenuTitleElements = tripMainElement.querySelectorAll(`.trip-controls h
 const siteMenuElements = [new MenuView(), new FilterView(filter)];
 siteMenuElements.forEach((element, index) => render(siteMenuTitleElements[index], element, RenderPosition.AFTEREND));
 
-const tripPresenter = new TripPresenter(tripMainElement, tripEventsElement);
+const tripPresenter = new TripPresenter(tripMainElement, eventsElement);
 
 // Trip rendering
 tripPresenter.init(generatedEvents);
