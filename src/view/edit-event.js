@@ -1,7 +1,7 @@
-import dayjs from 'dayjs';
-import {humanizeDate} from '../utils/event.js';
+import SmartView from '../view/smart.js';
 import {getDataForAllEventTypes, getDataForEventType, getDataForAllOffers} from '../mock/event.js';
-import AbstractView from '../view/abstract.js';
+import {humanizeDate} from '../utils/event.js';
+import dayjs from 'dayjs';
 
 const EMPTY_EVENT = {
   type: ``,
@@ -121,7 +121,7 @@ const createEditEventTemplate = (state) => {
   </li>`;
 };
 
-export default class EditEvent extends AbstractView {
+export default class EditEvent extends SmartView {
   constructor(event = EMPTY_EVENT) {
     super();
     this._event = event;
@@ -222,7 +222,7 @@ export default class EditEvent extends AbstractView {
     }
   }
 
-  _restoreHandlers() {
+  restoreHandlers() {
     this._setInnerHandlers();
     this.setClickHandler(this._callback.click);
     this.setFormSubmitHandler(this._callback.submit);
@@ -242,36 +242,6 @@ export default class EditEvent extends AbstractView {
     this.getElement()
       .querySelector(`form`)
       .addEventListener(`submit`, this._submitHandler);
-  }
-
-  updateElement() {
-    let prevElement = this.getElement();
-
-    const parent = prevElement.parentElement;
-    this.removeElement();
-
-    const newElement = this.getElement();
-    parent.replaceChild(newElement, prevElement);
-
-    this._restoreHandlers();
-  }
-
-  updateData(update, isStateUpdateOnly) {
-    if (!update) {
-      return;
-    }
-
-    this._state = Object.assign(
-        {},
-        this._state,
-        update
-    );
-
-    if (isStateUpdateOnly) {
-      return;
-    }
-
-    this.updateElement();
   }
 
   static parseEventToState(event) {
