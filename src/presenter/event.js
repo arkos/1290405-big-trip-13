@@ -56,6 +56,7 @@ export default class Event {
   }
 
   _handleClickRollupButtonUp() {
+    this._tripEventEditComponent.reset(this._tripEvent);
     this._switchToDisplay();
   }
 
@@ -64,7 +65,10 @@ export default class Event {
   }
 
   _handleEscKeyDown(evt) {
-    isEscEvent(evt, () => this._switchToDisplay());
+    isEscEvent(evt, () => {
+      this._tripEventEditComponent.reset(this._tripEvent);
+      this._switchToDisplay();
+    });
   }
 
   _handleFormSubmit(tripEvent) {

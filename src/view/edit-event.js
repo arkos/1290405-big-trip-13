@@ -221,6 +221,10 @@ export default class EditEvent extends SmartView {
     }
   }
 
+  reset(event) {
+    this.updateData(EditEvent.parseEventToState(event));
+  }
+
   restoreHandlers() {
     this._setInnerHandlers();
     this.setClickHandler(this._callback.click);
