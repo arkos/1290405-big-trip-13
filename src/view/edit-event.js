@@ -172,8 +172,6 @@ export default class EditEvent extends AbstractView {
 
     evt.preventDefault();
 
-    console.log(evt.target.dataset.offerKey);
-
     const offers = new Set(this._state.offers);
     offers.forEach((offer) => {
       if (offer.key === evt.target.dataset.offerKey) {
