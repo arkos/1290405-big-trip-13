@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import {humanizeDate} from '../utils/event.js';
-import {getDataForAllEventTypes} from '../mock/event.js';
+import {getDataForAllEventTypes, getDataForEventType, getDataForAllOffers} from '../mock/event.js';
 import AbstractView from '../view/abstract.js';
 
 const EMPTY_EVENT = {
@@ -9,21 +9,21 @@ const EMPTY_EVENT = {
   finishDate: dayjs().endOf(`day`),
   destination: ``,
   price: ``,
-  offers: {},
+  offers: new Set(),
   destinationInfo: {}
 };
 
-const createOffersTemplate = (offers) => {
-  return offers && (offers.length > 0) ? `<section class="event__section  event__section--offers">
+const createOffersTemplate = (offers, offersData) => {
+  return offers && (offers.size > 0) ? `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
     <div class="event__available-offers">
-      ${offers.map(({key, title, price}) => `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${key}-1" type="checkbox" name="event-offer-${key}" checked>
+      ${Array.from(offers).map(({key, selected}) => `<div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${key}-1" type="checkbox" data-offer-key="${key}" name="event-offer-${key}" ${selected ? `checked` : ``}>
         <label class="event__offer-label" for="event-offer-${key}-1">
-          <span class="event__offer-title">${title}</span>
+          <span class="event__offer-title">${offersData.get(key).title}</span>
           &plus;&euro;&nbsp;
-          <span class="event__offer-price">${price}</span>
+          <span class="event__offer-price">${offersData.get(key).price}</span>
         </label>
       </div>`).join(``)}
     </div>
@@ -59,11 +59,11 @@ const createTypesMenuTemplate = (allAvailableTypes) => {
 
 const createEditEventTemplate = (state) => {
 
-  const {type, startDate, finishDate, offers, destination, destinationInfo, price, src, allTypeData} = state;
+  const {type, startDate, finishDate, offers, offersData, destination, destinationInfo, price, src, allTypeData} = state;
 
   const typesMenuTemplate = createTypesMenuTemplate(allTypeData.entries());
 
-  const offersTemplate = createOffersTemplate(offers);
+  const offersTemplate = createOffersTemplate(offers, offersData);
 
   const destinationInfoTemplate = createDestinationInfoTemplate(destinationInfo);
 
@@ -131,12 +131,28 @@ export default class EditEvent extends AbstractView {
     this._submitHandler = this._submitHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
+    this._offerToggleHandler = this._offerToggleHandler.bind(this);
 
     this._setInnerHandlers();
   }
 
   getTemplate() {
     return createEditEventTemplate(this._state);
+  }
+
+  static _parseEventToAvailableOffers(event) {
+    const eventTypeData = getDataForEventType(event.type);
+    const offers = new Set();
+
+    if (event.offers && eventTypeData.offers.size > 0) {
+      eventTypeData.offers.forEach((availableOffer) => {
+        let selected = event.offers.has(availableOffer) ? true : false;
+        offers.add({key: availableOffer, selected});
+      }
+      );
+    }
+
+    return offers;
   }
 
   _clickHandler(evt) {
@@ -149,15 +165,40 @@ export default class EditEvent extends AbstractView {
     this._callback.submit(EditEvent.parseStateToEvent(this._state));
   }
 
+  _offerToggleHandler(evt) {
+    if (evt.target.tagName !== `INPUT`) {
+      return;
+    }
+
+    evt.preventDefault();
+
+    console.log(evt.target.dataset.offerKey);
+
+    const offers = new Set(this._state.offers);
+    offers.forEach((offer) => {
+      if (offer.key === evt.target.dataset.offerKey) {
+        offer.selected = !offer.selected;
+      }
+    });
+
+    this.updateData({
+      offers
+    });
+  }
+
   _eventTypeChangeHandler(evt) {
 
     if (evt.target.tagName !== `INPUT`) {
       return;
     }
 
+    const allAvailableTypes = getDataForAllEventTypes();
+
     evt.preventDefault();
     this.updateData({
-      type: evt.target.value
+      type: evt.target.value,
+      src: allAvailableTypes.get(evt.target.value).image,
+      offers: EditEvent._parseEventToAvailableOffers({type: evt.target.value, offers: new Set()})
     });
   }
 
@@ -176,6 +217,11 @@ export default class EditEvent extends AbstractView {
     this.getElement()
     .querySelector(`.event__input--price`)
     .addEventListener(`input`, this._priceInputHandler);
+
+    const offersRendered = this.getElement().querySelector(`.event__available-offers`);
+    if (offersRendered) {
+      offersRendered.addEventListener(`change`, this._offerToggleHandler);
+    }
   }
 
   _restoreHandlers() {
@@ -217,11 +263,6 @@ export default class EditEvent extends AbstractView {
       return;
     }
 
-    if (update.hasOwnProperty(`type`)) {
-      const allAvailableTypes = getDataForAllEventTypes();
-      update = Object.assign(update, {src: allAvailableTypes.get(update.type).image});
-    }
-
     this._state = Object.assign(
         {},
         this._state,
@@ -241,10 +282,16 @@ export default class EditEvent extends AbstractView {
     const [defaultTypeData] = allTypeData.values();
     const src = eventTypeData ? eventTypeData.image : defaultTypeData.image;
 
+    const offersData = getDataForAllOffers();
+
+    const offers = EditEvent._parseEventToAvailableOffers(event);
+
     return Object.assign(
         {},
         event,
         {
+          offers,
+          offersData,
           allTypeData,
           src
         }
@@ -254,8 +301,20 @@ export default class EditEvent extends AbstractView {
   static parseStateToEvent(state) {
     const event = Object.assign({}, state);
 
+    const copyOffers = new Set();
+
+    state.offers.forEach((offer) => {
+      if (offer.selected) {
+        const copyOffer = offer.key;
+        copyOffers.add(copyOffer);
+      }
+    });
+
+    event.offers = copyOffers;
+
     delete event.src;
     delete event.allTypeData;
+    delete event.offersData;
 
     return event;
   }
