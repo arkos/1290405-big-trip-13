@@ -24,14 +24,14 @@ export default class Event {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
   }
 
-  init(event, eventTypeInfoMap, offerInfoMap) {
+  init(event, eventTypeInfoMap, offerInfoMap, destinationInfoMap) {
     this._event = event;
 
     const prevEventComponent = this._eventComponent;
     const prevEventEditComponent = this._eventEditComponent;
 
     this._eventComponent = new EventView(event, offerInfoMap);
-    this._eventEditComponent = new EventEditView(event, eventTypeInfoMap, offerInfoMap);
+    this._eventEditComponent = new EventEditView(event, eventTypeInfoMap, offerInfoMap, destinationInfoMap);
 
     this._eventComponent.setClickHandler(this._handleClickRollupButtonDown);
     this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);

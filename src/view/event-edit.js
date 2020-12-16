@@ -42,6 +42,14 @@ const createDestinationInfoTemplate = ({description, photos}) => {
 </section>`;
 };
 
+const createAvailableDestinationsTemplate = (availableDestinations) => {
+  return `<datalist id="destination-list-1">
+    ${availableDestinations.map((destination) => `
+    <option value="${destination}"></option>
+    `).join(``)}
+  </datalist>`;
+};
+
 const createTypesMenuTemplate = (eventTypesMenu) => {
   return `<div class="event__type-list">
     <fieldset class="event__type-group">
@@ -58,13 +66,15 @@ const createTypesMenuTemplate = (eventTypesMenu) => {
 
 const createEventEditTemplate = (state) => {
 
-  const {type, startDate, finishDate, offers, destination, destinationInfo, price, src, eventTypesMenu} = state;
+  const {type, startDate, finishDate, offers, destination, availableDestinations, price, src, eventTypesMenu} = state;
 
   const typesMenuTemplate = createTypesMenuTemplate(eventTypesMenu);
 
   const offersTemplate = createOffersTemplate(offers);
 
-  const destinationInfoTemplate = createDestinationInfoTemplate(destinationInfo);
+  const destinationInfoTemplate = createDestinationInfoTemplate(destination);
+
+  const availableDestinationsTemplate = createAvailableDestinationsTemplate(availableDestinations);
 
   return `<li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
@@ -82,12 +92,8 @@ const createEventEditTemplate = (state) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
-          <datalist id="destination-list-1">
-            <option value="Amsterdam"></option>
-            <option value="Geneva"></option>
-            <option value="Chamonix"></option>
-          </datalist>
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.title}" list="destination-list-1">
+            ${availableDestinationsTemplate}
         </div>
 
         <div class="event__field-group  event__field-group--time">
@@ -121,11 +127,12 @@ const createEventEditTemplate = (state) => {
 };
 
 export default class EventEdit extends SmartView {
-  constructor(event = EMPTY_EVENT, eventTypeInfoMap, offerInfoMap) {
+  constructor(event = EMPTY_EVENT, eventTypeInfoMap, offerInfoMap, destinationInfoMap) {
     super();
     this._eventTypeInfoMap = eventTypeInfoMap;
     this._offerInfoMap = offerInfoMap;
-    this._state = EventEdit.parseEventToState(event, this._eventTypeInfoMap, this._offerInfoMap);
+    this._destinationInfoMap = destinationInfoMap;
+    this._state = EventEdit.parseEventToState(event, this._eventTypeInfoMap, this._offerInfoMap, this._destinationInfoMap);
 
     this._clickHandler = this._clickHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
@@ -162,6 +169,21 @@ export default class EventEdit extends SmartView {
     });
 
     return offerSelectionMap;
+  }
+
+  static _createDestinationSelection(currentDestination, destinationInfoMap) {
+    const availableDestinations = [];
+    let destination = {};
+
+    destinationInfoMap.forEach((value, key) => {
+      if (currentDestination === key) {
+        destination = {title: key, description: value.description, photos: value.photos.slice()};
+      } else {
+        availableDestinations.push(key);
+      }
+    });
+
+    return {destination, availableDestinations};
   }
 
   _clickHandler(evt) {
@@ -235,7 +257,7 @@ export default class EventEdit extends SmartView {
   }
 
   reset(event) {
-    this.updateData(EventEdit.parseEventToState(event, this._eventTypeInfoMap, this._offerInfoMap));
+    this.updateData(EventEdit.parseEventToState(event, this._eventTypeInfoMap, this._offerInfoMap, this._destinationInfoMap));
   }
 
   restoreHandlers() {
@@ -260,7 +282,7 @@ export default class EventEdit extends SmartView {
       .addEventListener(`submit`, this._submitHandler);
   }
 
-  static parseEventToState(event, eventTypeInfoMap, offerInfoMap) {
+  static parseEventToState(event, eventTypeInfoMap, offerInfoMap, destinationInfoMap) {
     const offerSelectionMap = EventEdit._createOfferSelectionForType(event.type, event.offers, eventTypeInfoMap, offerInfoMap);
 
     const eventTypesMenu = new Map();
@@ -270,13 +292,17 @@ export default class EventEdit extends SmartView {
     const [defaultTypeData] = eventTypeInfoMap.values();
     const src = eventTypeData ? eventTypeData.image : defaultTypeData.image;
 
+    const {destination, availableDestinations} = EventEdit._createDestinationSelection(event.destination, destinationInfoMap);
+
     return Object.assign(
         {},
         event,
         {
           offers: offerSelectionMap,
           src,
-          eventTypesMenu
+          eventTypesMenu,
+          destination,
+          availableDestinations
         }
     );
   }

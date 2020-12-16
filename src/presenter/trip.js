@@ -32,10 +32,11 @@ export default class Trip {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
-  init(events, eventTypeInfoMap, offerInfoMap) {
+  init(events, eventTypeInfoMap, offerInfoMap, destinationInfoMap) {
     this._events = events.slice();
     this._eventTypeInfoMap = new Map(eventTypeInfoMap);
     this._offerInfoMap = new Map(offerInfoMap);
+    this._destinationInfoMap = new Map(destinationInfoMap);
     this._sortEvents();
 
     this._renderTrip();
@@ -48,7 +49,7 @@ export default class Trip {
 
   _renderEvent(event) {
     const eventPresenter = new EventPresenter(this._eventListComponent, this._handleEventChange, this._handleModeChange);
-    eventPresenter.init(event, this._eventTypeInfoMap, this._offerInfoMap);
+    eventPresenter.init(event, this._eventTypeInfoMap, this._offerInfoMap, this._destinationInfoMap);
     this._eventPresenterMap.set(event.id, eventPresenter);
   }
 

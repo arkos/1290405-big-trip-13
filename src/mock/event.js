@@ -100,7 +100,7 @@ const offerInfoMap = new Map(
 );
 
 const generateDestination = () => {
-  const destinations = destinationInfoMap.keys();
+  const destinations = [...destinationInfoMap.keys()];
   const randomIndex = getRandomInteger(0, destinations.length - 1);
   return destinations[randomIndex];
 };
@@ -137,6 +137,10 @@ const generateDestinationInfo = () => {
 };
 
 const destinationInfoMap = generateDestinationInfo();
+
+export const getDataForAllDestinations = () => {
+  return destinationInfoMap;
+};
 
 const generateType = () => {
   const types = Array.from(eventTypeInfoMap.keys());

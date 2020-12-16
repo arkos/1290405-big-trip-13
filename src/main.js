@@ -1,6 +1,6 @@
 import MenuView from './view/menu.js';
 import FilterView from './view/filter.js';
-import {generateEvent, getDataForAllEventTypes, getDataForAllOffers} from './mock/event.js';
+import {generateEvent, getDataForAllDestinations, getDataForAllEventTypes, getDataForAllOffers} from './mock/event.js';
 import {generateFilter} from './mock/filter.js';
 import {render, RenderPosition} from './utils/render.js';
 import TripPresenter from './presenter/trip.js';
@@ -9,6 +9,7 @@ const EVENT_COUNT = 20;
 const generatedEvents = new Array(EVENT_COUNT).fill().map(generateEvent);
 const eventTypeInfoMap = getDataForAllEventTypes();
 const offerInfoMap = getDataForAllOffers();
+const destinationInfoMap = getDataForAllDestinations();
 
 const tripMainElement = document.querySelector(`.trip-main`);
 const eventsElement = document.querySelector(`.trip-events`);
@@ -22,4 +23,4 @@ siteMenuElements.forEach((element, index) => render(siteMenuTitleElements[index]
 const tripPresenter = new TripPresenter(tripMainElement, eventsElement);
 
 // Trip rendering
-tripPresenter.init(generatedEvents, eventTypeInfoMap, offerInfoMap);
+tripPresenter.init(generatedEvents, eventTypeInfoMap, offerInfoMap, destinationInfoMap);
