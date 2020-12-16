@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import {nanoid} from 'nanoid';
 import {getRandomInteger, getRandomItems} from '../utils/common.js';
 
-const eventTypesInfoMap = new Map(
+const eventTypeInfoMap = new Map(
     [
       [
         `taxi`,
@@ -87,7 +87,7 @@ const eventTypesInfoMap = new Map(
     ]
 );
 
-const offersMap = new Map(
+const offerInfoMap = new Map(
     [
       [`uber`, {title: `Order Uber`, price: 20}],
       [`car`, {title: `Rent a car`, price: 200}],
@@ -100,7 +100,7 @@ const offersMap = new Map(
 );
 
 const generateType = () => {
-  const types = Array.from(eventTypesInfoMap.keys());
+  const types = Array.from(eventTypeInfoMap.keys());
 
   const randomIndex = getRandomInteger(0, types.length - 1);
   return types[randomIndex];
@@ -162,19 +162,19 @@ const generateDestinationInfo = () => {
 };
 
 export const getDataForEventType = (type) => {
-  if (!eventTypesInfoMap.has(type)) {
+  if (!eventTypeInfoMap.has(type)) {
     return null;
   }
 
-  return eventTypesInfoMap.get(type);
+  return eventTypeInfoMap.get(type);
 };
 
 export const getDataForAllEventTypes = () => {
-  return eventTypesInfoMap;
+  return eventTypeInfoMap;
 };
 
 export const getDataForAllOffers = () => {
-  return offersMap;
+  return offerInfoMap;
 };
 
 export const generateEvent = () => {
