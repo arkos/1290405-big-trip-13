@@ -49,7 +49,7 @@ const createTypesMenuTemplate = (eventTypesMenu) => {
 
       ${Array.from(eventTypesMenu).map(([key, title]) => `<div class="event__type-item">
       <input id="event-type-${key}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${key}">
-      <label class="event__type-label  event__type-label--${key}" for="event-type-${key}-1">${title.title}</label>
+      <label class="event__type-label  event__type-label--${key}" for="event-type-${key}-1">${title}</label>
     </div>`).join(``)}
 
     </fieldset>
@@ -60,7 +60,7 @@ const createEventEditTemplate = (state) => {
 
   const {type, startDate, finishDate, offers, destination, destinationInfo, price, src, eventTypesMenu} = state;
 
-  const typesMenuTemplate = createTypesMenuTemplate(eventTypesMenu.entries());
+  const typesMenuTemplate = createTypesMenuTemplate(eventTypesMenu);
 
   const offersTemplate = createOffersTemplate(offers);
 
@@ -202,7 +202,7 @@ export default class EventEdit extends SmartView {
     evt.preventDefault();
     this.updateData({
       type: evt.target.value,
-      src: this._state.eventTypeInfoMap.get(evt.target.value).image,
+      src: this._eventTypeInfoMap.get(evt.target.value).image,
       offers: EventEdit._createOfferSelectionForType(
           evt.target.value,
           null,
