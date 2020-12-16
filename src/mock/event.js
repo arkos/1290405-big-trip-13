@@ -99,44 +99,16 @@ const offerInfoMap = new Map(
     ]
 );
 
-const generateType = () => {
-  const types = Array.from(eventTypeInfoMap.keys());
-
-  const randomIndex = getRandomInteger(0, types.length - 1);
-  return types[randomIndex];
-};
-
 const generateDestination = () => {
-  const destinations = [
-    `Amsterdam`,
-    `Chamonix`,
-    `Geneva`
-  ];
-
+  const destinations = destinationInfoMap.keys();
   const randomIndex = getRandomInteger(0, destinations.length - 1);
   return destinations[randomIndex];
-};
-
-const generateOffers = (type) => {
-  const eventTypeData = getDataForEventType(type);
-  const offers = Array.from(eventTypeData.offers);
-
-  if (offers.length > 0) {
-    const randomSize = getRandomInteger(1, offers.length);
-    offers.length = randomSize;
-  }
-
-  return new Set(offers);
 };
 
 const generatePhotos = () => {
   const randomSize = getRandomInteger(1, 3);
   const photos = new Array(randomSize).fill().map(() => `http://picsum.photos/248/152?r=${Math.random()}`);
   return photos;
-};
-
-const generateDate = (offsetFromNow = 0, offsetUnit = `h`) => {
-  return dayjs().add(offsetFromNow, offsetUnit);
 };
 
 const generateDescription = () => {
@@ -147,26 +119,53 @@ const generateDescription = () => {
   return `${randomDescriptions.join(`. `)}.`;
 };
 
+const generateDestinationInfo = () => {
+  const destinations = [
+    `Amsterdam`,
+    `Chamonix`,
+    `Geneva`,
+    `Tel Aviv`,
+    `Washington`,
+    `San Francisco`
+  ];
+
+  const destinationInfo = destinations.map(
+      (destination) => [destination, {description: generateDescription(), photos: generatePhotos()}]
+  );
+
+  return new Map(destinationInfo);
+};
+
+const destinationInfoMap = generateDestinationInfo();
+
+const generateType = () => {
+  const types = Array.from(eventTypeInfoMap.keys());
+
+  const randomIndex = getRandomInteger(0, types.length - 1);
+  return types[randomIndex];
+};
+
+const generateOffers = (type) => {
+  const eventTypeData = eventTypeInfoMap.get(type);
+  const offers = Array.from(eventTypeData.offers);
+
+  if (offers.length > 0) {
+    const randomSize = getRandomInteger(1, offers.length);
+    offers.length = randomSize;
+  }
+
+  return new Set(offers);
+};
+
+const generateDate = (offsetFromNow = 0, offsetUnit = `h`) => {
+  return dayjs().add(offsetFromNow, offsetUnit);
+};
+
 const generatePrice = () => {
   const upper = 1000;
   const lower = 100;
   const price = getRandomInteger(lower, upper);
   return price;
-};
-
-const generateDestinationInfo = () => {
-  return {
-    description: generateDescription(),
-    photos: generatePhotos()
-  };
-};
-
-export const getDataForEventType = (type) => {
-  if (!eventTypeInfoMap.has(type)) {
-    return null;
-  }
-
-  return eventTypeInfoMap.get(type);
 };
 
 export const getDataForAllEventTypes = () => {
@@ -206,7 +205,6 @@ export const generateEvent = () => {
     destination: generateDestination(),
     price: generatePrice(),
     offers: generateOffers(type),
-    destinationInfo: generateDestinationInfo(),
     isFavorite: Boolean(getRandomInteger(0, 1))
   };
 };
