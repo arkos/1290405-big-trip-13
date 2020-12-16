@@ -1,5 +1,4 @@
 import SmartView from './smart.js';
-import {getDataForAllEventTypes, getDataForEventType, getDataForAllOffers} from '../mock/event.js';
 import {humanizeDate} from '../utils/event.js';
 import dayjs from 'dayjs';
 
@@ -13,17 +12,17 @@ const EMPTY_EVENT = {
   destinationInfo: {}
 };
 
-const createOffersTemplate = (offers, offersData) => {
+const createOffersTemplate = (offers) => {
   return offers && (offers.size > 0) ? `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
     <div class="event__available-offers">
-      ${Array.from(offers).map(({key, selected}) => `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${key}-1" type="checkbox" data-offer-key="${key}" name="event-offer-${key}" ${selected ? `checked` : ``}>
+      ${Array.from(offers).map(([key, value]) => `<div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${key}-1" type="checkbox" data-offer-key="${key}" name="event-offer-${key}" ${value.selected ? `checked` : ``}>
         <label class="event__offer-label" for="event-offer-${key}-1">
-          <span class="event__offer-title">${offersData.get(key).title}</span>
+          <span class="event__offer-title">${value.title}</span>
           &plus;&euro;&nbsp;
-          <span class="event__offer-price">${offersData.get(key).price}</span>
+          <span class="event__offer-price">${value.price}</span>
         </label>
       </div>`).join(``)}
     </div>
@@ -43,14 +42,14 @@ const createDestinationInfoTemplate = ({description, photos}) => {
 </section>`;
 };
 
-const createTypesMenuTemplate = (allAvailableTypes) => {
+const createTypesMenuTemplate = (eventTypesMenu) => {
   return `<div class="event__type-list">
     <fieldset class="event__type-group">
       <legend class="visually-hidden">Event type</legend>
 
-      ${Array.from(allAvailableTypes).map(([typeDataKey, typeDataValue]) => `<div class="event__type-item">
-      <input id="event-type-${typeDataKey}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeDataKey}">
-      <label class="event__type-label  event__type-label--${typeDataKey}" for="event-type-${typeDataKey}-1">${typeDataValue.title}</label>
+      ${Array.from(eventTypesMenu).map(([key, title]) => `<div class="event__type-item">
+      <input id="event-type-${key}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${key}">
+      <label class="event__type-label  event__type-label--${key}" for="event-type-${key}-1">${title.title}</label>
     </div>`).join(``)}
 
     </fieldset>
@@ -59,11 +58,11 @@ const createTypesMenuTemplate = (allAvailableTypes) => {
 
 const createEventEditTemplate = (state) => {
 
-  const {type, startDate, finishDate, offers, offersData, destination, destinationInfo, price, src, allTypeData} = state;
+  const {type, startDate, finishDate, offers, destination, destinationInfo, price, src, eventTypesMenu} = state;
 
-  const typesMenuTemplate = createTypesMenuTemplate(allTypeData.entries());
+  const typesMenuTemplate = createTypesMenuTemplate(eventTypesMenu.entries());
 
-  const offersTemplate = createOffersTemplate(offers, offersData);
+  const offersTemplate = createOffersTemplate(offers);
 
   const destinationInfoTemplate = createDestinationInfoTemplate(destinationInfo);
 
@@ -122,9 +121,11 @@ const createEventEditTemplate = (state) => {
 };
 
 export default class EventEdit extends SmartView {
-  constructor(event = EMPTY_EVENT) {
+  constructor(event = EMPTY_EVENT, eventTypeInfoMap, offerInfoMap) {
     super();
-    this._state = EventEdit.parseEventToState(event);
+    this._eventTypeInfoMap = eventTypeInfoMap;
+    this._offerInfoMap = offerInfoMap;
+    this._state = EventEdit.parseEventToState(event, this._eventTypeInfoMap, this._offerInfoMap);
 
     this._clickHandler = this._clickHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
@@ -139,19 +140,28 @@ export default class EventEdit extends SmartView {
     return createEventEditTemplate(this._state);
   }
 
-  static _parseEventToAvailableOffers(event) {
-    const eventTypeData = getDataForEventType(event.type);
-    const offers = new Set();
+  static _createOfferSelectionForType(type, selectedOffers, eventTypeInfoMap, offerInfoMap) {
 
-    if (event.offers && eventTypeData.offers.size > 0) {
-      eventTypeData.offers.forEach((availableOffer) => {
-        let selected = event.offers.has(availableOffer) ? true : false;
-        offers.add({key: availableOffer, selected});
-      }
-      );
+    const allOfferKeysForEventType = eventTypeInfoMap.get(type).offers;
+
+    if (!allOfferKeysForEventType || allOfferKeysForEventType.size === 0) {
+      return new Map();
     }
 
-    return offers;
+    const offerSelectionMap = new Map();
+
+    allOfferKeysForEventType.forEach((offerKey) => {
+      const offerInfo = offerInfoMap.get(offerKey);
+      const offerForEventType = {
+        key: offerKey,
+        title: offerInfo.title,
+        price: offerInfo.price,
+        selected: selectedOffers ? selectedOffers.has(offerKey) : false
+      };
+      offerSelectionMap.set(offerKey, offerForEventType);
+    });
+
+    return offerSelectionMap;
   }
 
   _clickHandler(evt) {
@@ -171,10 +181,10 @@ export default class EventEdit extends SmartView {
 
     evt.preventDefault();
 
-    const offers = new Set(this._state.offers);
-    offers.forEach((offer) => {
-      if (offer.key === evt.target.dataset.offerKey) {
-        offer.selected = !offer.selected;
+    const offers = new Map(this._state.offers);
+    offers.forEach((value, key) => {
+      if (key === evt.target.dataset.offerKey) {
+        value.selected = !value.selected;
       }
     });
 
@@ -189,13 +199,16 @@ export default class EventEdit extends SmartView {
       return;
     }
 
-    const allAvailableTypes = getDataForAllEventTypes();
-
     evt.preventDefault();
     this.updateData({
       type: evt.target.value,
-      src: allAvailableTypes.get(evt.target.value).image,
-      offers: EventEdit._parseEventToAvailableOffers({type: evt.target.value, offers: new Set()})
+      src: this._state.eventTypeInfoMap.get(evt.target.value).image,
+      offers: EventEdit._createOfferSelectionForType(
+          evt.target.value,
+          null,
+          this._eventTypeInfoMap,
+          this._offerInfoMap
+      )
     });
   }
 
@@ -222,7 +235,7 @@ export default class EventEdit extends SmartView {
   }
 
   reset(event) {
-    this.updateData(EventEdit.parseEventToState(event));
+    this.updateData(EventEdit.parseEventToState(event, this._eventTypeInfoMap, this._offerInfoMap));
   }
 
   restoreHandlers() {
@@ -247,24 +260,23 @@ export default class EventEdit extends SmartView {
       .addEventListener(`submit`, this._submitHandler);
   }
 
-  static parseEventToState(event) {
-    const allTypeData = getDataForAllEventTypes();
-    const eventTypeData = allTypeData.get(event.type);
-    const [defaultTypeData] = allTypeData.values();
+  static parseEventToState(event, eventTypeInfoMap, offerInfoMap) {
+    const offerSelectionMap = EventEdit._createOfferSelectionForType(event.type, event.offers, eventTypeInfoMap, offerInfoMap);
+
+    const eventTypesMenu = new Map();
+    eventTypeInfoMap.forEach((value, key) => eventTypesMenu.set(key, value.title));
+
+    const eventTypeData = eventTypeInfoMap.get(event.type);
+    const [defaultTypeData] = eventTypeInfoMap.values();
     const src = eventTypeData ? eventTypeData.image : defaultTypeData.image;
-
-    const offersData = getDataForAllOffers();
-
-    const offers = EventEdit._parseEventToAvailableOffers(event);
 
     return Object.assign(
         {},
         event,
         {
-          offers,
-          offersData,
-          allTypeData,
-          src
+          offers: offerSelectionMap,
+          src,
+          eventTypesMenu
         }
     );
   }
@@ -274,9 +286,9 @@ export default class EventEdit extends SmartView {
 
     const copyOffers = new Set();
 
-    state.offers.forEach((offer) => {
-      if (offer.selected) {
-        const copyOffer = offer.key;
+    state.offers.forEach((value, key) => {
+      if (value.selected) {
+        const copyOffer = key;
         copyOffers.add(copyOffer);
       }
     });

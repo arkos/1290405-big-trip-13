@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import {humanizeDate} from '../utils/event.js';
-import {getDataForAllOffers} from '../mock/event.js';
 import AbstractView from './abstract.js';
 
 dayjs.extend(duration);
@@ -14,18 +13,18 @@ const createEventOfferTemplate = ({title, price}) => {
   </li>`;
 };
 
-const createEventOffersTemplate = (offers, offersData) => {
+const createEventOffersTemplate = (offers) => {
   return offers.size > 0 ? `<h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-    ${Array.from(offers).map((offer) => createEventOfferTemplate(offersData.get(offer))).join(``)}
+    ${Array.from(offers).map(([, offerValue]) => createEventOfferTemplate(offerValue)).join(``)}
   </ul>` : ``;
 };
 
 const createEventTemplate = (state) => {
 
-  const {type, destination, startDate, finishDate, price, offers, offersData, isFavorite} = state;
+  const {type, destination, startDate, finishDate, price, offers, isFavorite} = state;
 
-  const offersTemplate = createEventOffersTemplate(offers, offersData);
+  const offersTemplate = createEventOffersTemplate(offers);
 
   const durationBetweenDates = dayjs.duration(finishDate.diff(startDate));
 
@@ -83,10 +82,10 @@ const createEventTemplate = (state) => {
 };
 
 export default class Event extends AbstractView {
-  constructor(event) {
+  constructor(event, offerInfoMap) {
     super();
     this._event = event;
-    this._state = Event._parseEventToState(event);
+    this._state = Event._parseEventToState(event, offerInfoMap);
 
     this._clickHandler = this._clickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
@@ -118,13 +117,18 @@ export default class Event extends AbstractView {
       .addEventListener(`click`, this._favoriteClickHandler);
   }
 
-  static _parseEventToState(event) {
-    const offersData = getDataForAllOffers();
+  static _parseEventToState(event, offerInfoMap) {
+    const offerSelectionMap = new Map();
+
+    event.offers.forEach((offerKey) => {
+      const offerInfo = offerInfoMap.get(offerKey);
+      offerSelectionMap.set(offerKey, {title: offerInfo.title, price: offerInfo.price});
+    });
 
     return Object.assign(
         {},
         event,
-        {offersData}
+        {offers: offerSelectionMap}
     );
   }
 }
