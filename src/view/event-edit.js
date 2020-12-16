@@ -208,7 +208,7 @@ export default class EventEdit extends SmartView {
 
     const {destination, availableDestinations} = EventEdit._createDestinationSelection(selectedDestination, this._destinationInfoMap);
 
-    if (!destination) {
+    if (!destination || destination.title === this._state.destination.title) {
       return;
     }
 
