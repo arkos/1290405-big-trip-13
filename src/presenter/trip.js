@@ -2,7 +2,7 @@ import SortView from '../view/sort.js';
 import NoEventView from '../view/no-event.js';
 import TripInfoView from '../view/trip-info.js';
 import TripPriceView from '../view/trip-price.js';
-import EventListView from '../view/trip-event-list.js';
+import EventListView from '../view/event-list.js';
 import {remove, render, RenderPosition, replace} from '../utils/render.js';
 import {generateSort} from '../mock/sort.js';
 import {getTripInfo, getTripPrice, sortEventDateAsc, sortEventPriceDesc, sortEventDurationDesc} from '../utils/event.js';
