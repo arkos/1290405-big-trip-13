@@ -119,7 +119,7 @@ export default class Trip {
 
   _handleEventChange(updatedEvent) {
     this._events = updateItem(this._events, updatedEvent);
-    this._eventPresenterMap.get(updatedEvent.id).init(updatedEvent, this._eventTypeInfoMap, this._offerInfoMap);
+    this._eventPresenterMap.get(updatedEvent.id).init(updatedEvent, this._eventTypeInfoMap, this._offerInfoMap, this._destinationInfoMap);
 
     this._renderTripInfo();
     this._renderTripPrice();

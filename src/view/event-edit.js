@@ -92,7 +92,7 @@ const createEventEditTemplate = (state) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.title}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination ? destination.title : ``}" list="destination-list-1">
             ${availableDestinationsTemplate}
         </div>
 
@@ -139,6 +139,7 @@ export default class EventEdit extends SmartView {
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
     this._offerToggleHandler = this._offerToggleHandler.bind(this);
+    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -194,6 +195,27 @@ export default class EventEdit extends SmartView {
   _submitHandler(evt) {
     evt.preventDefault();
     this._callback.submit(EventEdit.parseStateToEvent(this._state));
+  }
+
+  _destinationChangeHandler(evt) {
+    evt.preventDefault();
+
+    let selectedDestination = evt.target.value;
+
+    if (!this._destinationInfoMap.has(selectedDestination)) {
+      selectedDestination = this._state.destination.title;
+    }
+
+    const {destination, availableDestinations} = EventEdit._createDestinationSelection(selectedDestination, this._destinationInfoMap);
+
+    if (!destination) {
+      return;
+    }
+
+    this.updateData({
+      destination,
+      availableDestinations
+    });
   }
 
   _offerToggleHandler(evt) {
@@ -254,6 +276,10 @@ export default class EventEdit extends SmartView {
     if (offersRendered) {
       offersRendered.addEventListener(`change`, this._offerToggleHandler);
     }
+
+    this.getElement()
+    .querySelector(`.event__input--destination`)
+    .addEventListener(`change`, this._destinationChangeHandler);
   }
 
   reset(event) {
@@ -320,6 +346,7 @@ export default class EventEdit extends SmartView {
     });
 
     event.offers = copyOffers;
+    event.destination = state.destination.title;
 
     delete event.src;
     delete event.allTypeData;
