@@ -134,12 +134,13 @@ export default class EventEdit extends SmartView {
     this._destinationInfoMap = destinationInfoMap;
     this._state = EventEdit.parseEventToState(event, this._eventTypeInfoMap, this._offerInfoMap, this._destinationInfoMap);
 
-    this._clickHandler = this._clickHandler.bind(this);
+    this._clickRollupButtonHandler = this._clickRollupButtonHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
     this._offerToggleHandler = this._offerToggleHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
+    this._deleteClickHandler = this._deleteClickHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -187,14 +188,19 @@ export default class EventEdit extends SmartView {
     return {destination, availableDestinations};
   }
 
-  _clickHandler(evt) {
+  _clickRollupButtonHandler(evt) {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.rollupButtonClick();
   }
 
   _submitHandler(evt) {
     evt.preventDefault();
     this._callback.submit(EventEdit.parseStateToEvent(this._state));
+  }
+
+  _deleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick();
   }
 
   _destinationChangeHandler(evt) {
@@ -288,16 +294,16 @@ export default class EventEdit extends SmartView {
 
   restoreHandlers() {
     this._setInnerHandlers();
-    this.setClickHandler(this._callback.click);
+    this.setClickRollupButtonHandler(this._callback.rollupButtonClick);
     this.setFormSubmitHandler(this._callback.submit);
   }
 
-  setClickHandler(callback) {
-    this._callback.click = callback;
+  setClickRollupButtonHandler(callback) {
+    this._callback.rollupButtonClick = callback;
 
     this.getElement()
       .querySelector(`.event__rollup-btn`)
-      .addEventListener(`click`, this._clickHandler);
+      .addEventListener(`click`, this._clickRollupButtonHandler);
   }
 
   setFormSubmitHandler(callback) {

@@ -28,6 +28,7 @@ export default class Event {
     this._handleEscKeyDown = this._handleEscKeyDown.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
   init(event) {
@@ -39,9 +40,9 @@ export default class Event {
     this._eventComponent = new EventView(event, this._offerInfoMap);
     this._eventEditComponent = new EventEditView(event, this._eventTypeInfoMap, this._offerInfoMap, this._destinationInfoMap);
 
-    this._eventComponent.setClickHandler(this._handleClickRollupButtonDown);
+    this._eventComponent.setRollupButtonClickHandler(this._handleClickRollupButtonDown);
     this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._eventEditComponent.setClickHandler(this._handleClickRollupButtonUp);
+    this._eventEditComponent.setRollupButtonClickHandler(this._handleClickRollupButtonUp);
     this._eventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
 
     if ((prevEventComponent === null) || (prevEventEditComponent === null)) {
@@ -91,6 +92,14 @@ export default class Event {
         UserAction.UPDATE_EVENT,
         UpdateType.MINOR,
         Object.assign({}, this._event, {isFavorite: !this._event.isFavorite}));
+  }
+
+  _handleDeleteClick() {
+    this._changeData(
+        UserAction.DELETE_EVENT,
+        UpdateType.MINOR,
+        Object.assign({}, this._event)
+    );
   }
 
   _switchToEdit() {
