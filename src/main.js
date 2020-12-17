@@ -4,6 +4,7 @@ import {generateEvent, getDataForAllDestinations, getDataForAllEventTypes, getDa
 import {generateFilter} from './mock/filter.js';
 import {render, RenderPosition} from './utils/render.js';
 import TripPresenter from './presenter/trip.js';
+import EventsModel from './model/events.js';
 
 const EVENT_COUNT = 20;
 const generatedEvents = new Array(EVENT_COUNT).fill().map(generateEvent);
@@ -14,13 +15,16 @@ const destinationInfoMap = getDataForAllDestinations();
 const tripMainElement = document.querySelector(`.trip-main`);
 const eventsElement = document.querySelector(`.trip-events`);
 
+const eventsModel = new EventsModel();
+eventsModel.setEvents(generatedEvents);
+
 // Site Menu rendering
 const filter = generateFilter();
 const siteMenuTitleElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
 const siteMenuElements = [new MenuView(), new FilterView(filter)];
 siteMenuElements.forEach((element, index) => render(siteMenuTitleElements[index], element, RenderPosition.AFTEREND));
 
-const tripPresenter = new TripPresenter(tripMainElement, eventsElement);
+const tripPresenter = new TripPresenter(tripMainElement, eventsElement, eventsModel);
 
 // Trip rendering
 tripPresenter.init(generatedEvents, eventTypeInfoMap, offerInfoMap, destinationInfoMap);

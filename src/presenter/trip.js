@@ -12,9 +12,11 @@ import EventPresenter from '../presenter/event.js';
 
 
 export default class Trip {
-  constructor(tripContainer, eventContainer) {
+  constructor(tripContainer, eventContainer, eventsModel) {
     this._tripContainer = tripContainer;
     this._eventContainer = eventContainer;
+    this._eventsModel = eventsModel;
+
     this._eventPresenterMap = new Map();
 
     const sort = generateSort();
@@ -30,6 +32,10 @@ export default class Trip {
     this._handleEventChange = this._handleEventChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+  }
+
+  _getEvents() {
+    return this._eventsModel.getEvents();
   }
 
   init(events, eventTypeInfoMap, offerInfoMap, destinationInfoMap) {
