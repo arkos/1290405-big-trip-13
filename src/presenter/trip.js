@@ -7,7 +7,6 @@ import {remove, render, RenderPosition, replace} from '../utils/render.js';
 import {generateSort} from '../mock/sort.js';
 import {getTripInfo, getTripPrice, sortEventDateAsc, sortEventPriceDesc, sortEventDurationDesc} from '../utils/event.js';
 import {SortType} from '../utils/const.js';
-import {updateItem} from '../utils/common.js';
 import EventPresenter from '../presenter/event.js';
 
 
@@ -35,16 +34,19 @@ export default class Trip {
   }
 
   _getEvents() {
-    return this._eventsModel.getEvents();
+    switch (this._currentSortType) {
+      case SortType.DAY:
+        return this._eventsModel.getEvents().slice().sort(sortEventDateAsc);
+      case SortType.TIME:
+        return this._eventsModel.getEvents().slice().sort(sortEventDurationDesc);
+      case SortType.PRICE:
+        return this._eventsModel.getEvents().slice().sort(sortEventPriceDesc);
+      default:
+        return this._eventsModel.getEvents();
+    }
   }
 
-  init(events, eventTypeInfoMap, offerInfoMap, destinationInfoMap) {
-    this._events = events.slice();
-    this._eventTypeInfoMap = new Map(eventTypeInfoMap);
-    this._offerInfoMap = new Map(offerInfoMap);
-    this._destinationInfoMap = new Map(destinationInfoMap);
-    this._sortEvents();
-
+  init() {
     this._renderTrip();
   }
 
@@ -62,7 +64,7 @@ export default class Trip {
   _renderEvents() {
     render(this._eventContainer, this._eventListComponent, RenderPosition.BEFOREEND);
 
-    this._events.forEach((event) => this._renderEvent(event));
+    this._getEvents().forEach((event) => this._renderEvent(event));
   }
 
   _renderNoEvents() {
@@ -70,7 +72,7 @@ export default class Trip {
   }
 
   _renderTripInfo() {
-    const tripInfo = getTripInfo(this._events);
+    const tripInfo = getTripInfo(this._getEvents());
 
     const prevTripInfoComponent = this._tripInfoComponent;
     this._tripInfoComponent = new TripInfoView(tripInfo);
@@ -87,7 +89,7 @@ export default class Trip {
   }
 
   _renderTripPrice() {
-    const totalPriceForEvents = getTripPrice(this._events);
+    const totalPriceForEvents = getTripPrice(this._getEvents());
 
     const prevTripPriceComponent = this._tripPriceComponent;
     this._tripPriceComponent = new TripPriceView(totalPriceForEvents);
@@ -107,25 +109,8 @@ export default class Trip {
     this._eventPresenterMap.clear();
   }
 
-  _sortEvents() {
-    switch (this._currentSortType) {
-      case SortType.DAY:
-        this._events.sort(sortEventDateAsc);
-        break;
-      case SortType.TIME:
-        this._events.sort(sortEventDurationDesc);
-        break;
-      case SortType.PRICE:
-        this._events.sort(sortEventPriceDesc);
-        break;
-      default:
-        throw new Error(`Invalid sort type ${this._currentSortType}`);
-    }
-  }
-
   _handleEventChange(updatedEvent) {
-    this._events = updateItem(this._events, updatedEvent);
-    this._eventPresenterMap.get(updatedEvent.id).init(updatedEvent, this._eventTypeInfoMap, this._offerInfoMap, this._destinationInfoMap);
+    this._eventPresenterMap.get(updatedEvent.id).init(updatedEvent);
 
     this._renderTripInfo();
     this._renderTripPrice();
@@ -141,13 +126,12 @@ export default class Trip {
     }
 
     this._currentSortType = sortType;
-    this._sortEvents();
     this._clearEventList();
     this._renderEvents();
   }
 
   _renderTrip() {
-    if (this._events.length === 0) {
+    if (this._getEvents().length === 0) {
       this._renderNoEvents();
       return;
     }
