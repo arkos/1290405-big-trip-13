@@ -2,65 +2,113 @@ import dayjs from 'dayjs';
 import {nanoid} from 'nanoid';
 import {getRandomInteger, getRandomItems} from '../utils/common.js';
 
-const generateType = () => {
-  const types = [
-    `Taxi`,
-    `Bus`,
-    `Train`,
-    `Ship`,
-    `Transport`,
-    `Drive`,
-    `Flight`,
-    `Check-in`,
-    `Sightseeing`,
-    `Restaurant`
-  ];
+const eventTypeInfoMap = new Map(
+    [
+      [
+        `taxi`,
+        {
+          title: `Taxi`,
+          image: `img/icons/taxi.png`,
+          offers: new Set([`uber`])
+        }
+      ],
+      [
+        `bus`,
+        {
+          title: `Bus`,
+          image: `img/icons/bus.png`,
+          offers: new Set()
+        }
+      ],
+      [
+        `train`,
+        {
+          title: `Train`,
+          image: `img/icons/train.png`,
+          offers: new Set()
+        }
+      ],
+      [
+        `ship`,
+        {
+          title: `Ship`,
+          image: `img/icons/ship.png`,
+          offers: new Set()
+        }
+      ],
+      [
+        `transport`,
+        {
+          title: `Transport`,
+          image: `img/icons/transport.png`,
+          offers: new Set()
+        }
+      ],
+      [
+        `drive`,
+        {
+          title: `Drive`,
+          image: `img/icons/drive.png`,
+          offers: new Set([`car`])
+        }
+      ],
+      [
+        `flight`,
+        {
+          title: `Flight`,
+          image: `img/icons/flight.png`,
+          offers: new Set([`luggage`, `comfort`])
+        }
+      ],
+      [
+        `check-in`,
+        {
+          title: `Check-In`,
+          image: `img/icons/check-in.png`,
+          offers: new Set([`breakfast`])
+        }
+      ],
+      [
+        `sightseeing`,
+        {
+          title: `Sightseeing`,
+          image: `img/icons/sightseeing.png`,
+          offers: new Set([`tickets`, `lunch`])
+        }
+      ],
+      [
+        `restaurant`,
+        {
+          title: `Restaurant`,
+          image: `img/icons/restaurant.png`,
+          offers: new Set()
+        }
+      ],
+    ]
+);
 
-  const randomIndex = getRandomInteger(0, types.length - 1);
-  return types[randomIndex];
-};
+const offerInfoMap = new Map(
+    [
+      [`uber`, {title: `Order Uber`, price: 20}],
+      [`car`, {title: `Rent a car`, price: 200}],
+      [`luggage`, {title: `Add luggage`, price: 50}],
+      [`comfort`, {title: `Switch to comfort`, price: 80}],
+      [`breakfast`, {title: `Add breakfast`, price: 50}],
+      [`tickets`, {title: `Book tickets`, price: 40}],
+      [`lunch`, {title: `Lunch in city`, price: 30}]
+    ]
+);
 
 const generateDestination = () => {
-  const destinations = [
-    `Amsterdam`,
-    `Chamonix`,
-    `Geneva`
-  ];
-
+  const destinations = [...destinationInfoMap.keys()];
   const randomIndex = getRandomInteger(0, destinations.length - 1);
   return destinations[randomIndex];
-};
-
-const generateOffers = (type) => {
-
-  const offers = [
-    {type: `taxi`, key: `uber`, title: `Order Uber`, price: 20},
-    {type: `flight`, key: `luggage`, title: `Add luggage`, price: 50},
-    {type: `flight`, key: `comfort`, title: `Switch to comfort`, price: 80},
-    {type: `drive`, key: `car`, title: `Rent a car`, price: 200},
-    {type: `check-in`, key: `brekfast`, title: `Add breakfast`, price: 50},
-    {type: `sightseeing`, key: `tickets`, title: `Book tickets`, price: 40},
-    {type: `sightseeing`, key: `lunch`, title: `Lunch in city`, price: 30},
-  ];
-
-  const filteredOffers = offers.filter((offer) => type === offer.type);
-
-  if (filteredOffers.length > 0) {
-    const randomSize = getRandomInteger(1, filteredOffers.length);
-    filteredOffers.length = randomSize;
-  }
-
-  return filteredOffers;
 };
 
 const generatePhotos = () => {
   const randomSize = getRandomInteger(1, 3);
   const photos = new Array(randomSize).fill().map(() => `http://picsum.photos/248/152?r=${Math.random()}`);
   return photos;
-};
-
-const generateDate = (offsetFromNow = 0, offsetUnit = `h`) => {
-  return dayjs().add(offsetFromNow, offsetUnit);
 };
 
 const generateDescription = () => {
@@ -71,6 +119,52 @@ const generateDescription = () => {
   return `${randomDescriptions.join(`. `)}.`;
 };
 
+const generateDestinationInfo = () => {
+  const destinations = [
+    `Amsterdam`,
+    `Chamonix`,
+    `Geneva`,
+    `Tel Aviv`,
+    `Washington`,
+    `San Francisco`
+  ];
+
+  const destinationInfo = destinations.map(
+      (destination) => [destination, {description: generateDescription(), photos: generatePhotos()}]
+  );
+
+  return new Map(destinationInfo);
+};
+
+const destinationInfoMap = generateDestinationInfo();
+
+export const getDataForAllDestinations = () => {
+  return destinationInfoMap;
+};
+
+const generateType = () => {
+  const types = Array.from(eventTypeInfoMap.keys());
+
+  const randomIndex = getRandomInteger(0, types.length - 1);
+  return types[randomIndex];
+};
+
+const generateOffers = (type) => {
+  const eventTypeData = eventTypeInfoMap.get(type);
+  const offers = Array.from(eventTypeData.offers);
+
+  if (offers.length > 0) {
+    const randomSize = getRandomInteger(1, offers.length);
+    offers.length = randomSize;
+  }
+
+  return new Set(offers);
+};
+
+const generateDate = (offsetFromNow = 0, offsetUnit = `h`) => {
+  return dayjs().add(offsetFromNow, offsetUnit);
+};
+
 const generatePrice = () => {
   const upper = 1000;
   const lower = 100;
@@ -78,11 +172,12 @@ const generatePrice = () => {
   return price;
 };
 
-const generateDestinationInfo = () => {
-  return {
-    description: generateDescription(),
-    photos: generatePhotos()
-  };
+export const getDataForAllEventTypes = () => {
+  return eventTypeInfoMap;
+};
+
+export const getDataForAllOffers = () => {
+  return offerInfoMap;
 };
 
 export const generateEvent = () => {
@@ -113,8 +208,7 @@ export const generateEvent = () => {
     finishDate,
     destination: generateDestination(),
     price: generatePrice(),
-    offers: generateOffers(type.toLowerCase()),
-    destinationInfo: generateDestinationInfo(),
+    offers: generateOffers(type),
     isFavorite: Boolean(getRandomInteger(0, 1))
   };
 };

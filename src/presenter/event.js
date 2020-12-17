@@ -1,5 +1,5 @@
-import TripEventView from '../view/trip-event.js';
-import EditEventView from '../view/edit-event.js';
+import EventView from '../view/event.js';
+import EventEditView from '../view/event-edit.js';
 import {isEscEvent} from '../utils/common.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 
@@ -11,8 +11,8 @@ const Mode = {
 export default class Event {
   constructor(eventListContainer, changeData, changeMode) {
     this._eventListContainer = eventListContainer;
-    this._tripEventComponent = null;
-    this._tripEventEditComponent = null;
+    this._eventComponent = null;
+    this._eventEditComponent = null;
     this._changeData = changeData;
     this._changeMode = changeMode;
     this._mode = Mode.DEFAULT;
@@ -24,31 +24,31 @@ export default class Event {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
   }
 
-  init(tripEvent) {
-    this._tripEvent = tripEvent;
+  init(event, eventTypeInfoMap, offerInfoMap, destinationInfoMap) {
+    this._event = event;
 
-    const prevEventComponent = this._tripEventComponent;
-    const prevEventEditComponent = this._tripEventEditComponent;
+    const prevEventComponent = this._eventComponent;
+    const prevEventEditComponent = this._eventEditComponent;
 
-    this._tripEventComponent = new TripEventView(tripEvent);
-    this._tripEventEditComponent = new EditEventView(tripEvent);
+    this._eventComponent = new EventView(event, offerInfoMap);
+    this._eventEditComponent = new EventEditView(event, eventTypeInfoMap, offerInfoMap, destinationInfoMap);
 
-    this._tripEventComponent.setClickHandler(this._handleClickRollupButtonDown);
-    this._tripEventComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._tripEventEditComponent.setClickHandler(this._handleClickRollupButtonUp);
-    this._tripEventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._eventComponent.setClickHandler(this._handleClickRollupButtonDown);
+    this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    this._eventEditComponent.setClickHandler(this._handleClickRollupButtonUp);
+    this._eventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
 
     if ((prevEventComponent === null) || (prevEventEditComponent === null)) {
-      render(this._eventListContainer, this._tripEventComponent, RenderPosition.BEFOREEND);
+      render(this._eventListContainer, this._eventComponent, RenderPosition.BEFOREEND);
       return;
     }
 
     if (this._mode === Mode.DEFAULT) {
-      replace(this._tripEventComponent, prevEventComponent);
+      replace(this._eventComponent, prevEventComponent);
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._tripEventEditComponent, prevEventEditComponent);
+      replace(this._eventEditComponent, prevEventEditComponent);
     }
 
     remove(prevEventComponent);
@@ -56,6 +56,7 @@ export default class Event {
   }
 
   _handleClickRollupButtonUp() {
+    this._eventEditComponent.reset(this._event);
     this._switchToDisplay();
   }
 
@@ -64,27 +65,30 @@ export default class Event {
   }
 
   _handleEscKeyDown(evt) {
-    isEscEvent(evt, () => this._switchToDisplay());
+    isEscEvent(evt, () => {
+      this._eventEditComponent.reset(this._event);
+      this._switchToDisplay();
+    });
   }
 
-  _handleFormSubmit(tripEvent) {
-    this._changeData(tripEvent);
+  _handleFormSubmit(event) {
+    this._changeData(event);
     this._switchToDisplay();
   }
 
   _handleFavoriteClick() {
-    this._changeData(Object.assign({}, this._tripEvent, {isFavorite: !this._tripEvent.isFavorite}));
+    this._changeData(Object.assign({}, this._event, {isFavorite: !this._event.isFavorite}));
   }
 
   _switchToEdit() {
-    replace(this._tripEventEditComponent, this._tripEventComponent);
+    replace(this._eventEditComponent, this._eventComponent);
     document.addEventListener(`keydown`, this._handleEscKeyDown);
     this._changeMode();
     this._mode = Mode.EDITING;
   }
 
   _switchToDisplay() {
-    replace(this._tripEventComponent, this._tripEventEditComponent);
+    replace(this._eventComponent, this._eventEditComponent);
     document.removeEventListener(`keydown`, this._handleEscKeyDown);
     this._mode = Mode.DEFAULT;
   }
@@ -96,7 +100,7 @@ export default class Event {
   }
 
   destroy() {
-    remove(this._tripEventComponent);
-    remove(this._tripEventEditComponent);
+    remove(this._eventComponent);
+    remove(this._eventEditComponent);
   }
 }

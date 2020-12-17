@@ -1,11 +1,11 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import {humanizeDate} from '../utils/event.js';
-import AbstractView from '../view/abstract.js';
+import AbstractView from './abstract.js';
 
 dayjs.extend(duration);
 
-const createTripEventOfferTemplate = ({title, price}) => {
+const createEventOfferTemplate = ({title, price}) => {
   return `<li class="event__offer">
     <span class="event__offer-title">${title}</span>
     &plus;&euro;&nbsp;
@@ -13,18 +13,18 @@ const createTripEventOfferTemplate = ({title, price}) => {
   </li>`;
 };
 
-const createTripEventOffersTemplate = (offers) => {
-  return offers.length > 0 ? `<h4 class="visually-hidden">Offers:</h4>
+const createEventOffersTemplate = (offers) => {
+  return offers.size > 0 ? `<h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-    ${offers.map((offer) => createTripEventOfferTemplate(offer)).join(``)}
+    ${Array.from(offers).map(([, offerValue]) => createEventOfferTemplate(offerValue)).join(``)}
   </ul>` : ``;
 };
 
-const createTripEventTemplate = (tripEvent) => {
+const createEventTemplate = (state) => {
 
-  const {type, destination, startDate, finishDate, price, offers, isFavorite} = tripEvent;
+  const {type, destination, startDate, finishDate, price, offers, isFavorite} = state;
 
-  const offersTemplate = createTripEventOffersTemplate(offers);
+  const offersTemplate = createEventOffersTemplate(offers);
 
   const durationBetweenDates = dayjs.duration(finishDate.diff(startDate));
 
@@ -81,17 +81,18 @@ const createTripEventTemplate = (tripEvent) => {
   </li>`;
 };
 
-export default class TripEvent extends AbstractView {
-  constructor(event) {
+export default class Event extends AbstractView {
+  constructor(event, offerInfoMap) {
     super();
     this._event = event;
+    this._state = Event._parseEventToState(event, offerInfoMap);
 
     this._clickHandler = this._clickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
   getTemplate() {
-    return createTripEventTemplate(this._event);
+    return createEventTemplate(this._state);
   }
 
   _clickHandler(evt) {
@@ -114,5 +115,20 @@ export default class TripEvent extends AbstractView {
     this._callback.favoriteClick = callback;
     this.getElement().querySelector(`.event__favorite-btn`)
       .addEventListener(`click`, this._favoriteClickHandler);
+  }
+
+  static _parseEventToState(event, offerInfoMap) {
+    const offerSelectionMap = new Map();
+
+    event.offers.forEach((offerKey) => {
+      const offerInfo = offerInfoMap.get(offerKey);
+      offerSelectionMap.set(offerKey, {title: offerInfo.title, price: offerInfo.price});
+    });
+
+    return Object.assign(
+        {},
+        event,
+        {offers: offerSelectionMap}
+    );
   }
 }
