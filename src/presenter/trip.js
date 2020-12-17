@@ -4,7 +4,6 @@ import TripInfoView from '../view/trip-info.js';
 import TripPriceView from '../view/trip-price.js';
 import EventListView from '../view/event-list.js';
 import {remove, render, RenderPosition, replace} from '../utils/render.js';
-import {generateSort} from '../mock/sort.js';
 import {getTripInfo, getTripPrice, sortEventDateAsc, sortEventPriceDesc, sortEventDurationDesc} from '../utils/event.js';
 import {SortType, UserAction, UpdateType} from '../utils/const.js';
 import EventPresenter from '../presenter/event.js';
@@ -18,8 +17,8 @@ export default class Trip {
 
     this._eventPresenterMap = new Map();
 
-    this._sortLabels = generateSort();
     this._currentSortType = SortType.DAY;
+    this._sortComponent = null;
 
     this._tripPriceComponent = null;
     this._tripInfoComponent = null;
@@ -57,7 +56,7 @@ export default class Trip {
       this._sortComponent = null;
     }
 
-    this._sortComponent = new SortView(this._sortLabels);
+    this._sortComponent = new SortView(this._currentSortType);
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
 
     render(this._eventContainer, this._sortComponent, RenderPosition.BEFOREEND);
