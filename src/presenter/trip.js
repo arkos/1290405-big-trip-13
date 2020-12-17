@@ -6,7 +6,7 @@ import EventListView from '../view/event-list.js';
 import {remove, render, RenderPosition, replace} from '../utils/render.js';
 import {generateSort} from '../mock/sort.js';
 import {getTripInfo, getTripPrice, sortEventDateAsc, sortEventPriceDesc, sortEventDurationDesc} from '../utils/event.js';
-import {SortType} from '../utils/const.js';
+import {SortType, UserAction, UpdateType} from '../utils/const.js';
 import EventPresenter from '../presenter/event.js';
 
 
@@ -113,9 +113,31 @@ export default class Trip {
   }
 
   _handleViewAction(actionType, updateType, update) {
+    switch (actionType) {
+      case UserAction.ADD_EVENT:
+        this._eventsModel.addEvent(updateType, update);
+        break;
+      case UserAction.UPDATE_EVENT:
+        this._eventsModel.updateEvent(updateType, update);
+        break;
+      case UserAction.DELETE_EVENT:
+        this._eventsModel.deleteEvent(updateType, update);
+        break;
+    }
   }
 
   _handleModelEvent(updateType, data) {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this._eventPresenterMap.get(data.id).init(data);
+        break;
+      case UpdateType.MINOR:
+        break;
+      case UpdateType.MAJOR:
+        break;
+    }
+
+    // Should render trip info and trip price in some cases.
   }
 
   _handleModeChange() {
