@@ -2,6 +2,7 @@ import EventView from '../view/event.js';
 import EventEditView from '../view/event-edit.js';
 import {isEscEvent} from '../utils/common.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
+import {UserAction, UpdateType} from '../utils/const.js';
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -72,12 +73,19 @@ export default class Event {
   }
 
   _handleFormSubmit(event) {
-    this._changeData(event);
+    this._changeData(
+        UserAction.UPDATE_EVENT,
+        UpdateType.MINOR,
+        event
+    );
     this._switchToDisplay();
   }
 
   _handleFavoriteClick() {
-    this._changeData(Object.assign({}, this._event, {isFavorite: !this._event.isFavorite}));
+    this._changeData(
+        UserAction.UPDATE_EVENT,
+        UpdateType.MINOR,
+        Object.assign({}, this._event, {isFavorite: !this._event.isFavorite}));
   }
 
   _switchToEdit() {

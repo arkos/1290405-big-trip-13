@@ -28,9 +28,12 @@ export default class Trip {
     this._noEventComponent = new NoEventView();
     this._eventListComponent = new EventListView();
 
-    this._handleEventChange = this._handleEventChange.bind(this);
+    this._handleViewAction = this._handleViewAction.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+
+    this._eventsModel.attach(this._handleModelEvent);
   }
 
   _getEvents() {
@@ -56,7 +59,7 @@ export default class Trip {
   }
 
   _renderEvent(event) {
-    const eventPresenter = new EventPresenter(this._eventListComponent, this._handleEventChange, this._handleModeChange);
+    const eventPresenter = new EventPresenter(this._eventListComponent, this._handleViewAction, this._handleModeChange);
     eventPresenter.init(event, this._eventTypeInfoMap, this._offerInfoMap, this._destinationInfoMap);
     this._eventPresenterMap.set(event.id, eventPresenter);
   }
@@ -109,11 +112,10 @@ export default class Trip {
     this._eventPresenterMap.clear();
   }
 
-  _handleEventChange(updatedEvent) {
-    this._eventPresenterMap.get(updatedEvent.id).init(updatedEvent);
+  _handleViewAction(actionType, updateType, update) {
+  }
 
-    this._renderTripInfo();
-    this._renderTripPrice();
+  _handleModelEvent(updateType, data) {
   }
 
   _handleModeChange() {
