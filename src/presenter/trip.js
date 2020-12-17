@@ -18,8 +18,7 @@ export default class Trip {
 
     this._eventPresenterMap = new Map();
 
-    const sort = generateSort();
-    this._sortComponent = new SortView(sort);
+    this._sortLabels = generateSort();
     this._currentSortType = SortType.DAY;
 
     this._tripPriceComponent = null;
@@ -54,8 +53,14 @@ export default class Trip {
   }
 
   _renderSort() {
-    render(this._eventContainer, this._sortComponent, RenderPosition.BEFOREEND);
+    if (this._sortComponent !== null) {
+      this._sortComponent = null;
+    }
+
+    this._sortComponent = new SortView(this._sortLabels);
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+
+    render(this._eventContainer, this._sortComponent, RenderPosition.BEFOREEND);
   }
 
   _renderEvent(event) {
@@ -64,10 +69,10 @@ export default class Trip {
     this._eventPresenterMap.set(event.id, eventPresenter);
   }
 
-  _renderEvents() {
+  _renderEvents(events) {
     render(this._eventContainer, this._eventListComponent, RenderPosition.BEFOREEND);
 
-    this._getEvents().forEach((event) => this._renderEvent(event));
+    events.forEach((event) => this._renderEvent(event));
   }
 
   _renderNoEvents() {
@@ -107,9 +112,32 @@ export default class Trip {
     remove(prevTripPriceComponent);
   }
 
-  _clearEventList() {
+  _renderTrip() {
+    const events = this._getEvents();
+
+    if (events.length === 0) {
+      this._renderNoEvents();
+      return;
+    }
+
+    this._renderTripInfo();
+    this._renderTripPrice();
+    this._renderSort();
+    this._renderEvents(events);
+  }
+
+  _clearTrip({resetSortType = false} = {}) {
     this._eventPresenterMap.forEach((presenter) => presenter.destroy());
     this._eventPresenterMap.clear();
+
+    remove(this._sortComponent);
+    remove(this._noEventComponent);
+    remove(this._tripInfoComponent);
+    remove(this._tripPriceComponent);
+
+    if (resetSortType) {
+      this._currentSortType = SortType.DAY;
+    }
   }
 
   _handleViewAction(actionType, updateType, update) {
@@ -132,8 +160,12 @@ export default class Trip {
         this._eventPresenterMap.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
+        this._clearTrip();
+        this._renderTrip();
         break;
       case UpdateType.MAJOR:
+        this._clearTrip();
+        this._renderTrip({resetSortType: true});
         break;
     }
 
@@ -150,19 +182,7 @@ export default class Trip {
     }
 
     this._currentSortType = sortType;
-    this._clearEventList();
-    this._renderEvents();
-  }
-
-  _renderTrip() {
-    if (this._getEvents().length === 0) {
-      this._renderNoEvents();
-      return;
-    }
-
-    this._renderTripInfo();
-    this._renderTripPrice();
-    this._renderSort();
-    this._renderEvents();
+    this._clearTrip();
+    this._renderTrip();
   }
 }
