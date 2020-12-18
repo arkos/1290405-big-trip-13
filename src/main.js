@@ -31,3 +31,8 @@ const tripPresenter = new TripPresenter(tripMainElement, eventsElement, eventsMo
 
 // Trip rendering
 tripPresenter.init();
+
+document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (evt) => {
+  evt.preventDefault();
+  tripPresenter.createEvent();
+});
