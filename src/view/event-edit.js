@@ -200,7 +200,7 @@ export default class EventEdit extends SmartView {
 
   _deleteClickHandler(evt) {
     evt.preventDefault();
-    this._callback.deleteClick();
+    this._callback.deleteClick(EventEdit.parseStateToEvent(this._state));
   }
 
   _destinationChangeHandler(evt) {
@@ -294,11 +294,11 @@ export default class EventEdit extends SmartView {
 
   restoreHandlers() {
     this._setInnerHandlers();
-    this.setClickRollupButtonHandler(this._callback.rollupButtonClick);
+    this.setRollupButtonClickHandler(this._callback.rollupButtonClick);
     this.setFormSubmitHandler(this._callback.submit);
   }
 
-  setClickRollupButtonHandler(callback) {
+  setRollupButtonClickHandler(callback) {
     this._callback.rollupButtonClick = callback;
 
     this.getElement()
@@ -312,6 +312,14 @@ export default class EventEdit extends SmartView {
     this.getElement()
       .querySelector(`form`)
       .addEventListener(`submit`, this._submitHandler);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+
+    this.getElement()
+    .querySelector(`.event__reset-btn`)
+    .addEventListener(`click`, this._deleteClickHandler);
   }
 
   static parseEventToState(event, eventTypeInfoMap, offerInfoMap, destinationInfoMap) {
