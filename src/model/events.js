@@ -48,7 +48,7 @@ export default class Events extends Subject {
 
     this._events = [
       ...this._events.slice(0, index),
-      ...this.events.slice(index + 1)
+      ...this._events.slice(index + 1)
     ];
 
     this._notify(updateType, update);

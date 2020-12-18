@@ -6,7 +6,7 @@ import {render, RenderPosition} from './utils/render.js';
 import TripPresenter from './presenter/trip.js';
 import EventsModel from './model/events.js';
 
-const EVENT_COUNT = 20;
+const EVENT_COUNT = 10;
 const generatedEvents = new Array(EVENT_COUNT).fill().map(generateEvent);
 
 const tripMainElement = document.querySelector(`.trip-main`);
