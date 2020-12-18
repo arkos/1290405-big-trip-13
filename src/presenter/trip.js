@@ -86,36 +86,23 @@ export default class Trip {
   }
 
   _renderTripInfo(events) {
-    const tripInfo = getTripInfo(events);
-
-    const prevTripInfoComponent = this._tripInfoComponent;
-    this._tripInfoComponent = new TripInfoView(tripInfo);
-
-    if (prevTripInfoComponent === null) {
-      render(this._tripContainer, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
-      return;
+    if (this._tripInfoComponent !== null) {
+      this._tripInfoComponent = null;
     }
 
-    render(this._tripInfoComponent, this._tripPriceComponent, RenderPosition.BEFOREEND);
-    replace(this._tripInfoComponent, prevTripInfoComponent);
-
-    remove(prevTripInfoComponent);
+    const tripInfo = getTripInfo(events);
+    this._tripInfoComponent = new TripInfoView(tripInfo);
+    render(this._tripContainer, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
   }
 
   _renderTripPrice(events) {
-    const totalPriceForEvents = getTripPrice(events);
-
-    const prevTripPriceComponent = this._tripPriceComponent;
-    this._tripPriceComponent = new TripPriceView(totalPriceForEvents);
-
-    if (prevTripPriceComponent === null) {
-      render(this._tripInfoComponent, this._tripPriceComponent, RenderPosition.BEFOREEND);
-      return;
+    if (this._tripPriceComponent !== null) {
+      this._tripPriceComponent = null;
     }
 
-    replace(this._tripPriceComponent, prevTripPriceComponent);
-
-    remove(prevTripPriceComponent);
+    const totalPriceForEvents = getTripPrice(events);
+    this._tripPriceComponent = new TripPriceView(totalPriceForEvents);
+    render(this._tripInfoComponent, this._tripPriceComponent, RenderPosition.BEFOREEND);
   }
 
   _renderTrip() {
