@@ -3,6 +3,7 @@ import FilterView from './view/filter.js';
 import {generateEvent} from './mock/event.js';
 import {render, RenderPosition} from './utils/render.js';
 import TripPresenter from './presenter/trip.js';
+import FilterPresenter from './presenter/filter.js';
 import EventsModel from './model/events.js';
 import FilterModel from './model/filter.js';
 
@@ -19,15 +20,13 @@ const filterModel = new FilterModel();
 
 // Site Menu rendering
 
-const filter = {
-  everything: `Everything`,
-  future: `Future`,
-  past: `Past`
-};
-
 const siteMenuTitleElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
-const siteMenuElements = [new MenuView(), new FilterView(filter)];
-siteMenuElements.forEach((element, index) => render(siteMenuTitleElements[index], element, RenderPosition.AFTEREND));
+const [menuContainer, filterContainer] = siteMenuTitleElements;
+
+render(menuContainer, new MenuView(), RenderPosition.AFTEREND);
+
+const filterPresenter = new FilterPresenter(filterContainer, filterModel);
+filterPresenter.init();
 
 const tripPresenter = new TripPresenter(tripMainElement, eventsElement, eventsModel);
 
