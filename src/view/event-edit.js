@@ -257,6 +257,7 @@ export default class EventEdit extends SmartView {
     this._setInnerHandlers();
     this.setRollupButtonClickHandler(this._callback.rollupButtonClick);
     this.setFormSubmitHandler(this._callback.submit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
   setRollupButtonClickHandler(callback) {
