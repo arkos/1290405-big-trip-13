@@ -149,45 +149,6 @@ export default class EventEdit extends SmartView {
     return createEventEditTemplate(this._state);
   }
 
-  static _createOfferSelectionForType(type, selectedOffers, eventTypeInfoMap, offerInfoMap) {
-
-    const allOfferKeysForEventType = eventTypeInfoMap.get(type).offers;
-
-    if (!allOfferKeysForEventType || allOfferKeysForEventType.size === 0) {
-      return new Map();
-    }
-
-    const offerSelectionMap = new Map();
-
-    allOfferKeysForEventType.forEach((offerKey) => {
-      const offerInfo = offerInfoMap.get(offerKey);
-      const offerForEventType = {
-        key: offerKey,
-        title: offerInfo.title,
-        price: offerInfo.price,
-        selected: selectedOffers ? selectedOffers.has(offerKey) : false
-      };
-      offerSelectionMap.set(offerKey, offerForEventType);
-    });
-
-    return offerSelectionMap;
-  }
-
-  static _createDestinationSelection(currentDestination, destinationInfoMap) {
-    const availableDestinations = [];
-    let destination = {};
-
-    destinationInfoMap.forEach((value, key) => {
-      if (currentDestination === key) {
-        destination = {title: key, description: value.description, photos: value.photos.slice()};
-      } else {
-        availableDestinations.push(key);
-      }
-    });
-
-    return {destination, availableDestinations};
-  }
-
   _clickRollupButtonHandler(evt) {
     evt.preventDefault();
     this._callback.rollupButtonClick();
@@ -367,5 +328,44 @@ export default class EventEdit extends SmartView {
     delete event.offersData;
 
     return event;
+  }
+
+  static _createDestinationSelection(currentDestination, destinationInfoMap) {
+    const availableDestinations = [];
+    let destination = {};
+
+    destinationInfoMap.forEach((value, key) => {
+      if (currentDestination === key) {
+        destination = {title: key, description: value.description, photos: value.photos.slice()};
+      } else {
+        availableDestinations.push(key);
+      }
+    });
+
+    return {destination, availableDestinations};
+  }
+
+  static _createOfferSelectionForType(type, selectedOffers, eventTypeInfoMap, offerInfoMap) {
+
+    const allOfferKeysForEventType = eventTypeInfoMap.get(type).offers;
+
+    if (!allOfferKeysForEventType || allOfferKeysForEventType.size === 0) {
+      return new Map();
+    }
+
+    const offerSelectionMap = new Map();
+
+    allOfferKeysForEventType.forEach((offerKey) => {
+      const offerInfo = offerInfoMap.get(offerKey);
+      const offerForEventType = {
+        key: offerKey,
+        title: offerInfo.title,
+        price: offerInfo.price,
+        selected: selectedOffers ? selectedOffers.has(offerKey) : false
+      };
+      offerSelectionMap.set(offerKey, offerForEventType);
+    });
+
+    return offerSelectionMap;
   }
 }
