@@ -5,6 +5,7 @@ import {generateFilter} from './mock/filter.js';
 import {render, RenderPosition} from './utils/render.js';
 import TripPresenter from './presenter/trip.js';
 import EventsModel from './model/events.js';
+import FilterModel from './model/filter.js';
 
 const EVENT_COUNT = 10;
 const generatedEvents = new Array(EVENT_COUNT).fill().map(generateEvent);
@@ -14,6 +15,8 @@ const eventsElement = document.querySelector(`.trip-events`);
 
 const eventsModel = new EventsModel();
 eventsModel.setEvents(generatedEvents);
+
+const filterModel = new FilterModel();
 
 // Site Menu rendering
 const filter = generateFilter();
