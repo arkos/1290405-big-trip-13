@@ -63,3 +63,11 @@ export const sortEventDurationDesc = (lhsEvent, rhsEvent) => {
 
   return rhsDurationMs - lhsDurationMs;
 };
+
+export const isPastDate = (date) => {
+  return date === null ? false : dayjs().isAfter(date);
+};
+
+export const isFutureDate = (date) => {
+  return date === null ? false : dayjs().isBefore(date, `day`) || dayjs().isSame(date, `day`);
+};
