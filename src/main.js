@@ -1,5 +1,4 @@
 import MenuView from './view/menu.js';
-import FilterView from './view/filter.js';
 import {generateEvent} from './mock/event.js';
 import {render, RenderPosition} from './utils/render.js';
 import TripPresenter from './presenter/trip.js';
@@ -28,7 +27,7 @@ render(menuContainer, new MenuView(), RenderPosition.AFTEREND);
 const filterPresenter = new FilterPresenter(filterContainer, filterModel);
 filterPresenter.init();
 
-const tripPresenter = new TripPresenter(tripMainElement, eventsElement, eventsModel);
+const tripPresenter = new TripPresenter(tripMainElement, eventsElement, eventsModel, filterModel);
 
 // Trip rendering
 tripPresenter.init();
