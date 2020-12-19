@@ -71,3 +71,25 @@ export const isPastDate = (date) => {
 export const isFutureDate = (date) => {
   return date === null ? false : dayjs().isBefore(date, `day`) || dayjs().isSame(date, `day`);
 };
+
+export const formatDuration = (startDate, finishDate) => {
+  const durationBetweenDates = dayjs.duration(finishDate.diff(startDate));
+
+  const days = durationBetweenDates.days();
+  const hours = durationBetweenDates.hours();
+  const minutes = durationBetweenDates.minutes();
+
+  let template;
+
+  if (days) {
+    template = `DD[D] HH[H] mm[M]`;
+  } else if (hours) {
+    template = `HH[H] mm[M]`;
+  } else {
+    template = `mm[M]`;
+  }
+
+  const durationBeforeFormat = `0000-00-${days} ${hours}:${minutes}`;
+  const formattedDuration = dayjs(durationBeforeFormat).format(template);
+  return formattedDuration;
+};
