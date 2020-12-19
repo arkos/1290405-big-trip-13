@@ -7,9 +7,8 @@ const EMPTY_EVENT = {
   startDate: dayjs().startOf(`day`),
   finishDate: dayjs().endOf(`day`),
   destination: ``,
-  price: ``,
-  offers: [],
-  destinationInfo: {}
+  price: 0,
+  offers: []
 };
 
 const createOffersTemplate = (offers) => {
@@ -66,7 +65,7 @@ const createTypesMenuTemplate = (eventTypesMenu) => {
 
 const createEventEditTemplate = (state) => {
 
-  const {type, startDate, finishDate, offers, destination, availableDestinations, price, src, eventTypesMenu} = state;
+  const {type, startDate, finishDate, offers, destination, availableDestinations, price, image, eventTypesMenu} = state;
 
   const typesMenuTemplate = createTypesMenuTemplate(eventTypesMenu);
 
@@ -82,7 +81,7 @@ const createEventEditTemplate = (state) => {
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="${src}" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="${image}" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
           ${typesMenuTemplate}
@@ -127,7 +126,7 @@ const createEventEditTemplate = (state) => {
 };
 
 export default class EventEdit extends SmartView {
-  constructor(event = EMPTY_EVENT, typesDataMap, offersDataMap, destinationsDataMap) {
+  constructor(typesDataMap, offersDataMap, destinationsDataMap, event = EMPTY_EVENT) {
     super();
     this._typesDataMap = typesDataMap;
     this._offersDataMap = offersDataMap;
@@ -213,7 +212,7 @@ export default class EventEdit extends SmartView {
     evt.preventDefault();
     this.updateData({
       type: evt.target.value,
-      src: this._typesDataMap.get(evt.target.value).image,
+      image: this._typesDataMap.get(evt.target.value).image,
       offers: EventEdit._createOfferSelectionForType(
           evt.target.value,
           null,
@@ -284,14 +283,17 @@ export default class EventEdit extends SmartView {
   }
 
   static parseEventToState(event, typesDataMap, offersDataMap, destinationsDataMap) {
-    const offerSelectionMap = EventEdit._createOfferSelectionForType(event.type, event.offers, offersDataMap);
+    const [defaultType] = typesDataMap.keys();
+    const type = event.type ? event.type : defaultType;
+
+
+    const offerSelectionMap = EventEdit._createOfferSelectionForType(type, event.offers, offersDataMap);
 
     const eventTypesMenu = new Map();
     typesDataMap.forEach((value, key) => eventTypesMenu.set(key, value.title));
 
-    const eventTypeData = typesDataMap.get(event.type);
-    const [defaultTypeData] = typesDataMap.values();
-    const src = eventTypeData ? eventTypeData.image : defaultTypeData.image;
+    const eventTypeData = typesDataMap.get(type);
+    const {image} = eventTypeData;
 
     const {destination, availableDestinations} = EventEdit._createDestinationSelection(event.destination, destinationsDataMap);
 
@@ -299,8 +301,9 @@ export default class EventEdit extends SmartView {
         {},
         event,
         {
+          type,
           offers: offerSelectionMap,
-          src,
+          image,
           eventTypesMenu,
           destination,
           availableDestinations
@@ -331,7 +334,7 @@ export default class EventEdit extends SmartView {
 
   static _createDestinationSelection(currentDestination, destinationsDataMap) {
     const availableDestinations = [];
-    let destination = {};
+    let destination = {title: ``, description: ``, photos: []};
 
     destinationsDataMap.forEach((value, key) => {
       if (currentDestination === key) {

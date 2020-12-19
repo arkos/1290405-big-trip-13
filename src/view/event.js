@@ -65,7 +65,7 @@ const createEventTemplate = (state) => {
 };
 
 export default class Event extends AbstractView {
-  constructor(event, typesDataMap, offersDataMap) {
+  constructor(typesDataMap, offersDataMap, event) {
     super();
     this._event = event;
     this._state = Event._parseEventToState(event, typesDataMap, offersDataMap);

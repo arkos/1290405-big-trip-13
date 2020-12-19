@@ -64,7 +64,7 @@ export default class Trip {
   createEvent() {
     this._currentSortType = SortType.DAY;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this._eventNewPresenter.init();
+    this._eventNewPresenter.init(this._dataListModel);
   }
 
   _renderSort() {

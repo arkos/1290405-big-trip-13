@@ -7,7 +7,7 @@ import EventsModel from './model/events.js';
 import FilterModel from './model/filter.js';
 import DataListModel from './model/data-list.js';
 
-const EVENT_COUNT = 10;
+const EVENT_COUNT = 3;
 const generatedEvents = new Array(EVENT_COUNT).fill().map(generateEvent);
 
 const eventTypeInfoMap = getDataForAllEventTypes();

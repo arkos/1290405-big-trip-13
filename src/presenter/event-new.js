@@ -14,20 +14,24 @@ export default class EventNew {
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
     this._handleEscKeyDown = this._handleEscKeyDown.bind(this);
+    this._handleClickRollupButtonUp = this._handleClickRollupButtonUp.bind(this);
   }
 
-  init() {
+  init(dataListModel) {
     if (this._eventEditComponent !== null) {
       return;
     }
 
-    this._eventEditComponent = new EventEditView();
+    this._dataListModel = dataListModel;
+
+    this._eventEditComponent = new EventEditView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), this._dataListModel.getDestinations());
     this._eventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._eventEditComponent.setDeleteClickHandler(this._handleDeleteClick);
+    this._eventEditComponent.setRollupButtonClickHandler(this._handleClickRollupButtonUp);
 
-    render(this._eventListContainer, this._eventComponent, RenderPosition.BEFOREEND);
+    render(this._eventListContainer, this._eventEditComponent, RenderPosition.AFTERBEGIN);
 
-    document.addEventListener(`keydown`, this._escKeyDownHandler);
+    document.addEventListener(`keydown`, this._handleEscKeyDown);
   }
 
   destroy() {
@@ -58,5 +62,9 @@ export default class EventNew {
     isEscEvent(evt, () => {
       this.destroy();
     });
+  }
+
+  _handleClickRollupButtonUp() {
+    this.destroy();
   }
 }
