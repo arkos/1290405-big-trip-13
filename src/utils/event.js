@@ -73,7 +73,7 @@ export const isFutureDate = (date) => {
 };
 
 export const formatDuration = (startDate, finishDate) => {
-  const durationBetweenDates = dayjs.duration(finishDate.diff(startDate));
+  const durationBetweenDates = dayjs.duration(dayjs(finishDate).diff(dayjs(startDate)));
 
   const days = durationBetweenDates.days();
   const hours = durationBetweenDates.hours();

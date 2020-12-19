@@ -172,8 +172,6 @@ export default class Trip {
         this._renderTrip();
         break;
     }
-
-    // Should render trip info and trip price in some cases.
   }
 
   _handleModeChange() {

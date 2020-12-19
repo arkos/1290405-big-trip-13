@@ -189,9 +189,9 @@ export const generateEvent = () => {
   const startDate = dayjs(generatedDate)
     .add(randomOffsetDays, `d`)
     .add(randomOffsetHours, `h`)
-    .add(randomOffsetMinutes, `m`);
+    .add(randomOffsetMinutes, `m`).toDate();
 
-  const finishDate = dayjs(startDate).add(Math.abs(randomOffsetDays), `d`).add(Math.abs(randomOffsetHours), `h`).add(Math.abs(randomOffsetMinutes), `m`);
+  const finishDate = dayjs(startDate).add(Math.abs(randomOffsetDays), `d`).add(Math.abs(randomOffsetHours), `h`).add(Math.abs(randomOffsetMinutes), `m`).toDate();
 
   return {
     id: nanoid(),
