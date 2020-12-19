@@ -155,6 +155,60 @@ export default class EventEdit extends SmartView {
     return createEventEditTemplate(this._state);
   }
 
+  reset(event) {
+    this.updateData(EventEdit.parseEventToState(event, this._typesDataMap, this._offersDataMap, this._destinationsDataMap));
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setRollupButtonClickHandler(this._callback.rollupButtonClick);
+    this.setFormSubmitHandler(this._callback.submit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
+  }
+
+  setRollupButtonClickHandler(callback) {
+    this._callback.rollupButtonClick = callback;
+
+    this.getElement()
+      .querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, this._clickRollupButtonHandler);
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.submit = callback;
+
+    this.getElement()
+      .querySelector(`form`)
+      .addEventListener(`submit`, this._submitHandler);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+
+    this.getElement()
+    .querySelector(`.event__reset-btn`)
+    .addEventListener(`click`, this._deleteClickHandler);
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+    .querySelector(`.event__type-list`)
+    .addEventListener(`change`, this._eventTypeChangeHandler);
+
+    this.getElement()
+    .querySelector(`.event__input--price`)
+    .addEventListener(`input`, this._priceInputHandler);
+
+    const offersRendered = this.getElement().querySelector(`.event__available-offers`);
+    if (offersRendered) {
+      offersRendered.addEventListener(`change`, this._offerToggleHandler);
+    }
+
+    this.getElement()
+    .querySelector(`.event__input--destination`)
+    .addEventListener(`change`, this._destinationChangeHandler);
+  }
+
   _clickRollupButtonHandler(evt) {
     evt.preventDefault();
     this._callback.rollupButtonClick();
@@ -233,60 +287,6 @@ export default class EventEdit extends SmartView {
     this.updateData({
       price: parseInt(evt.target.value, 10)
     }, true);
-  }
-
-  _setInnerHandlers() {
-    this.getElement()
-    .querySelector(`.event__type-list`)
-    .addEventListener(`change`, this._eventTypeChangeHandler);
-
-    this.getElement()
-    .querySelector(`.event__input--price`)
-    .addEventListener(`input`, this._priceInputHandler);
-
-    const offersRendered = this.getElement().querySelector(`.event__available-offers`);
-    if (offersRendered) {
-      offersRendered.addEventListener(`change`, this._offerToggleHandler);
-    }
-
-    this.getElement()
-    .querySelector(`.event__input--destination`)
-    .addEventListener(`change`, this._destinationChangeHandler);
-  }
-
-  reset(event) {
-    this.updateData(EventEdit.parseEventToState(event, this._typesDataMap, this._offersDataMap, this._destinationsDataMap));
-  }
-
-  restoreHandlers() {
-    this._setInnerHandlers();
-    this.setRollupButtonClickHandler(this._callback.rollupButtonClick);
-    this.setFormSubmitHandler(this._callback.submit);
-    this.setDeleteClickHandler(this._callback.deleteClick);
-  }
-
-  setRollupButtonClickHandler(callback) {
-    this._callback.rollupButtonClick = callback;
-
-    this.getElement()
-      .querySelector(`.event__rollup-btn`)
-      .addEventListener(`click`, this._clickRollupButtonHandler);
-  }
-
-  setFormSubmitHandler(callback) {
-    this._callback.submit = callback;
-
-    this.getElement()
-      .querySelector(`form`)
-      .addEventListener(`submit`, this._submitHandler);
-  }
-
-  setDeleteClickHandler(callback) {
-    this._callback.deleteClick = callback;
-
-    this.getElement()
-    .querySelector(`.event__reset-btn`)
-    .addEventListener(`click`, this._deleteClickHandler);
   }
 
   static parseEventToState(event, typesDataMap, offersDataMap, destinationsDataMap) {

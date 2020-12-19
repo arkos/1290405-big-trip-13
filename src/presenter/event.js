@@ -59,6 +59,30 @@ export default class Event {
     remove(prevEventEditComponent);
   }
 
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._switchToDisplay();
+    }
+  }
+
+  destroy() {
+    remove(this._eventComponent);
+    remove(this._eventEditComponent);
+  }
+
+  _switchToEdit() {
+    replace(this._eventEditComponent, this._eventComponent);
+    document.addEventListener(`keydown`, this._handleEscKeyDown);
+    this._changeMode();
+    this._mode = Mode.EDITING;
+  }
+
+  _switchToDisplay() {
+    replace(this._eventComponent, this._eventEditComponent);
+    document.removeEventListener(`keydown`, this._handleEscKeyDown);
+    this._mode = Mode.DEFAULT;
+  }
+
   _handleClickRollupButtonUp() {
     this._eventEditComponent.reset(this._event);
     this._switchToDisplay();
@@ -99,27 +123,5 @@ export default class Event {
     );
   }
 
-  _switchToEdit() {
-    replace(this._eventEditComponent, this._eventComponent);
-    document.addEventListener(`keydown`, this._handleEscKeyDown);
-    this._changeMode();
-    this._mode = Mode.EDITING;
-  }
 
-  _switchToDisplay() {
-    replace(this._eventComponent, this._eventEditComponent);
-    document.removeEventListener(`keydown`, this._handleEscKeyDown);
-    this._mode = Mode.DEFAULT;
-  }
-
-  resetView() {
-    if (this._mode !== Mode.DEFAULT) {
-      this._switchToDisplay();
-    }
-  }
-
-  destroy() {
-    remove(this._eventComponent);
-    remove(this._eventEditComponent);
-  }
 }

@@ -40,6 +40,16 @@ export default class Trip {
     this._eventNewPresenter = new EventNewPresenter(this._eventListComponent, this._handleViewAction);
   }
 
+  init() {
+    this._renderTrip();
+  }
+
+  createEvent() {
+    this._currentSortType = SortType.DAY;
+    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this._eventNewPresenter.init(this._dataListModel);
+  }
+
   _getEvents() {
     const filterType = this._filterModel.getFilter();
     const events = this._eventsModel.getEvents();
@@ -55,16 +65,6 @@ export default class Trip {
       default:
         return filteredEvents;
     }
-  }
-
-  init() {
-    this._renderTrip();
-  }
-
-  createEvent() {
-    this._currentSortType = SortType.DAY;
-    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this._eventNewPresenter.init(this._dataListModel);
   }
 
   _renderSort() {
