@@ -9,7 +9,6 @@ const eventTypeInfoMap = new Map(
         {
           title: `Taxi`,
           image: `img/icons/taxi.png`,
-          offers: new Set([`uber`])
         }
       ],
       [
@@ -17,7 +16,6 @@ const eventTypeInfoMap = new Map(
         {
           title: `Bus`,
           image: `img/icons/bus.png`,
-          offers: new Set()
         }
       ],
       [
@@ -25,7 +23,6 @@ const eventTypeInfoMap = new Map(
         {
           title: `Train`,
           image: `img/icons/train.png`,
-          offers: new Set()
         }
       ],
       [
@@ -33,7 +30,6 @@ const eventTypeInfoMap = new Map(
         {
           title: `Ship`,
           image: `img/icons/ship.png`,
-          offers: new Set()
         }
       ],
       [
@@ -41,7 +37,6 @@ const eventTypeInfoMap = new Map(
         {
           title: `Transport`,
           image: `img/icons/transport.png`,
-          offers: new Set()
         }
       ],
       [
@@ -49,7 +44,6 @@ const eventTypeInfoMap = new Map(
         {
           title: `Drive`,
           image: `img/icons/drive.png`,
-          offers: new Set([`car`])
         }
       ],
       [
@@ -57,7 +51,6 @@ const eventTypeInfoMap = new Map(
         {
           title: `Flight`,
           image: `img/icons/flight.png`,
-          offers: new Set([`luggage`, `comfort`])
         }
       ],
       [
@@ -65,7 +58,6 @@ const eventTypeInfoMap = new Map(
         {
           title: `Check-In`,
           image: `img/icons/check-in.png`,
-          offers: new Set([`breakfast`])
         }
       ],
       [
@@ -73,7 +65,6 @@ const eventTypeInfoMap = new Map(
         {
           title: `Sightseeing`,
           image: `img/icons/sightseeing.png`,
-          offers: new Set([`tickets`, `lunch`])
         }
       ],
       [
@@ -81,7 +72,6 @@ const eventTypeInfoMap = new Map(
         {
           title: `Restaurant`,
           image: `img/icons/restaurant.png`,
-          offers: new Set()
         }
       ],
     ]
@@ -89,13 +79,13 @@ const eventTypeInfoMap = new Map(
 
 const offerInfoMap = new Map(
     [
-      [`uber`, {title: `Order Uber`, price: 20}],
-      [`car`, {title: `Rent a car`, price: 200}],
-      [`luggage`, {title: `Add luggage`, price: 50}],
-      [`comfort`, {title: `Switch to comfort`, price: 80}],
-      [`breakfast`, {title: `Add breakfast`, price: 50}],
-      [`tickets`, {title: `Book tickets`, price: 40}],
-      [`lunch`, {title: `Lunch in city`, price: 30}]
+      [`uber`, {title: `Order Uber`, price: 20, eventTypeKey: `taxi`}],
+      [`car`, {title: `Rent a car`, price: 200, eventTypeKey: `drive`}],
+      [`luggage`, {title: `Add luggage`, price: 50, eventTypeKey: `flight`}],
+      [`comfort`, {title: `Switch to comfort`, price: 80, eventTypeKey: `flight`}],
+      [`breakfast`, {title: `Add breakfast`, price: 50, eventTypeKey: `check-in`}],
+      [`tickets`, {title: `Book tickets`, price: 40, eventTypeKey: `sightseeing`}],
+      [`lunch`, {title: `Lunch in city`, price: 30, eventTypeKey: `sightseeing`}]
     ]
 );
 
@@ -150,15 +140,17 @@ const generateType = () => {
 };
 
 const generateOffers = (type) => {
-  const eventTypeData = eventTypeInfoMap.get(type);
-  const offers = Array.from(eventTypeData.offers);
+  const allOffers = Array.from(offerInfoMap);
+  const allOffersForType = allOffers.reduce(
+      (result, [key, value]) => [...result, ...(value.eventTypeKey === type ? [key] : [])], []
+  );
 
-  if (offers.length > 0) {
-    const randomSize = getRandomInteger(1, offers.length);
-    offers.length = randomSize;
+  if (allOffersForType.length > 0) {
+    const randomSize = getRandomInteger(0, allOffersForType.length);
+    allOffersForType.length = randomSize;
   }
 
-  return new Set(offers);
+  return allOffersForType;
 };
 
 const generateDate = (offsetFromNow = 0, offsetUnit = `h`) => {
