@@ -8,7 +8,7 @@ const EMPTY_EVENT = {
   finishDate: dayjs().endOf(`day`),
   destination: ``,
   price: ``,
-  offers: new Set(),
+  offers: [],
   destinationInfo: {}
 };
 
@@ -127,12 +127,12 @@ const createEventEditTemplate = (state) => {
 };
 
 export default class EventEdit extends SmartView {
-  constructor(event = EMPTY_EVENT, eventTypeInfoMap, offerInfoMap, destinationInfoMap) {
+  constructor(event = EMPTY_EVENT, typesDataMap, offersDataMap, destinationsDataMap) {
     super();
-    this._eventTypeInfoMap = eventTypeInfoMap;
-    this._offerInfoMap = offerInfoMap;
-    this._destinationInfoMap = destinationInfoMap;
-    this._state = EventEdit.parseEventToState(event, this._eventTypeInfoMap, this._offerInfoMap, this._destinationInfoMap);
+    this._typesDataMap = typesDataMap;
+    this._offersDataMap = offersDataMap;
+    this._destinationsDataMap = destinationsDataMap;
+    this._state = EventEdit.parseEventToState(event, this._typesDataMap, this._offersDataMap, this._destinationsDataMap);
 
     this._clickRollupButtonHandler = this._clickRollupButtonHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
@@ -169,11 +169,11 @@ export default class EventEdit extends SmartView {
 
     let selectedDestination = evt.target.value;
 
-    if (!this._destinationInfoMap.has(selectedDestination)) {
+    if (!this._destinationsDataMap.has(selectedDestination)) {
       selectedDestination = this._state.destination.title;
     }
 
-    const {destination, availableDestinations} = EventEdit._createDestinationSelection(selectedDestination, this._destinationInfoMap);
+    const {destination, availableDestinations} = EventEdit._createDestinationSelection(selectedDestination, this._destinationsDataMap);
 
     if (!destination || destination.title === this._state.destination.title) {
       return;
@@ -213,12 +213,11 @@ export default class EventEdit extends SmartView {
     evt.preventDefault();
     this.updateData({
       type: evt.target.value,
-      src: this._eventTypeInfoMap.get(evt.target.value).image,
+      src: this._typesDataMap.get(evt.target.value).image,
       offers: EventEdit._createOfferSelectionForType(
           evt.target.value,
           null,
-          this._eventTypeInfoMap,
-          this._offerInfoMap
+          this._offersDataMap
       )
     });
   }
@@ -250,7 +249,7 @@ export default class EventEdit extends SmartView {
   }
 
   reset(event) {
-    this.updateData(EventEdit.parseEventToState(event, this._eventTypeInfoMap, this._offerInfoMap, this._destinationInfoMap));
+    this.updateData(EventEdit.parseEventToState(event, this._typesDataMap, this._offersDataMap, this._destinationsDataMap));
   }
 
   restoreHandlers() {
@@ -284,17 +283,17 @@ export default class EventEdit extends SmartView {
     .addEventListener(`click`, this._deleteClickHandler);
   }
 
-  static parseEventToState(event, eventTypeInfoMap, offerInfoMap, destinationInfoMap) {
-    const offerSelectionMap = EventEdit._createOfferSelectionForType(event.type, event.offers, eventTypeInfoMap, offerInfoMap);
+  static parseEventToState(event, typesDataMap, offersDataMap, destinationsDataMap) {
+    const offerSelectionMap = EventEdit._createOfferSelectionForType(event.type, event.offers, offersDataMap);
 
     const eventTypesMenu = new Map();
-    eventTypeInfoMap.forEach((value, key) => eventTypesMenu.set(key, value.title));
+    typesDataMap.forEach((value, key) => eventTypesMenu.set(key, value.title));
 
-    const eventTypeData = eventTypeInfoMap.get(event.type);
-    const [defaultTypeData] = eventTypeInfoMap.values();
+    const eventTypeData = typesDataMap.get(event.type);
+    const [defaultTypeData] = typesDataMap.values();
     const src = eventTypeData ? eventTypeData.image : defaultTypeData.image;
 
-    const {destination, availableDestinations} = EventEdit._createDestinationSelection(event.destination, destinationInfoMap);
+    const {destination, availableDestinations} = EventEdit._createDestinationSelection(event.destination, destinationsDataMap);
 
     return Object.assign(
         {},
@@ -312,30 +311,29 @@ export default class EventEdit extends SmartView {
   static parseStateToEvent(state) {
     const event = Object.assign({}, state);
 
-    const copyOffers = new Set();
+    const offers = [];
 
     state.offers.forEach((value, key) => {
       if (value.selected) {
-        const copyOffer = key;
-        copyOffers.add(copyOffer);
+        offers.push(key);
       }
     });
 
-    event.offers = copyOffers;
+    event.offers = offers;
     event.destination = state.destination.title;
 
     delete event.src;
-    delete event.allTypeData;
-    delete event.offersData;
+    delete event.eventTypesMenu;
+    delete event.availableDestinations;
 
     return event;
   }
 
-  static _createDestinationSelection(currentDestination, destinationInfoMap) {
+  static _createDestinationSelection(currentDestination, destinationsDataMap) {
     const availableDestinations = [];
     let destination = {};
 
-    destinationInfoMap.forEach((value, key) => {
+    destinationsDataMap.forEach((value, key) => {
       if (currentDestination === key) {
         destination = {title: key, description: value.description, photos: value.photos.slice()};
       } else {
@@ -346,25 +344,17 @@ export default class EventEdit extends SmartView {
     return {destination, availableDestinations};
   }
 
-  static _createOfferSelectionForType(type, selectedOffers, eventTypeInfoMap, offerInfoMap) {
-
-    const allOfferKeysForEventType = eventTypeInfoMap.get(type).offers;
-
-    if (!allOfferKeysForEventType || allOfferKeysForEventType.size === 0) {
-      return new Map();
-    }
-
+  static _createOfferSelectionForType(type, selectedOffers, offersDataMap) {
     const offerSelectionMap = new Map();
 
-    allOfferKeysForEventType.forEach((offerKey) => {
-      const offerInfo = offerInfoMap.get(offerKey);
-      const offerForEventType = {
-        key: offerKey,
-        title: offerInfo.title,
-        price: offerInfo.price,
-        selected: selectedOffers ? selectedOffers.has(offerKey) : false
-      };
-      offerSelectionMap.set(offerKey, offerForEventType);
+    offersDataMap.forEach((value, key) => {
+      if (value.eventTypeKey === type) {
+        offerSelectionMap.set(key, {
+          title: value.title,
+          price: value.price,
+          selected: selectedOffers ? (selectedOffers.indexOf(key) !== -1) : false
+        });
+      }
     });
 
     return offerSelectionMap;

@@ -3,7 +3,6 @@ import EventEditView from '../view/event-edit.js';
 import {isEscEvent} from '../utils/common.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import {UserAction, UpdateType} from '../utils/const.js';
-import {getDataForAllDestinations, getDataForAllEventTypes, getDataForAllOffers} from '../mock/event.js';
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -18,10 +17,6 @@ export default class Event {
     this._changeData = changeData;
     this._changeMode = changeMode;
     this._mode = Mode.DEFAULT;
-
-    this._eventTypeInfoMap = getDataForAllEventTypes();
-    this._offerInfoMap = getDataForAllOffers();
-    this._destinationInfoMap = getDataForAllDestinations();
 
     this._handleClickRollupButtonUp = this._handleClickRollupButtonUp.bind(this);
     this._handleClickRollupButtonDown = this._handleClickRollupButtonDown.bind(this);
@@ -39,7 +34,7 @@ export default class Event {
     const prevEventEditComponent = this._eventEditComponent;
 
     this._eventComponent = new EventView(event, this._dataListModel.getTypes(), this._dataListModel.getOffers());
-    this._eventEditComponent = new EventEditView(event, this._dataListModel.getTypes(), this._offerInfoMap, this._destinationInfoMap);
+    this._eventEditComponent = new EventEditView(event, this._dataListModel.getTypes(), this._dataListModel.getOffers(), this._dataListModel.getDestinations());
 
     this._eventComponent.setRollupButtonClickHandler(this._handleClickRollupButtonDown);
     this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);
