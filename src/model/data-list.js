@@ -3,17 +3,23 @@ import Subject from '../utils/subject.js';
 export default class DataList extends Subject {
   constructor() {
     super();
-    this._options = new Map();
+    this._offers = new Map();
     this._types = new Map();
     this._destinations = new Map();
   }
 
-  setOptions(options) {
-    this._options = new Map(options);
+  setData(offers, types, destinations) {
+    this.setOffers(offers);
+    this.setTypes(types);
+    this.setDestinations(destinations);
   }
 
-  getOptions() {
-    return this._options;
+  setOffers(offers) {
+    this._offers = new Map(offers);
+  }
+
+  getOffers() {
+    return this._offers;
   }
 
   setTypes(types) {
