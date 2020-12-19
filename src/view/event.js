@@ -65,10 +65,10 @@ const createEventTemplate = (state) => {
 };
 
 export default class Event extends AbstractView {
-  constructor(event, typeInfoMap, offerInfoMap) {
+  constructor(event, typesDataMap, offersDataMap) {
     super();
     this._event = event;
-    this._state = Event._parseEventToState(event, typeInfoMap, offerInfoMap);
+    this._state = Event._parseEventToState(event, typesDataMap, offersDataMap);
 
     this._clickRollupButtonHandler = this._clickRollupButtonHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
@@ -100,15 +100,15 @@ export default class Event extends AbstractView {
       .addEventListener(`click`, this._favoriteClickHandler);
   }
 
-  static _parseEventToState(event, typeInfoMap, offerInfoMap) {
+  static _parseEventToState(event, typesDataMap, offersDataMap) {
     const offerSelectionMap = new Map();
 
     event.offers.forEach((offerKey) => {
-      const offerInfo = offerInfoMap.get(offerKey);
+      const offerInfo = offersDataMap.get(offerKey);
       offerSelectionMap.set(offerKey, {title: offerInfo.title, price: offerInfo.price});
     });
 
-    const image = typeInfoMap.get(event.type).image;
+    const image = typesDataMap.get(event.type).image;
 
     return Object.assign(
         {},
