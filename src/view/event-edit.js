@@ -13,6 +13,11 @@ const EMPTY_EVENT = {
   offers: []
 };
 
+const DeleteButtonLabel = {
+  ADD: `Cancel`,
+  EDIT: `Delete`
+};
+
 const createOffersTemplate = (offers) => {
   return offers && (offers.size > 0) ? `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
@@ -67,7 +72,7 @@ const createTypesMenuTemplate = (eventTypesMenu) => {
 
 const createEventEditTemplate = (state) => {
 
-  const {type, startDate, finishDate, offers, destination, availableDestinations, price, image, eventTypesMenu} = state;
+  const {type, startDate, finishDate, offers, destination, availableDestinations, price, image, eventTypesMenu, deleteButtonLabel} = state;
 
   const typesMenuTemplate = createTypesMenuTemplate(eventTypesMenu);
 
@@ -93,7 +98,7 @@ const createEventEditTemplate = (state) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination ? he.encode(destination.title) : ``}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination ? he.encode(destination.title) : ``}" list="destination-list-1" autocomplete="off">
             ${availableDestinationsTemplate}
         </div>
 
@@ -114,7 +119,7 @@ const createEventEditTemplate = (state) => {
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Delete</button>
+        <button class="event__reset-btn" type="reset">${deleteButtonLabel}</button>
         <button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
         </button>
@@ -285,9 +290,10 @@ export default class EventEdit extends SmartView {
   }
 
   static parseEventToState(event, typesDataMap, offersDataMap, destinationsDataMap) {
+    const deleteButtonLabel = (event === EMPTY_EVENT) ? DeleteButtonLabel.ADD : DeleteButtonLabel.EDIT;
+
     const [defaultType] = typesDataMap.keys();
     const type = event.type ? event.type : defaultType;
-
 
     const offerSelectionMap = EventEdit._createOfferSelectionForType(type, event.offers, offersDataMap);
 
@@ -308,7 +314,8 @@ export default class EventEdit extends SmartView {
           image,
           eventTypesMenu,
           destination,
-          availableDestinations
+          availableDestinations,
+          deleteButtonLabel
         }
     );
   }
@@ -330,6 +337,7 @@ export default class EventEdit extends SmartView {
     delete event.src;
     delete event.eventTypesMenu;
     delete event.availableDestinations;
+    delete event.deleteButtonLabel;
 
     return event;
   }
