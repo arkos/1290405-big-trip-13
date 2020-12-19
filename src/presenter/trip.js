@@ -11,11 +11,12 @@ import EventPresenter from '../presenter/event.js';
 import EventNewPresenter from '../presenter/event-new.js';
 
 export default class Trip {
-  constructor(tripContainer, eventContainer, eventsModel, filterModel) {
+  constructor(tripContainer, eventContainer, eventsModel, filterModel, dataListModel) {
     this._tripContainer = tripContainer;
     this._eventContainer = eventContainer;
     this._eventsModel = eventsModel;
     this._filterModel = filterModel;
+    this._dataListModel = dataListModel;
 
     this._eventPresenterMap = new Map();
 
@@ -79,7 +80,7 @@ export default class Trip {
 
   _renderEvent(event) {
     const eventPresenter = new EventPresenter(this._eventListComponent, this._handleViewAction, this._handleModeChange);
-    eventPresenter.init(event, this._eventTypeInfoMap, this._offerInfoMap, this._destinationInfoMap);
+    eventPresenter.init(event, this._dataListModel);
     this._eventPresenterMap.set(event.id, eventPresenter);
   }
 

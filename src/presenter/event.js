@@ -31,14 +31,15 @@ export default class Event {
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
-  init(event) {
+  init(event, dataListModel) {
     this._event = event;
+    this._dataListModel = dataListModel;
 
     const prevEventComponent = this._eventComponent;
     const prevEventEditComponent = this._eventEditComponent;
 
-    this._eventComponent = new EventView(event, this._offerInfoMap);
-    this._eventEditComponent = new EventEditView(event, this._eventTypeInfoMap, this._offerInfoMap, this._destinationInfoMap);
+    this._eventComponent = new EventView(event, this._dataListModel.getTypes(), this._dataListModel.getOffers());
+    this._eventEditComponent = new EventEditView(event, this._dataListModel.getTypes(), this._offerInfoMap, this._destinationInfoMap);
 
     this._eventComponent.setRollupButtonClickHandler(this._handleClickRollupButtonDown);
     this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);
