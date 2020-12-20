@@ -26,7 +26,7 @@ const createEventTemplate = (state) => {
 
   const offersTemplate = createEventOffersTemplate(offers);
 
-  const durationBetweenDates = dayjs.duration(finishDate.diff(startDate));
+  const durationBetweenDates = dayjs.duration(dayjs(finishDate).diff(dayjs(startDate)));
 
   const days = durationBetweenDates.days();
   const hours = durationBetweenDates.hours();
