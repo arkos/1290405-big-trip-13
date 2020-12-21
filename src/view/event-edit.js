@@ -115,7 +115,7 @@ const createEventEditTemplate = (state) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}" pattern="\\d+" required autocomplete="off">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -147,6 +147,7 @@ export default class EventEdit extends SmartView {
     this._offerToggleHandler = this._offerToggleHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
     this._deleteClickHandler = this._deleteClickHandler.bind(this);
+    this._invalidPriceHandler = this._invalidPriceHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -195,9 +196,9 @@ export default class EventEdit extends SmartView {
     .querySelector(`.event__type-list`)
     .addEventListener(`change`, this._eventTypeChangeHandler);
 
-    this.getElement()
-    .querySelector(`.event__input--price`)
-    .addEventListener(`input`, this._priceInputHandler);
+    const priceElement = this.getElement().querySelector(`.event__input--price`);
+    priceElement.addEventListener(`input`, this._priceInputHandler);
+    priceElement.addEventListener(`invalid`, this._invalidPriceHandler);
 
     const offersRendered = this.getElement().querySelector(`.event__available-offers`);
     if (offersRendered) {
@@ -207,6 +208,10 @@ export default class EventEdit extends SmartView {
     this.getElement()
     .querySelector(`.event__input--destination`)
     .addEventListener(`change`, this._destinationChangeHandler);
+  }
+
+  _invalidPriceHandler() {
+    this.getElement().querySelector(`.event__save-btn`).disabled = true;
   }
 
   _clickRollupButtonHandler(evt) {
@@ -284,6 +289,11 @@ export default class EventEdit extends SmartView {
 
   _priceInputHandler(evt) {
     evt.preventDefault();
+
+    if (evt.target.reportValidity()) {
+      this.getElement().querySelector(`.event__save-btn`).disabled = false;
+    }
+
     this.updateData({
       price: parseInt(evt.target.value, 10)
     }, true);
