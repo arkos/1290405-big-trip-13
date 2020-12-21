@@ -1,6 +1,9 @@
 import SmartView from './smart.js';
 import {humanizeDate} from '../utils/event.js';
 import dayjs from 'dayjs';
+import flatpickr from 'flatpickr';
+
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const EMPTY_EVENT = {
   type: ``,
@@ -133,6 +136,8 @@ export default class EventEdit extends SmartView {
     this._offerInfoMap = offerInfoMap;
     this._destinationInfoMap = destinationInfoMap;
     this._state = EventEdit.parseEventToState(event, this._eventTypeInfoMap, this._offerInfoMap, this._destinationInfoMap);
+    this._startDatePicker = null;
+    this._finishDatePicker = null;
 
     this._clickHandler = this._clickHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
@@ -140,51 +145,76 @@ export default class EventEdit extends SmartView {
     this._priceInputHandler = this._priceInputHandler.bind(this);
     this._offerToggleHandler = this._offerToggleHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
+    this._startDateCloseHandler = this._startDateCloseHandler.bind(this);
+    this._finishDateCloseHandler = this._finishDateCloseHandler.bind(this);
 
     this._setInnerHandlers();
+    this._setStartDatePicker();
+    this._setFinishDatePicker();
   }
 
   getTemplate() {
     return createEventEditTemplate(this._state);
   }
 
-  static _createOfferSelectionForType(type, selectedOffers, eventTypeInfoMap, offerInfoMap) {
-
-    const allOfferKeysForEventType = eventTypeInfoMap.get(type).offers;
-
-    if (!allOfferKeysForEventType || allOfferKeysForEventType.size === 0) {
-      return new Map();
+  _setStartDatePicker() {
+    if (this._startDatePicker) {
+      this._startDatePicker.destroy();
+      this._startDatePicker = null;
     }
 
-    const offerSelectionMap = new Map();
-
-    allOfferKeysForEventType.forEach((offerKey) => {
-      const offerInfo = offerInfoMap.get(offerKey);
-      const offerForEventType = {
-        key: offerKey,
-        title: offerInfo.title,
-        price: offerInfo.price,
-        selected: selectedOffers ? selectedOffers.has(offerKey) : false
-      };
-      offerSelectionMap.set(offerKey, offerForEventType);
-    });
-
-    return offerSelectionMap;
+    this._startDatePicker = flatpickr(
+        this.getElement().querySelector(`input[name='event-start-time']`),
+        {
+          enableTime: true,
+          // eslint-disable-next-line camelcase
+          time_24hr: true,
+          dateFormat: `d/m/y H:i`,
+          defaultDate: this._state.startDate,
+          maxDate: dayjs(this._state.finishDate).subtract(1, `m`).toDate(),
+          onClose: this._startDateCloseHandler
+        }
+    );
   }
 
-  static _createDestinationSelection(currentDestination, destinationInfoMap) {
-    const availableDestinations = [];
-    let destination = {};
+  _setFinishDatePicker() {
+    if (this._finishDatePicker) {
+      this._finishDatePicker.destroy();
+      this._finishDatePicker = null;
+    }
 
-    destinationInfoMap.forEach((value, key) => {
-      if (currentDestination === key) {
-        destination = {title: key, description: value.description, photos: value.photos.slice()};
-      } else {
-        availableDestinations.push(key);
-      }
-    });
+    this._finishDatePicker = flatpickr(
+        this.getElement().querySelector(`input[name='event-end-time']`),
+        {
+          enableTime: true,
+          // eslint-disable-next-line camelcase
+          time_24hr: true,
+          dateFormat: `d/m/y H:i`,
+          defaultDate: this._state.finishDate,
+          minDate: dayjs(this._state.startDate).add(1, `m`).toDate(),
+          onClose: this._finishDateCloseHandler
+        }
+    );
+  }
 
-    return {destination, availableDestinations};
+  _startDateCloseHandler([userDate]) {
+    this.updateData(
+        {
+          startDate: dayjs(userDate).second(0).toDate(),
+        },
+        true
+    );
+    this._setFinishDatePicker();
+  }
+
+  _finishDateCloseHandler([userDate]) {
+    this.updateData(
+        {
+          finishDate: dayjs(userDate).second(0).toDate(),
+        },
+        true
+    );
+    this._setStartDatePicker();
   }
 
   _clickHandler(evt) {
@@ -290,6 +320,8 @@ export default class EventEdit extends SmartView {
     this._setInnerHandlers();
     this.setClickHandler(this._callback.click);
     this.setFormSubmitHandler(this._callback.submit);
+    this._setStartDatePicker();
+    this._setFinishDatePicker();
   }
 
   setClickHandler(callback) {
@@ -353,5 +385,44 @@ export default class EventEdit extends SmartView {
     delete event.offersData;
 
     return event;
+  }
+
+  static _createOfferSelectionForType(type, selectedOffers, eventTypeInfoMap, offerInfoMap) {
+
+    const allOfferKeysForEventType = eventTypeInfoMap.get(type).offers;
+
+    if (!allOfferKeysForEventType || allOfferKeysForEventType.size === 0) {
+      return new Map();
+    }
+
+    const offerSelectionMap = new Map();
+
+    allOfferKeysForEventType.forEach((offerKey) => {
+      const offerInfo = offerInfoMap.get(offerKey);
+      const offerForEventType = {
+        key: offerKey,
+        title: offerInfo.title,
+        price: offerInfo.price,
+        selected: selectedOffers ? selectedOffers.has(offerKey) : false
+      };
+      offerSelectionMap.set(offerKey, offerForEventType);
+    });
+
+    return offerSelectionMap;
+  }
+
+  static _createDestinationSelection(currentDestination, destinationInfoMap) {
+    const availableDestinations = [];
+    let destination = {};
+
+    destinationInfoMap.forEach((value, key) => {
+      if (currentDestination === key) {
+        destination = {title: key, description: value.description, photos: value.photos.slice()};
+      } else {
+        availableDestinations.push(key);
+      }
+    });
+
+    return {destination, availableDestinations};
   }
 }
