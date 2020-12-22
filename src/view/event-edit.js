@@ -139,6 +139,7 @@ export default class EventEdit extends SmartView {
     this._offersDataMap = offersDataMap;
     this._destinationsDataMap = destinationsDataMap;
     this._state = EventEdit.parseEventToState(event, this._typesDataMap, this._offersDataMap, this._destinationsDataMap);
+    this._destinationOptions = this._buildDestinationOptions();
 
     this._clickRollupButtonHandler = this._clickRollupButtonHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
@@ -161,6 +162,7 @@ export default class EventEdit extends SmartView {
   }
 
   restoreHandlers() {
+    this._buildDestinationOptions();
     this._setInnerHandlers();
     this.setRollupButtonClickHandler(this._callback.rollupButtonClick);
     this.setFormSubmitHandler(this._callback.submit);
@@ -189,6 +191,28 @@ export default class EventEdit extends SmartView {
     this.getElement()
     .querySelector(`.event__reset-btn`)
     .addEventListener(`click`, this._deleteClickHandler);
+  }
+
+  _buildDestinationOptions() {
+    const destinations = this.getElement().querySelector(`#destination-list-1`);
+    const options = Array.from(destinations.options);
+    return new Set(options);
+  }
+
+  _validateDestination() {
+    const destinationElement = this.getElement().querySelector(`.event__input--destination`);
+    if (!this._destinationOptions.has(destinationElement.value)) {
+      destinationElement.setCustomValidity(`You have to select a destination from the provided destinations list`);
+      return false;
+    }
+
+    destinationElement.setCustomValidity(``);
+    return true;
+  }
+
+  _validateAll() {
+    this._validateDestination();
+    this.getElement().querySelector(`.event--edit`).checkValidity();
   }
 
   _setInnerHandlers() {
