@@ -3,6 +3,9 @@ import {humanizeDate} from '../utils/event.js';
 import he from 'he';
 
 import dayjs from 'dayjs';
+import flatpickr from 'flatpickr';
+
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const EMPTY_EVENT = {
   type: ``,
@@ -140,6 +143,8 @@ export default class EventEdit extends SmartView {
     this._destinationsDataMap = destinationsDataMap;
     this._state = EventEdit.parseEventToState(event, this._typesDataMap, this._offersDataMap, this._destinationsDataMap);
     this._destinationOptions = this._buildDestinationOptions();
+    this._startDatePicker = null;
+    this._finishDatePicker = null;
 
     this._clickRollupButtonHandler = this._clickRollupButtonHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
@@ -148,13 +153,79 @@ export default class EventEdit extends SmartView {
     this._offerToggleHandler = this._offerToggleHandler.bind(this);
     this._destinationInputHandler = this._destinationInputHandler.bind(this);
     this._deleteClickHandler = this._deleteClickHandler.bind(this);
+    this._startDateCloseHandler = this._startDateCloseHandler.bind(this);
+    this._finishDateCloseHandler = this._finishDateCloseHandler.bind(this);
 
     this._setInnerHandlers();
     this._validateAll();
+
+    this._setStartDatePicker();
+    this._setFinishDatePicker();
+    this._setInnerHandlers();
   }
 
   getTemplate() {
     return createEventEditTemplate(this._state);
+  }
+
+  _setStartDatePicker() {
+    if (this._startDatePicker) {
+      this._startDatePicker.destroy();
+      this._startDatePicker = null;
+    }
+
+    this._startDatePicker = flatpickr(
+        this.getElement().querySelector(`input[name='event-start-time']`),
+        {
+          enableTime: true,
+          // eslint-disable-next-line camelcase
+          time_24hr: true,
+          dateFormat: `d/m/y H:i`,
+          defaultDate: this._state.startDate,
+          maxDate: dayjs(this._state.finishDate).subtract(1, `m`).toDate(),
+          onClose: this._startDateCloseHandler
+        }
+    );
+  }
+
+  _setFinishDatePicker() {
+    if (this._finishDatePicker) {
+      this._finishDatePicker.destroy();
+      this._finishDatePicker = null;
+    }
+
+    this._finishDatePicker = flatpickr(
+        this.getElement().querySelector(`input[name='event-end-time']`),
+        {
+          enableTime: true,
+          // eslint-disable-next-line camelcase
+          time_24hr: true,
+          dateFormat: `d/m/y H:i`,
+          defaultDate: this._state.finishDate,
+          minDate: dayjs(this._state.startDate).add(1, `m`).toDate(),
+          onClose: this._finishDateCloseHandler
+        }
+    );
+  }
+
+  _startDateCloseHandler([userDate]) {
+    this.updateData(
+        {
+          startDate: dayjs(userDate).second(0).toDate(),
+        },
+        true
+    );
+    this._setFinishDatePicker();
+  }
+
+  _finishDateCloseHandler([userDate]) {
+    this.updateData(
+        {
+          finishDate: dayjs(userDate).second(0).toDate(),
+        },
+        true
+    );
+    this._setStartDatePicker();
   }
 
   reset(event) {
@@ -167,6 +238,8 @@ export default class EventEdit extends SmartView {
     this.setRollupButtonClickHandler(this._callback.rollupButtonClick);
     this.setFormSubmitHandler(this._callback.submit);
     this.setDeleteClickHandler(this._callback.deleteClick);
+    this._setStartDatePicker();
+    this._setFinishDatePicker();
     this._validateAll();
   }
 
