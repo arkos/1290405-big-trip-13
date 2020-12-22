@@ -148,7 +148,6 @@ export default class EventEdit extends SmartView {
     this._offerToggleHandler = this._offerToggleHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
     this._deleteClickHandler = this._deleteClickHandler.bind(this);
-    this._invalidPriceHandler = this._invalidPriceHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -162,7 +161,7 @@ export default class EventEdit extends SmartView {
   }
 
   restoreHandlers() {
-    this._buildDestinationOptions();
+    this._destinationOptions = this._buildDestinationOptions();
     this._setInnerHandlers();
     this.setRollupButtonClickHandler(this._callback.rollupButtonClick);
     this.setFormSubmitHandler(this._callback.submit);
@@ -189,13 +188,13 @@ export default class EventEdit extends SmartView {
     this._callback.deleteClick = callback;
 
     this.getElement()
-    .querySelector(`.event__reset-btn`)
-    .addEventListener(`click`, this._deleteClickHandler);
+      .querySelector(`.event__reset-btn`)
+      .addEventListener(`click`, this._deleteClickHandler);
   }
 
   _buildDestinationOptions() {
     const destinations = this.getElement().querySelector(`#destination-list-1`);
-    const options = Array.from(destinations.options);
+    const options = Array.from(destinations.options).map((option) => option.value);
     return new Set(options);
   }
 
@@ -212,30 +211,30 @@ export default class EventEdit extends SmartView {
 
   _validateAll() {
     this._validateDestination();
-    this.getElement().querySelector(`.event--edit`).checkValidity();
+    const isValid = this.getElement().querySelector(`.event--edit`).checkValidity();
+
+    const saveButton = this.getElement().querySelector(`.event__save-btn`);
+
+    saveButton.disabled = !isValid;
+
+    return isValid;
   }
 
   _setInnerHandlers() {
     this.getElement()
-    .querySelector(`.event__type-list`)
-    .addEventListener(`change`, this._eventTypeChangeHandler);
+      .querySelector(`.event__type-list`)
+      .addEventListener(`change`, this._eventTypeChangeHandler);
 
     const priceElement = this.getElement().querySelector(`.event__input--price`);
     priceElement.addEventListener(`input`, this._priceInputHandler);
-    priceElement.addEventListener(`invalid`, this._invalidPriceHandler);
 
     const offersRendered = this.getElement().querySelector(`.event__available-offers`);
     if (offersRendered) {
       offersRendered.addEventListener(`change`, this._offerToggleHandler);
     }
 
-    this.getElement()
-    .querySelector(`.event__input--destination`)
-    .addEventListener(`change`, this._destinationChangeHandler);
-  }
-
-  _invalidPriceHandler() {
-    this.getElement().querySelector(`.event__save-btn`).disabled = true;
+    const destinationElement = this.getElement().querySelector(`.event__input--destination`);
+    destinationElement.addEventListener(`input`, this._destinationChangeHandler);
   }
 
   _clickRollupButtonHandler(evt) {
@@ -255,6 +254,8 @@ export default class EventEdit extends SmartView {
 
   _destinationChangeHandler(evt) {
     evt.preventDefault();
+
+    this._validateAll();
 
     let selectedDestination = evt.target.value;
 
@@ -314,9 +315,7 @@ export default class EventEdit extends SmartView {
   _priceInputHandler(evt) {
     evt.preventDefault();
 
-    if (evt.target.reportValidity()) {
-      this.getElement().querySelector(`.event__save-btn`).disabled = false;
-    }
+    this._validateAll();
 
     this.updateData({
       price: parseInt(evt.target.value, 10)
@@ -383,9 +382,9 @@ export default class EventEdit extends SmartView {
     destinationsDataMap.forEach((value, key) => {
       if (currentDestination === key) {
         destination = {title: key, description: value.description, photos: value.photos.slice()};
-      } else {
-        availableDestinations.push(key);
       }
+
+      availableDestinations.push(key);
     });
 
     return {destination, availableDestinations};
