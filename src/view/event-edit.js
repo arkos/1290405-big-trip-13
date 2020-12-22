@@ -146,10 +146,11 @@ export default class EventEdit extends SmartView {
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
     this._offerToggleHandler = this._offerToggleHandler.bind(this);
-    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
+    this._destinationInputHandler = this._destinationInputHandler.bind(this);
     this._deleteClickHandler = this._deleteClickHandler.bind(this);
 
     this._setInnerHandlers();
+    this._validateAll();
   }
 
   getTemplate() {
@@ -166,6 +167,7 @@ export default class EventEdit extends SmartView {
     this.setRollupButtonClickHandler(this._callback.rollupButtonClick);
     this.setFormSubmitHandler(this._callback.submit);
     this.setDeleteClickHandler(this._callback.deleteClick);
+    this._validateAll();
   }
 
   setRollupButtonClickHandler(callback) {
@@ -234,7 +236,7 @@ export default class EventEdit extends SmartView {
     }
 
     const destinationElement = this.getElement().querySelector(`.event__input--destination`);
-    destinationElement.addEventListener(`input`, this._destinationChangeHandler);
+    destinationElement.addEventListener(`input`, this._destinationInputHandler);
   }
 
   _clickRollupButtonHandler(evt) {
@@ -252,7 +254,7 @@ export default class EventEdit extends SmartView {
     this._callback.deleteClick(EventEdit.parseStateToEvent(this._state));
   }
 
-  _destinationChangeHandler(evt) {
+  _destinationInputHandler(evt) {
     evt.preventDefault();
 
     this._validateAll();
