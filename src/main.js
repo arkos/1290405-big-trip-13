@@ -6,9 +6,14 @@ import FilterPresenter from './presenter/filter.js';
 import EventsModel from './model/events.js';
 import FilterModel from './model/filter.js';
 import DataListModel from './model/data-list.js';
+import Api from './api.js';
 
 const EVENT_COUNT = 3;
+const AUTHORIZATION = `Basic ab0d513b8d5045f4a72159701a847950`;
+const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
+
 const generatedEvents = new Array(EVENT_COUNT).fill().map(generateEvent);
+const api = new Api(END_POINT, AUTHORIZATION);
 
 const eventTypeInfoMap = getDataForAllEventTypes();
 const offerInfoMap = getDataForAllOffers();
