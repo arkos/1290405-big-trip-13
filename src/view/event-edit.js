@@ -9,8 +9,8 @@ import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const EMPTY_EVENT = {
   type: ``,
-  startDate: dayjs().startOf(`day`),
-  finishDate: dayjs().endOf(`day`),
+  startDate: dayjs().startOf(`day`).toDate(),
+  finishDate: dayjs().endOf(`day`).toDate(),
   destination: ``,
   price: 0,
   offers: []
@@ -158,10 +158,8 @@ export default class EventEdit extends SmartView {
 
     this._setInnerHandlers();
     this._validateAll();
-
     this._setStartDatePicker();
     this._setFinishDatePicker();
-    this._setInnerHandlers();
   }
 
   getTemplate() {
@@ -182,8 +180,8 @@ export default class EventEdit extends SmartView {
           time_24hr: true,
           dateFormat: `d/m/y H:i`,
           defaultDate: this._state.startDate,
-          maxDate: dayjs(this._state.finishDate).subtract(1, `m`).toDate(),
-          onClose: this._startDateCloseHandler
+          maxDate: dayjs(this._state.finishDate).second(0).subtract(1, `m`).toDate(),
+          onClose: this._startDateCloseHandler,
         }
     );
   }
@@ -202,8 +200,8 @@ export default class EventEdit extends SmartView {
           time_24hr: true,
           dateFormat: `d/m/y H:i`,
           defaultDate: this._state.finishDate,
-          minDate: dayjs(this._state.startDate).add(1, `m`).toDate(),
-          onClose: this._finishDateCloseHandler
+          minDate: dayjs(this._state.startDate).second(0).add(1, `m`).toDate(),
+          onClose: this._finishDateCloseHandler,
         }
     );
   }
