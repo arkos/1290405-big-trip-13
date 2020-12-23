@@ -53,4 +53,74 @@ export default class Events extends Subject {
 
     this._notify(updateType, update);
   }
+
+  static adaptToClient(event) {
+    const offers = [];
+    event.offers.forEach((offer) => offers.push(offer.title));
+
+    const adaptedEvent = Object.assign(
+        {},
+        event,
+        {
+          startDate: event.date_from !== null ? new Date(event.date_from) : event.date_from,
+          finishDate: event.date_to !== null ? new Date(event.date_to) : event.date_to,
+          destination: event.destination.name,
+          price: event.base_price,
+          isFavorite: event.is_favorite,
+          offers
+        }
+    );
+
+    delete adaptedEvent.date_from;
+    delete adaptedEvent.date_to;
+    delete adaptedEvent.base_price;
+    delete adaptedEvent.is_favorite;
+
+    return adaptedEvent;
+  }
+
+  static adaptToServer(event, destinationsDataMap, offersDataMap) {
+    const destination = {};
+    const destinationData = destinationsDataMap ? destinationsDataMap.get(destination) : null;
+
+    destination.name = event.destination;
+    destination.description = destinationData ? destinationData.description : null;
+    destination.pictures = [];
+
+    if (destinationData && destinationData.photos && destinationData.photos.length > 0) {
+      destination.pictures = destinationData.photos.map((photo) => ({src: photo, description: ``}));
+      // TODO: add photo src and description
+    }
+
+    let offers = [];
+
+    if (event.offers && event.offers.length > 0 && offersDataMap) {
+      offers = event.offers.forEach((offer) => {
+        const offerData = offersDataMap.get(offer);
+        if (offerData) {
+          offers.push({title: offerData.title, price: offerData.price});
+        }
+      });
+    }
+
+    const adaptedEvent = Object.assign(
+        {},
+        event,
+        {
+          "date_from": event.startDate instanceof Date ? event.startDate.toISOString() : null,
+          "date_to": event.finishDate instanceof Date ? event.finishDate.toISOString() : null,
+          "destination": destination,
+          "base_price": event.price,
+          "is_favorite": event.isFavorite,
+          "offers": offers
+        }
+    );
+
+    delete adaptedEvent.startDate;
+    delete adaptedEvent.finishDate;
+    delete adaptedEvent.price;
+    delete adaptedEvent.isFavorite;
+
+    return adaptedEvent;
+  }
 }
