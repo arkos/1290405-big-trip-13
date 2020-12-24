@@ -6,6 +6,7 @@ import EventsModel from './model/events.js';
 import FilterModel from './model/filter.js';
 import DataListModel from './model/data-list.js';
 import Api from './api.js';
+import {UpdateType} from './utils/const.js';
 
 const AUTHORIZATION = `Basic ab0d513b8d5045f4a72159701a847950`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
@@ -38,6 +39,9 @@ document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (e
   tripPresenter.createEvent();
 });
 
-api.getEvents().then((events) => eventsModel.setEvents(events));
+api.getEvents()
+.then((events) => eventsModel.setEvents(UpdateType.INIT, events))
+.catch(() => eventsModel.setEvents(UpdateType.INIT, []));
+
 api.getOffers().then((offers) => dataListModel.setOffers(offers));
 api.getDestinations().then((destinations) => dataListModel.setDestinations(destinations));
