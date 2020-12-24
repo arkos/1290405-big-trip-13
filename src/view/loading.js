@@ -1,4 +1,3 @@
-import Abstract from "./abstract";
 import AbstractView from '../view/abstract.js';
 
 const createLoadingTemplate = () => {

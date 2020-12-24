@@ -3,6 +3,7 @@ import NoEventView from '../view/no-event.js';
 import TripInfoView from '../view/trip-info.js';
 import TripPriceView from '../view/trip-price.js';
 import EventListView from '../view/event-list.js';
+import LoadingView from '../view/loading.js';
 import {remove, render, RenderPosition} from '../utils/render.js';
 import {getTripInfo, getTripPrice, sortEventDateAsc, sortEventPriceDesc, sortEventDurationDesc} from '../utils/event.js';
 import {filter} from '../utils/filter.js';
@@ -18,6 +19,8 @@ export default class Trip {
     this._filterModel = filterModel;
     this._dataListModel = dataListModel;
 
+    this._isLoading = true;
+
     this._eventPresenterMap = new Map();
 
     this._currentSortType = SortType.DAY;
@@ -28,6 +31,7 @@ export default class Trip {
 
     this._noEventComponent = new NoEventView();
     this._eventListComponent = new EventListView();
+    this._loadingComponent = new LoadingView();
 
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
@@ -65,6 +69,10 @@ export default class Trip {
       default:
         return filteredEvents;
     }
+  }
+
+  _renderLoading() {
+    render(this._eventContainer, this._loadingComponent, RenderPosition.BEFOREEND);
   }
 
   _renderSort() {
@@ -115,6 +123,11 @@ export default class Trip {
   }
 
   _renderTrip() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     const events = this._getEvents();
 
     if (events.length === 0) {
@@ -134,6 +147,7 @@ export default class Trip {
     this._eventPresenterMap.forEach((presenter) => presenter.destroy());
     this._eventPresenterMap.clear();
 
+    remove(this._loadingComponent);
     remove(this._sortComponent);
     remove(this._noEventComponent);
     remove(this._tripInfoComponent);
@@ -169,6 +183,11 @@ export default class Trip {
         break;
       case UpdateType.MAJOR:
         this._clearTrip({resetSortType: true});
+        this._renderTrip();
+        break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
         this._renderTrip();
         break;
     }
