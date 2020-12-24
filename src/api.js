@@ -1,3 +1,4 @@
+import DataListModel from './model/data-list.js';
 import EventsModel from './model/events.js';
 
 const Method = {
@@ -31,6 +32,18 @@ export default class Api {
     })
     .then(Api.toJSON)
     .then(EventsModel.adaptToClient);
+  }
+
+  getOffers() {
+    return this._load({url: `offers`})
+    .then(Api.toJSON)
+    .then((offers) => DataListModel.adaptOffersToClient(offers));
+  }
+
+  getDestinations() {
+    return this._load({url: `destinations`})
+    .then(Api.toJSON)
+    .then((destinations) => DataListModel.adaptDestinationsToClient(destinations));
   }
 
   _load({
