@@ -1,6 +1,5 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import {getDataForAllOffers} from '../mock/event.js';
 
 dayjs.extend(duration);
 
@@ -34,12 +33,12 @@ export const getTripInfo = (events) => {
   };
 };
 
-export const getTripPrice = (events) => {
+export const getTripPrice = (events, allOffers) => {
   if (!events || events.length === 0) {
     return 0;
   }
 
-  const offersData = getDataForAllOffers();
+  const offersData = allOffers;
 
   const totalPriceForEvents = events.reduce((total, event) => {
     const priceForEventOffers = Array.from(event.offers).reduce((sum, offer) => sum + offersData.get(offer).price, 0);
