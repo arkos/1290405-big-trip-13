@@ -63,3 +63,33 @@ export const sortEventDurationDesc = (lhsEvent, rhsEvent) => {
 
   return rhsDurationMs - lhsDurationMs;
 };
+
+export const isPastDate = (date) => {
+  return date === null ? false : dayjs().isAfter(date);
+};
+
+export const isFutureDate = (date) => {
+  return date === null ? false : dayjs().isBefore(date, `day`) || dayjs().isSame(date, `day`);
+};
+
+export const formatDuration = (startDate, finishDate) => {
+  const durationBetweenDates = dayjs.duration(dayjs(finishDate).diff(dayjs(startDate)));
+
+  const days = durationBetweenDates.days();
+  const hours = durationBetweenDates.hours();
+  const minutes = durationBetweenDates.minutes();
+
+  let template;
+
+  if (days) {
+    template = `DD[D] HH[H] mm[M]`;
+  } else if (hours) {
+    template = `HH[H] mm[M]`;
+  } else {
+    template = `mm[M]`;
+  }
+
+  const durationBeforeFormat = `0000-00-${days} ${hours}:${minutes}`;
+  const formattedDuration = dayjs(durationBeforeFormat).format(template);
+  return formattedDuration;
+};

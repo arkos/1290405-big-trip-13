@@ -2,6 +2,7 @@ import EventView from '../view/event.js';
 import EventEditView from '../view/event-edit.js';
 import {isEscEvent} from '../utils/common.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
+import {UserAction, UpdateType} from '../utils/const.js';
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -22,21 +23,24 @@ export default class Event {
     this._handleEscKeyDown = this._handleEscKeyDown.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
-  init(event, eventTypeInfoMap, offerInfoMap, destinationInfoMap) {
+  init(event, dataListModel) {
     this._event = event;
+    this._dataListModel = dataListModel;
 
     const prevEventComponent = this._eventComponent;
     const prevEventEditComponent = this._eventEditComponent;
 
-    this._eventComponent = new EventView(event, offerInfoMap);
-    this._eventEditComponent = new EventEditView(event, eventTypeInfoMap, offerInfoMap, destinationInfoMap);
+    this._eventComponent = new EventView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), event);
+    this._eventEditComponent = new EventEditView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), this._dataListModel.getDestinations(), event);
 
-    this._eventComponent.setClickHandler(this._handleClickRollupButtonDown);
+    this._eventComponent.setRollupButtonClickHandler(this._handleClickRollupButtonDown);
     this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._eventEditComponent.setClickHandler(this._handleClickRollupButtonUp);
+    this._eventEditComponent.setRollupButtonClickHandler(this._handleClickRollupButtonUp);
     this._eventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._eventEditComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     if ((prevEventComponent === null) || (prevEventEditComponent === null)) {
       render(this._eventListContainer, this._eventComponent, RenderPosition.BEFOREEND);
@@ -53,6 +57,30 @@ export default class Event {
 
     remove(prevEventComponent);
     remove(prevEventEditComponent);
+  }
+
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._switchToDisplay();
+    }
+  }
+
+  destroy() {
+    remove(this._eventComponent);
+    remove(this._eventEditComponent);
+  }
+
+  _switchToEdit() {
+    replace(this._eventEditComponent, this._eventComponent);
+    document.addEventListener(`keydown`, this._handleEscKeyDown);
+    this._changeMode();
+    this._mode = Mode.EDITING;
+  }
+
+  _switchToDisplay() {
+    replace(this._eventComponent, this._eventEditComponent);
+    document.removeEventListener(`keydown`, this._handleEscKeyDown);
+    this._mode = Mode.DEFAULT;
   }
 
   _handleClickRollupButtonUp() {
@@ -72,35 +100,28 @@ export default class Event {
   }
 
   _handleFormSubmit(event) {
-    this._changeData(event);
+    this._changeData(
+        UserAction.UPDATE_EVENT,
+        UpdateType.MINOR,
+        event
+    );
     this._switchToDisplay();
   }
 
   _handleFavoriteClick() {
-    this._changeData(Object.assign({}, this._event, {isFavorite: !this._event.isFavorite}));
+    this._changeData(
+        UserAction.UPDATE_EVENT,
+        UpdateType.MINOR,
+        Object.assign({}, this._event, {isFavorite: !this._event.isFavorite}));
   }
 
-  _switchToEdit() {
-    replace(this._eventEditComponent, this._eventComponent);
-    document.addEventListener(`keydown`, this._handleEscKeyDown);
-    this._changeMode();
-    this._mode = Mode.EDITING;
+  _handleDeleteClick(event) {
+    this._changeData(
+        UserAction.DELETE_EVENT,
+        UpdateType.MINOR,
+        event
+    );
   }
 
-  _switchToDisplay() {
-    replace(this._eventComponent, this._eventEditComponent);
-    document.removeEventListener(`keydown`, this._handleEscKeyDown);
-    this._mode = Mode.DEFAULT;
-  }
 
-  resetView() {
-    if (this._mode !== Mode.DEFAULT) {
-      this._switchToDisplay();
-    }
-  }
-
-  destroy() {
-    remove(this._eventComponent);
-    remove(this._eventEditComponent);
-  }
 }

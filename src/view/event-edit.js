@@ -1,5 +1,7 @@
 import SmartView from './smart.js';
 import {humanizeDate} from '../utils/event.js';
+import he from 'he';
+
 import dayjs from 'dayjs';
 import flatpickr from 'flatpickr';
 
@@ -7,12 +9,16 @@ import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const EMPTY_EVENT = {
   type: ``,
-  startDate: dayjs().startOf(`day`),
-  finishDate: dayjs().endOf(`day`),
+  startDate: dayjs().startOf(`day`).toDate(),
+  finishDate: dayjs().endOf(`day`).toDate(),
   destination: ``,
-  price: ``,
-  offers: new Set(),
-  destinationInfo: {}
+  price: 0,
+  offers: []
+};
+
+const DeleteButtonLabel = {
+  ADD: `Cancel`,
+  EDIT: `Delete`
 };
 
 const createOffersTemplate = (offers) => {
@@ -69,7 +75,7 @@ const createTypesMenuTemplate = (eventTypesMenu) => {
 
 const createEventEditTemplate = (state) => {
 
-  const {type, startDate, finishDate, offers, destination, availableDestinations, price, src, eventTypesMenu} = state;
+  const {type, startDate, finishDate, offers, destination, availableDestinations, price, image, eventTypesMenu, deleteButtonLabel} = state;
 
   const typesMenuTemplate = createTypesMenuTemplate(eventTypesMenu);
 
@@ -85,7 +91,7 @@ const createEventEditTemplate = (state) => {
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="${src}" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="${image}" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
           ${typesMenuTemplate}
@@ -95,7 +101,7 @@ const createEventEditTemplate = (state) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination ? destination.title : ``}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination ? he.encode(destination.title) : ``}" list="destination-list-1" autocomplete="off">
             ${availableDestinationsTemplate}
         </div>
 
@@ -112,11 +118,11 @@ const createEventEditTemplate = (state) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}" pattern="\\d+" required autocomplete="off">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Delete</button>
+        <button class="event__reset-btn" type="reset">${deleteButtonLabel}</button>
         <button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
         </button>
@@ -130,25 +136,28 @@ const createEventEditTemplate = (state) => {
 };
 
 export default class EventEdit extends SmartView {
-  constructor(event = EMPTY_EVENT, eventTypeInfoMap, offerInfoMap, destinationInfoMap) {
+  constructor(typesDataMap, offersDataMap, destinationsDataMap, event = EMPTY_EVENT) {
     super();
-    this._eventTypeInfoMap = eventTypeInfoMap;
-    this._offerInfoMap = offerInfoMap;
-    this._destinationInfoMap = destinationInfoMap;
-    this._state = EventEdit.parseEventToState(event, this._eventTypeInfoMap, this._offerInfoMap, this._destinationInfoMap);
+    this._typesDataMap = typesDataMap;
+    this._offersDataMap = offersDataMap;
+    this._destinationsDataMap = destinationsDataMap;
+    this._state = EventEdit.parseEventToState(event, this._typesDataMap, this._offersDataMap, this._destinationsDataMap);
+    this._destinationOptions = this._buildDestinationOptions();
     this._startDatePicker = null;
     this._finishDatePicker = null;
 
-    this._clickHandler = this._clickHandler.bind(this);
+    this._clickRollupButtonHandler = this._clickRollupButtonHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
     this._offerToggleHandler = this._offerToggleHandler.bind(this);
-    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
+    this._destinationInputHandler = this._destinationInputHandler.bind(this);
+    this._deleteClickHandler = this._deleteClickHandler.bind(this);
     this._startDateCloseHandler = this._startDateCloseHandler.bind(this);
     this._finishDateCloseHandler = this._finishDateCloseHandler.bind(this);
 
     this._setInnerHandlers();
+    this._validateAll();
     this._setStartDatePicker();
     this._setFinishDatePicker();
   }
@@ -171,8 +180,8 @@ export default class EventEdit extends SmartView {
           time_24hr: true,
           dateFormat: `d/m/y H:i`,
           defaultDate: this._state.startDate,
-          maxDate: dayjs(this._state.finishDate).subtract(1, `m`).toDate(),
-          onClose: this._startDateCloseHandler
+          maxDate: dayjs(this._state.finishDate).second(0).subtract(1, `m`).toDate(),
+          onClose: this._startDateCloseHandler,
         }
     );
   }
@@ -191,8 +200,8 @@ export default class EventEdit extends SmartView {
           time_24hr: true,
           dateFormat: `d/m/y H:i`,
           defaultDate: this._state.finishDate,
-          minDate: dayjs(this._state.startDate).add(1, `m`).toDate(),
-          onClose: this._finishDateCloseHandler
+          minDate: dayjs(this._state.startDate).second(0).add(1, `m`).toDate(),
+          onClose: this._finishDateCloseHandler,
         }
     );
   }
@@ -217,9 +226,93 @@ export default class EventEdit extends SmartView {
     this._setStartDatePicker();
   }
 
-  _clickHandler(evt) {
+  reset(event) {
+    this.updateData(EventEdit.parseEventToState(event, this._typesDataMap, this._offersDataMap, this._destinationsDataMap));
+  }
+
+  restoreHandlers() {
+    this._destinationOptions = this._buildDestinationOptions();
+    this._setInnerHandlers();
+    this.setRollupButtonClickHandler(this._callback.rollupButtonClick);
+    this.setFormSubmitHandler(this._callback.submit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
+    this._setStartDatePicker();
+    this._setFinishDatePicker();
+    this._validateAll();
+  }
+
+  setRollupButtonClickHandler(callback) {
+    this._callback.rollupButtonClick = callback;
+
+    this.getElement()
+      .querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, this._clickRollupButtonHandler);
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.submit = callback;
+
+    this.getElement()
+      .querySelector(`form`)
+      .addEventListener(`submit`, this._submitHandler);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+
+    this.getElement()
+      .querySelector(`.event__reset-btn`)
+      .addEventListener(`click`, this._deleteClickHandler);
+  }
+
+  _buildDestinationOptions() {
+    const destinations = this.getElement().querySelector(`#destination-list-1`);
+    const options = Array.from(destinations.options).map((option) => option.value);
+    return new Set(options);
+  }
+
+  _validateDestination() {
+    const destinationElement = this.getElement().querySelector(`.event__input--destination`);
+    if (!this._destinationOptions.has(destinationElement.value)) {
+      destinationElement.setCustomValidity(`You have to select a destination from the provided destinations list`);
+      return false;
+    }
+
+    destinationElement.setCustomValidity(``);
+    return true;
+  }
+
+  _validateAll() {
+    this._validateDestination();
+    const isValid = this.getElement().querySelector(`.event--edit`).checkValidity();
+
+    const saveButton = this.getElement().querySelector(`.event__save-btn`);
+
+    saveButton.disabled = !isValid;
+
+    return isValid;
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+      .querySelector(`.event__type-list`)
+      .addEventListener(`change`, this._eventTypeChangeHandler);
+
+    const priceElement = this.getElement().querySelector(`.event__input--price`);
+    priceElement.addEventListener(`input`, this._priceInputHandler);
+
+    const offersRendered = this.getElement().querySelector(`.event__available-offers`);
+    if (offersRendered) {
+      offersRendered.addEventListener(`change`, this._offerToggleHandler);
+    }
+
+    const destinationElement = this.getElement().querySelector(`.event__input--destination`);
+    destinationElement.addEventListener(`input`, this._destinationInputHandler);
+  }
+
+  _clickRollupButtonHandler(evt) {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.rollupButtonClick();
   }
 
   _submitHandler(evt) {
@@ -227,16 +320,23 @@ export default class EventEdit extends SmartView {
     this._callback.submit(EventEdit.parseStateToEvent(this._state));
   }
 
-  _destinationChangeHandler(evt) {
+  _deleteClickHandler(evt) {
     evt.preventDefault();
+    this._callback.deleteClick(EventEdit.parseStateToEvent(this._state));
+  }
+
+  _destinationInputHandler(evt) {
+    evt.preventDefault();
+
+    this._validateAll();
 
     let selectedDestination = evt.target.value;
 
-    if (!this._destinationInfoMap.has(selectedDestination)) {
+    if (!this._destinationsDataMap.has(selectedDestination)) {
       selectedDestination = this._state.destination.title;
     }
 
-    const {destination, availableDestinations} = EventEdit._createDestinationSelection(selectedDestination, this._destinationInfoMap);
+    const {destination, availableDestinations} = EventEdit._createDestinationSelection(selectedDestination, this._destinationsDataMap);
 
     if (!destination || destination.title === this._state.destination.title) {
       return;
@@ -276,91 +376,52 @@ export default class EventEdit extends SmartView {
     evt.preventDefault();
     this.updateData({
       type: evt.target.value,
-      src: this._eventTypeInfoMap.get(evt.target.value).image,
+      image: this._typesDataMap.get(evt.target.value).image,
       offers: EventEdit._createOfferSelectionForType(
           evt.target.value,
           null,
-          this._eventTypeInfoMap,
-          this._offerInfoMap
+          this._offersDataMap
       )
     });
   }
 
   _priceInputHandler(evt) {
     evt.preventDefault();
+
+    this._validateAll();
+
     this.updateData({
       price: parseInt(evt.target.value, 10)
     }, true);
   }
 
-  _setInnerHandlers() {
-    this.getElement()
-    .querySelector(`.event__type-list`)
-    .addEventListener(`change`, this._eventTypeChangeHandler);
+  static parseEventToState(event, typesDataMap, offersDataMap, destinationsDataMap) {
+    const deleteButtonLabel = (event === EMPTY_EVENT) ? DeleteButtonLabel.ADD : DeleteButtonLabel.EDIT;
 
-    this.getElement()
-    .querySelector(`.event__input--price`)
-    .addEventListener(`input`, this._priceInputHandler);
+    const [defaultType] = typesDataMap.keys();
+    const type = event.type ? event.type : defaultType;
 
-    const offersRendered = this.getElement().querySelector(`.event__available-offers`);
-    if (offersRendered) {
-      offersRendered.addEventListener(`change`, this._offerToggleHandler);
-    }
-
-    this.getElement()
-    .querySelector(`.event__input--destination`)
-    .addEventListener(`change`, this._destinationChangeHandler);
-  }
-
-  reset(event) {
-    this.updateData(EventEdit.parseEventToState(event, this._eventTypeInfoMap, this._offerInfoMap, this._destinationInfoMap));
-  }
-
-  restoreHandlers() {
-    this._setInnerHandlers();
-    this.setClickHandler(this._callback.click);
-    this.setFormSubmitHandler(this._callback.submit);
-    this._setStartDatePicker();
-    this._setFinishDatePicker();
-  }
-
-  setClickHandler(callback) {
-    this._callback.click = callback;
-
-    this.getElement()
-      .querySelector(`.event__rollup-btn`)
-      .addEventListener(`click`, this._clickHandler);
-  }
-
-  setFormSubmitHandler(callback) {
-    this._callback.submit = callback;
-
-    this.getElement()
-      .querySelector(`form`)
-      .addEventListener(`submit`, this._submitHandler);
-  }
-
-  static parseEventToState(event, eventTypeInfoMap, offerInfoMap, destinationInfoMap) {
-    const offerSelectionMap = EventEdit._createOfferSelectionForType(event.type, event.offers, eventTypeInfoMap, offerInfoMap);
+    const offerSelectionMap = EventEdit._createOfferSelectionForType(type, event.offers, offersDataMap);
 
     const eventTypesMenu = new Map();
-    eventTypeInfoMap.forEach((value, key) => eventTypesMenu.set(key, value.title));
+    typesDataMap.forEach((value, key) => eventTypesMenu.set(key, value.title));
 
-    const eventTypeData = eventTypeInfoMap.get(event.type);
-    const [defaultTypeData] = eventTypeInfoMap.values();
-    const src = eventTypeData ? eventTypeData.image : defaultTypeData.image;
+    const eventTypeData = typesDataMap.get(type);
+    const {image} = eventTypeData;
 
-    const {destination, availableDestinations} = EventEdit._createDestinationSelection(event.destination, destinationInfoMap);
+    const {destination, availableDestinations} = EventEdit._createDestinationSelection(event.destination, destinationsDataMap);
 
     return Object.assign(
         {},
         event,
         {
+          type,
           offers: offerSelectionMap,
-          src,
+          image,
           eventTypesMenu,
           destination,
-          availableDestinations
+          availableDestinations,
+          deleteButtonLabel
         }
     );
   }
@@ -368,61 +429,53 @@ export default class EventEdit extends SmartView {
   static parseStateToEvent(state) {
     const event = Object.assign({}, state);
 
-    const copyOffers = new Set();
+    const offers = [];
 
     state.offers.forEach((value, key) => {
       if (value.selected) {
-        const copyOffer = key;
-        copyOffers.add(copyOffer);
+        offers.push(key);
       }
     });
 
-    event.offers = copyOffers;
+    event.offers = offers;
     event.destination = state.destination.title;
 
     delete event.src;
-    delete event.allTypeData;
-    delete event.offersData;
+    delete event.eventTypesMenu;
+    delete event.availableDestinations;
+    delete event.deleteButtonLabel;
 
     return event;
   }
 
-  static _createOfferSelectionForType(type, selectedOffers, eventTypeInfoMap, offerInfoMap) {
-
-    const allOfferKeysForEventType = eventTypeInfoMap.get(type).offers;
-
-    if (!allOfferKeysForEventType || allOfferKeysForEventType.size === 0) {
-      return new Map();
-    }
-
-    const offerSelectionMap = new Map();
-
-    allOfferKeysForEventType.forEach((offerKey) => {
-      const offerInfo = offerInfoMap.get(offerKey);
-      const offerForEventType = {
-        key: offerKey,
-        title: offerInfo.title,
-        price: offerInfo.price,
-        selected: selectedOffers ? selectedOffers.has(offerKey) : false
-      };
-      offerSelectionMap.set(offerKey, offerForEventType);
-    });
-
-    return offerSelectionMap;
-  }
-
-  static _createDestinationSelection(currentDestination, destinationInfoMap) {
+  static _createDestinationSelection(currentDestination, destinationsDataMap) {
     const availableDestinations = [];
-    let destination = {};
+    let destination = {title: ``, description: ``, photos: []};
 
-    destinationInfoMap.forEach((value, key) => {
+    destinationsDataMap.forEach((value, key) => {
       if (currentDestination === key) {
         destination = {title: key, description: value.description, photos: value.photos.slice()};
-      } else {
-        availableDestinations.push(key);
       }
+
+      availableDestinations.push(key);
     });
 
     return {destination, availableDestinations};
+  }
+
+  static _createOfferSelectionForType(type, selectedOffers, offersDataMap) {
+    const offerSelectionMap = new Map();
+
+    offersDataMap.forEach((value, key) => {
+      if (value.eventTypeKey === type) {
+        offerSelectionMap.set(key, {
+          title: value.title,
+          price: value.price,
+          selected: selectedOffers ? (selectedOffers.indexOf(key) !== -1) : false
+        });
+      }
+    });
+
+    return offerSelectionMap;
   }
 }

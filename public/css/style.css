@@ -978,3 +978,8 @@ main {
 
 .statistics__item:not(:last-child) {
   margin-bottom: 78px; }
+
+.event__input:invalid {
+  background-color: #ffdddd;
+  outline: 1px solid #ff0000;
+  color: #900900;}

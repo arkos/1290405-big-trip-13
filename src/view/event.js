@@ -1,7 +1,8 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import {humanizeDate} from '../utils/event.js';
+import {humanizeDate, formatDuration} from '../utils/event.js';
 import AbstractView from './abstract.js';
+import he from 'he';
 
 dayjs.extend(duration);
 
@@ -22,38 +23,21 @@ const createEventOffersTemplate = (offers) => {
 
 const createEventTemplate = (state) => {
 
-  const {type, destination, startDate, finishDate, price, offers, isFavorite} = state;
+  const {type, destination, startDate, finishDate, price, offers, image, isFavorite} = state;
 
   const offersTemplate = createEventOffersTemplate(offers);
 
-  const durationBetweenDates = dayjs.duration(dayjs(finishDate).diff(dayjs(startDate)));
-
-  const days = durationBetweenDates.days();
-  const hours = durationBetweenDates.hours();
-  const minutes = durationBetweenDates.minutes();
-
-  let formatter;
-
-  if (days) {
-    formatter = `DD[D] HH[H] mm[M]`;
-  } else if (hours) {
-    formatter = `HH[H] mm[M]`;
-  } else {
-    formatter = `mm[M]`;
-  }
-
-  const durationBeforeFormat = `0000-00-${days} ${hours}:${minutes}`;
-  const formattedDuration = dayjs(durationBeforeFormat).format(formatter);
+  const formattedDuration = formatDuration(startDate, finishDate);
 
   const favoriteClassName = isFavorite ? `event__favorite-btn event__favorite-btn--active` : `event__favorite-btn`;
 
   return `<li class="trip-events__item">
     <div class="event">
-      <time class="event__date" datetime="${humanizeDate(startDate, `YYYY-MM-DD`)}">${humanizeDate(startDate, `MMM D`).toUpperCase()}</time>
+      <time class="event__date" datetime="${humanizeDate(startDate, `YYYY-MM-DD`)}">${humanizeDate(startDate, `MMM D`)}</time>
       <div class="event__type">
-        <img class="event__type-icon" width="42" height="42" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
+        <img class="event__type-icon" width="42" height="42" src="${image}" alt="Event type icon">
       </div>
-      <h3 class="event__title">${type} ${destination}</h3>
+      <h3 class="event__title">${type} ${he.encode(destination)}</h3>
       <div class="event__schedule">
         <p class="event__time">
           <time class="event__start-time" datetime="${humanizeDate(startDate, `YYYY-MM-DDTHH:mm`)}">${humanizeDate(startDate, `HH:mm`)}</time>
@@ -82,12 +66,12 @@ const createEventTemplate = (state) => {
 };
 
 export default class Event extends AbstractView {
-  constructor(event, offerInfoMap) {
+  constructor(typesDataMap, offersDataMap, event) {
     super();
     this._event = event;
-    this._state = Event._parseEventToState(event, offerInfoMap);
+    this._state = Event._parseEventToState(event, typesDataMap, offersDataMap);
 
-    this._clickHandler = this._clickHandler.bind(this);
+    this._clickRollupButtonHandler = this._clickRollupButtonHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
@@ -95,7 +79,19 @@ export default class Event extends AbstractView {
     return createEventTemplate(this._state);
   }
 
-  _clickHandler(evt) {
+  setRollupButtonClickHandler(callback) {
+    this._callback.click = callback;
+    this.getElement().querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, this._clickRollupButtonHandler);
+  }
+
+  setFavoriteClickHandler(callback) {
+    this._callback.favoriteClick = callback;
+    this.getElement().querySelector(`.event__favorite-btn`)
+      .addEventListener(`click`, this._favoriteClickHandler);
+  }
+
+  _clickRollupButtonHandler(evt) {
     evt.preventDefault();
     this._callback.click();
   }
@@ -105,30 +101,20 @@ export default class Event extends AbstractView {
     this._callback.favoriteClick();
   }
 
-  setClickHandler(callback) {
-    this._callback.click = callback;
-    this.getElement().querySelector(`.event__rollup-btn`)
-      .addEventListener(`click`, this._clickHandler);
-  }
-
-  setFavoriteClickHandler(callback) {
-    this._callback.favoriteClick = callback;
-    this.getElement().querySelector(`.event__favorite-btn`)
-      .addEventListener(`click`, this._favoriteClickHandler);
-  }
-
-  static _parseEventToState(event, offerInfoMap) {
+  static _parseEventToState(event, typesDataMap, offersDataMap) {
     const offerSelectionMap = new Map();
 
     event.offers.forEach((offerKey) => {
-      const offerInfo = offerInfoMap.get(offerKey);
+      const offerInfo = offersDataMap.get(offerKey);
       offerSelectionMap.set(offerKey, {title: offerInfo.title, price: offerInfo.price});
     });
+
+    const image = typesDataMap.get(event.type).image;
 
     return Object.assign(
         {},
         event,
-        {offers: offerSelectionMap}
+        {offers: offerSelectionMap, image}
     );
   }
 }
