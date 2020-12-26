@@ -1,5 +1,5 @@
 import DataListModel from './model/data-list.js';
-import EventsModel from './model/events.js';
+import PointsModel from './model/points.js';
 
 const Method = {
   GET: `GET`,
@@ -17,21 +17,21 @@ export default class Api {
     this._authorization = authorization;
   }
 
-  getEvents() {
+  getPoints() {
     return this._load({url: `points`})
     .then(Api.toJSON)
-    .then((events) => events.map(EventsModel.adaptToClient));
+    .then((points) => points.map(PointsModel.adaptToClient));
   }
 
-  updateEvent(event, destinationsDataMap, offersDataMap) {
+  updatePoint(point) {
     return this._load({
-      url: `points/${event.id}`,
+      url: `points/${point.id}`,
       method: Method.PUT,
-      body: JSON.stringify(EventsModel.adaptToServer(event, destinationsDataMap, offersDataMap)),
+      body: JSON.stringify(PointsModel.adaptToServer(point)),
       headers: new Headers({"Content-Type": `application/json`})
     })
     .then(Api.toJSON)
-    .then(EventsModel.adaptToClient);
+    .then(PointsModel.adaptToClient);
   }
 
   getOffers() {
