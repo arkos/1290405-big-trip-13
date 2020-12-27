@@ -2,7 +2,7 @@ import SortView from '../view/sort.js';
 import NoPointView from '../view/no-point.js';
 import TripInfoView from '../view/trip-info.js';
 import TripPriceView from '../view/trip-price.js';
-import EventListView from '../view/event-list.js';
+import PointListView from '../view/point-list.js';
 import LoadingView from '../view/loading.js';
 import {remove, render, RenderPosition} from '../utils/render.js';
 import {getTripInfo, getTripPrice, sortEventDateAsc, sortEventPriceDesc, sortEventDurationDesc} from '../utils/event.js';
@@ -31,7 +31,7 @@ export default class Trip {
     this._tripInfoComponent = null;
 
     this._noEventComponent = new NoPointView();
-    this._eventListComponent = new EventListView();
+    this._eventListComponent = new PointListView();
     this._loadingComponent = new LoadingView();
 
     this._handleViewAction = this._handleViewAction.bind(this);
