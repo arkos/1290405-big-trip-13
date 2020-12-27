@@ -371,7 +371,11 @@ export default class PointEdit extends SmartView {
       type: evt.target.value,
       offers: PointEdit._createOfferSelectionForType(
           [],
+<<<<<<< HEAD
           this._offers.get(evt.target.value)
+=======
+          this._offers
+>>>>>>> 79b297fcf860a97131c90814d2c23570c989b8be
       )
     });
   }
