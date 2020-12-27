@@ -148,7 +148,7 @@ export default class PointEdit extends SmartView {
 
     this._clickRollupButtonHandler = this._clickRollupButtonHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
-    this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
+    this._pointTypeChangeHandler = this._pointTypeChangeHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
     this._offerToggleHandler = this._offerToggleHandler.bind(this);
     this._destinationInputHandler = this._destinationInputHandler.bind(this);
@@ -296,7 +296,7 @@ export default class PointEdit extends SmartView {
   _setInnerHandlers() {
     this.getElement()
       .querySelector(`.event__type-list`)
-      .addEventListener(`change`, this._eventTypeChangeHandler);
+      .addEventListener(`change`, this._pointTypeChangeHandler);
 
     const priceElement = this.getElement().querySelector(`.event__input--price`);
     priceElement.addEventListener(`input`, this._priceInputHandler);
@@ -367,7 +367,7 @@ export default class PointEdit extends SmartView {
     });
   }
 
-  _eventTypeChangeHandler(evt) {
+  _pointTypeChangeHandler(evt) {
 
     if (evt.target.tagName !== `INPUT`) {
       return;

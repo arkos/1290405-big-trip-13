@@ -68,7 +68,7 @@ const createPointTemplate = (state) => {
 export default class Point extends AbstractView {
   constructor(typesDataMap, offersDataMap, event) {
     super();
-    this._event = event;
+    this._point = event;
     this._state = Point._parsePointToState(event, typesDataMap, offersDataMap);
 
     this._clickRollupButtonHandler = this._clickRollupButtonHandler.bind(this);

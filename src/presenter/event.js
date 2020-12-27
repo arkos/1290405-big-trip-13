@@ -11,9 +11,9 @@ const Mode = {
 
 export default class Point {
   constructor(eventListContainer, changeData, changeMode) {
-    this._eventListContainer = eventListContainer;
-    this._eventComponent = null;
-    this._eventEditComponent = null;
+    this._pointListContainer = eventListContainer;
+    this._pointComponent = null;
+    this._pointEditComponent = null;
     this._changeData = changeData;
     this._changeMode = changeMode;
     this._mode = Mode.DEFAULT;
@@ -27,32 +27,32 @@ export default class Point {
   }
 
   init(event, dataListModel) {
-    this._event = event;
+    this._point = event;
     this._dataListModel = dataListModel;
 
-    const prevPointComponent = this._eventComponent;
-    const prevPointEditComponent = this._eventEditComponent;
+    const prevPointComponent = this._pointComponent;
+    const prevPointEditComponent = this._pointEditComponent;
 
-    this._eventComponent = new PointView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), event);
-    this._eventEditComponent = new PointEditView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), this._dataListModel.getDestinations(), event);
+    this._pointComponent = new PointView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), event);
+    this._pointEditComponent = new PointEditView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), this._dataListModel.getDestinations(), event);
 
-    this._eventComponent.setRollupButtonClickHandler(this._handleClickRollupButtonDown);
-    this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._eventEditComponent.setRollupButtonClickHandler(this._handleClickRollupButtonUp);
-    this._eventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
-    this._eventEditComponent.setDeleteClickHandler(this._handleDeleteClick);
+    this._pointComponent.setRollupButtonClickHandler(this._handleClickRollupButtonDown);
+    this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    this._pointEditComponent.setRollupButtonClickHandler(this._handleClickRollupButtonUp);
+    this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     if ((prevPointComponent === null) || (prevPointEditComponent === null)) {
-      render(this._eventListContainer, this._eventComponent, RenderPosition.BEFOREEND);
+      render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
       return;
     }
 
     if (this._mode === Mode.DEFAULT) {
-      replace(this._eventComponent, prevPointComponent);
+      replace(this._pointComponent, prevPointComponent);
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._eventEditComponent, prevPointEditComponent);
+      replace(this._pointEditComponent, prevPointEditComponent);
     }
 
     remove(prevPointComponent);
@@ -66,25 +66,25 @@ export default class Point {
   }
 
   destroy() {
-    remove(this._eventComponent);
-    remove(this._eventEditComponent);
+    remove(this._pointComponent);
+    remove(this._pointEditComponent);
   }
 
   _switchToEdit() {
-    replace(this._eventEditComponent, this._eventComponent);
+    replace(this._pointEditComponent, this._pointComponent);
     document.addEventListener(`keydown`, this._handleEscKeyDown);
     this._changeMode();
     this._mode = Mode.EDITING;
   }
 
   _switchToDisplay() {
-    replace(this._eventComponent, this._eventEditComponent);
+    replace(this._pointComponent, this._pointEditComponent);
     document.removeEventListener(`keydown`, this._handleEscKeyDown);
     this._mode = Mode.DEFAULT;
   }
 
   _handleClickRollupButtonUp() {
-    this._eventEditComponent.reset(this._event);
+    this._pointEditComponent.reset(this._point);
     this._switchToDisplay();
   }
 
@@ -94,7 +94,7 @@ export default class Point {
 
   _handleEscKeyDown(evt) {
     isEscEvent(evt, () => {
-      this._eventEditComponent.reset(this._event);
+      this._pointEditComponent.reset(this._point);
       this._switchToDisplay();
     });
   }
@@ -112,7 +112,7 @@ export default class Point {
     this._changeData(
         UserAction.UPDATE_POINT,
         UpdateType.MINOR,
-        Object.assign({}, this._event, {isFavorite: !this._event.isFavorite}));
+        Object.assign({}, this._point, {isFavorite: !this._point.isFavorite}));
   }
 
   _handleDeleteClick(event) {
