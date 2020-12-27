@@ -7,7 +7,7 @@ import flatpickr from 'flatpickr';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
-const EMPTY_EVENT = {
+const EMPTY_POINT = {
   type: ``,
   dateFrom: dayjs().startOf(`day`).toDate(),
   dateTo: dayjs().endOf(`day`).toDate(),
@@ -136,12 +136,12 @@ const createPointEditTemplate = (state) => {
 };
 
 export default class PointEdit extends SmartView {
-  constructor(typesDataMap, offersDataMap, destinationsDataMap, event = EMPTY_EVENT) {
+  constructor(typesDataMap, offersDataMap, destinationsDataMap, point = EMPTY_POINT) {
     super();
     this._typesDataMap = typesDataMap;
     this._offersDataMap = offersDataMap;
     this._destinationsDataMap = destinationsDataMap;
-    this._state = PointEdit.parsePointToState(event, this._typesDataMap, this._offersDataMap, this._destinationsDataMap);
+    this._state = PointEdit.parsePointToState(point, this._typesDataMap, this._offersDataMap, this._destinationsDataMap);
     this._destinationOptions = this._buildDestinationOptions();
     this._dateFromPicker = null;
     this._dateToPicker = null;
@@ -226,8 +226,8 @@ export default class PointEdit extends SmartView {
     this._setDateFromPicker();
   }
 
-  reset(event) {
-    this.updateData(PointEdit.parsePointToState(event, this._typesDataMap, this._offersDataMap, this._destinationsDataMap));
+  reset(point) {
+    this.updateData(PointEdit.parsePointToState(point, this._typesDataMap, this._offersDataMap, this._destinationsDataMap));
   }
 
   restoreHandlers() {
@@ -395,30 +395,30 @@ export default class PointEdit extends SmartView {
     }, true);
   }
 
-  static parsePointToState(event, typesDataMap, offersDataMap, destinationsDataMap) {
-    const deleteButtonLabel = (event === EMPTY_EVENT) ? DeleteButtonLabel.ADD : DeleteButtonLabel.EDIT;
+  static parsePointToState(point, typesDataMap, offersDataMap, destinationsDataMap) {
+    const deleteButtonLabel = (point === EMPTY_POINT) ? DeleteButtonLabel.ADD : DeleteButtonLabel.EDIT;
 
     const [defaultType] = typesDataMap.keys();
-    const type = event.type ? event.type : defaultType;
+    const type = point.type ? point.type : defaultType;
 
-    const offerSelectionMap = PointEdit._createOfferSelectionForType(type, event.offers, offersDataMap);
+    const offerSelectionMap = PointEdit._createOfferSelectionForType(type, point.offers, offersDataMap);
 
-    const eventTypesMenu = new Map();
-    typesDataMap.forEach((value, key) => eventTypesMenu.set(key, value.title));
+    const pointTypesMenu = new Map();
+    typesDataMap.forEach((value, key) => pointTypesMenu.set(key, value.title));
 
-    const eventTypeData = typesDataMap.get(type);
-    const {image} = eventTypeData;
+    const pointTypeData = typesDataMap.get(type);
+    const {image} = pointTypeData;
 
-    const {destination, availableDestinations} = PointEdit._createDestinationSelection(event.destination, destinationsDataMap);
+    const {destination, availableDestinations} = PointEdit._createDestinationSelection(point.destination, destinationsDataMap);
 
     return Object.assign(
         {},
-        event,
+        point,
         {
           type,
           offers: offerSelectionMap,
           image,
-          eventTypesMenu,
+          pointTypesMenu,
           destination,
           availableDestinations,
           deleteButtonLabel
@@ -427,7 +427,7 @@ export default class PointEdit extends SmartView {
   }
 
   static parseStateToPoint(state) {
-    const event = Object.assign({}, state);
+    const point = Object.assign({}, state);
 
     const offers = [];
 
@@ -437,15 +437,15 @@ export default class PointEdit extends SmartView {
       }
     });
 
-    event.offers = offers;
-    event.destination = state.destination.title;
+    point.offers = offers;
+    point.destination = state.destination.title;
 
-    delete event.src;
-    delete event.eventTypesMenu;
-    delete event.availableDestinations;
-    delete event.deleteButtonLabel;
+    delete point.src;
+    delete point.pointTypesMenu;
+    delete point.availableDestinations;
+    delete point.deleteButtonLabel;
 
-    return event;
+    return point;
   }
 
   static _createDestinationSelection(currentDestination, destinationsDataMap) {
@@ -467,7 +467,7 @@ export default class PointEdit extends SmartView {
     const offerSelectionMap = new Map();
 
     offersDataMap.forEach((value, key) => {
-      if (value.eventTypeKey === type) {
+      if (value.pointTypeKey === type) {
         offerSelectionMap.set(key, {
           title: value.title,
           price: value.price,
