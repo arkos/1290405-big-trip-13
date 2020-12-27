@@ -13,7 +13,7 @@ const AUTHORIZATION = `Basic ab0d513b8d5045f4a72159701a847950`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 
 const tripMainElement = document.querySelector(`.trip-main`);
-const pointsElement = document.querySelector(`.trip-points`);
+const pointsElement = document.querySelector(`.trip-events`);
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
@@ -43,7 +43,7 @@ const tripPresenter = new TripPresenter(
 // Trip rendering
 tripPresenter.init();
 
-document.querySelector(`.trip-main__point-add-btn`).addPointListener(`click`, (evt) => {
+document.querySelector(`.trip-main__event-add-btn`).addPointListener(`click`, (evt) => {
   evt.prpointDefault();
   tripPresenter.createPoint();
 });

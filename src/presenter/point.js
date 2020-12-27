@@ -26,15 +26,16 @@ export default class Point {
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
-  init(point, dataListModel) {
+  init(point, offersModel, destinationsModel) {
     this._point = point;
-    this._dataListModel = dataListModel;
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
 
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
 
-    this._pointComponent = new PointView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), point);
-    this._pointEditComponent = new PointEditView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), this._dataListModel.getDestinations(), point);
+    this._pointComponent = new PointView(this._offersModel.getOffers(), point);
+    this._pointEditComponent = new PointEditView(this.offersModel.getOffers(), this._destinationsModel.getDestinations(), point);
 
     this._pointComponent.setRollupButtonClickHandler(this._handleClickRollupButtonDown);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);

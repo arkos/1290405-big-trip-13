@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import pointTypes from '../utils/const.js';
 import {humanizeDate, formatDuration} from '../utils/point.js';
 import AbstractView from './abstract.js';
-import he from 'he';
 
 dayjs.extend(duration);
 
@@ -17,17 +17,19 @@ const createPointOfferTemplate = ({title, price}) => {
 const createPointOffersTemplate = (offers) => {
   return offers.size > 0 ? `<h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-    ${Array.from(offers).map(([, offerValue]) => createPointOfferTemplate(offerValue)).join(``)}
+    ${offers.map((offer) => createPointOfferTemplate(offer)).join(``)}
   </ul>` : ``;
 };
 
-const createPointTemplate = (state) => {
+const createPointTemplate = (point) => {
 
-  const {type, destination, dateFrom, dateTo, price, offers, image, isFavorite} = state;
+  const {type, dateFrom, dateTo, destination, price, isFavorite, offers} = point;
 
   const offersTemplate = createPointOffersTemplate(offers);
 
   const formattedDuration = formatDuration(dateFrom, dateTo);
+
+  const typeIcon = pointTypes.get(type).src;
 
   const favoriteClassName = isFavorite ? `event__favorite-btn event__favorite-btn--active` : `event__favorite-btn`;
 
@@ -35,9 +37,9 @@ const createPointTemplate = (state) => {
     <div class="event">
       <time class="event__date" datetime="${humanizeDate(dateFrom, `YYYY-MM-DD`)}">${humanizeDate(dateFrom, `MMM D`)}</time>
       <div class="event__type">
-        <img class="event__type-icon" width="42" height="42" src="${image}" alt="Event type icon">
+        <img class="event__type-icon" width="42" height="42" src="${typeIcon}" alt="Event type icon">
       </div>
-      <h3 class="event__title">${type} ${he.encode(destination)}</h3>
+      <h3 class="event__title">${type} ${destination.name}</h3>
       <div class="event__schedule">
         <p class="event__time">
           <time class="event__start-time" datetime="${humanizeDate(dateFrom, `YYYY-MM-DDTHH:mm`)}">${humanizeDate(dateFrom, `HH:mm`)}</time>
@@ -66,17 +68,16 @@ const createPointTemplate = (state) => {
 };
 
 export default class Point extends AbstractView {
-  constructor(typesDataMap, offersDataMap, point) {
+  constructor(point) {
     super();
     this._point = point;
-    this._state = Point._parsePointToState(point, typesDataMap, offersDataMap);
 
     this._clickRollupButtonHandler = this._clickRollupButtonHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
   getTemplate() {
-    return createPointTemplate(this._state);
+    return createPointTemplate(this._point);
   }
 
   setRollupButtonClickHandler(callback) {
@@ -99,22 +100,5 @@ export default class Point extends AbstractView {
   _favoriteClickHandler(evt) {
     evt.preventDefault();
     this._callback.favoriteClick();
-  }
-
-  static _parsePointToState(point, typesDataMap, offersDataMap) {
-    const offerSelectionMap = new Map();
-
-    point.offers.forEach((offerKey) => {
-      const offerInfo = offersDataMap.get(offerKey);
-      offerSelectionMap.set(offerKey, {title: offerInfo.title, price: offerInfo.price});
-    });
-
-    const image = typesDataMap.get(point.type).image;
-
-    return Object.assign(
-        {},
-        point,
-        {offers: offerSelectionMap, image}
-    );
   }
 }
