@@ -5,7 +5,7 @@ import TripPriceView from '../view/trip-price.js';
 import PointListView from '../view/point-list.js';
 import LoadingView from '../view/loading.js';
 import {remove, render, RenderPosition} from '../utils/render.js';
-import {getTripInfo, getTripPrice, sortEventDateAsc, sortEventPriceDesc, sortEventDurationDesc} from '../utils/event.js';
+import {getTripInfo, getTripPrice, sortEventDateAsc, sortEventPriceDesc, sortEventDurationDesc} from '../utils/point.js';
 import {filter} from '../utils/filter.js';
 import {SortType, UserAction, UpdateType, FilterType} from '../utils/const.js';
 import EventPresenter from '../presenter/event.js';

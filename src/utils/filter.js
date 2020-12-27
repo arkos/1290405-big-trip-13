@@ -1,5 +1,5 @@
 import {FilterType} from './const.js';
-import {isPastDate, isFutureDate} from '../utils/event.js';
+import {isPastDate, isFutureDate} from './point.js';
 
 export const filter = {
   [FilterType.EVERYTHING]: (events) => events.slice(),

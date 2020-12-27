@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import {humanizeDate, formatDuration} from '../utils/event.js';
+import {humanizeDate, formatDuration} from '../utils/point.js';
 import AbstractView from './abstract.js';
 import he from 'he';
 
