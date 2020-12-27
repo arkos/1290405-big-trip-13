@@ -34,7 +34,7 @@ export default class Point {
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
 
-    this._pointComponent = new PointView(this._offersModel.getOffers(), point);
+    this._pointComponent = new PointView(point);
     this._pointEditComponent = new PointEditView(this.offersModel.getOffers(), this._destinationsModel.getDestinations(), point);
 
     this._pointComponent.setRollupButtonClickHandler(this._handleClickRollupButtonDown);

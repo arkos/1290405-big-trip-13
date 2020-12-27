@@ -8,13 +8,12 @@ export const humanizeDate = (date, formatter = `YYYY-MM-DD`) => {
 };
 
 const getDestinationsForTrip = (points) => {
-
   if (!points || points.length === 0) {
     return null;
   }
 
-  const destinations = [];
-  points.forEach((point) => destinations.push(point.destination));
+  const destinations = points.map((point) => point.destination.name);
+
   return destinations;
 };
 
@@ -33,15 +32,13 @@ export const getTripInfo = (points) => {
   };
 };
 
-export const getTripPrice = (points, allOffers) => {
+export const getTripPrice = (points) => {
   if (!points || points.length === 0) {
     return 0;
   }
 
-  const offersData = allOffers;
-
   const totalPriceForPoints = points.reduce((total, point) => {
-    const priceForPointOffers = Array.from(point.offers).reduce((sum, offer) => sum + offersData.get(offer).price, 0);
+    const priceForPointOffers = point.offers.reduce((sum, offer) => sum + offer.price, 0);
     return point.price + priceForPointOffers + total;
   }, 0);
 

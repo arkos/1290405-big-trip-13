@@ -31,7 +31,7 @@ export default class PointNew {
 
     render(this._pointListContainer, this._pointEditComponent, RenderPosition.AFTERBEGIN);
 
-    document.addPointListener(`keydown`, this._handleEscKeyDown);
+    document.addEventListener(`keydown`, this._handleEscKeyDown);
   }
 
   destroy() {

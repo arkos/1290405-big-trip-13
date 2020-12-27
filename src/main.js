@@ -43,8 +43,8 @@ const tripPresenter = new TripPresenter(
 // Trip rendering
 tripPresenter.init();
 
-document.querySelector(`.trip-main__event-add-btn`).addPointListener(`click`, (evt) => {
-  evt.prpointDefault();
+document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (evt) => {
+  evt.preventDefault();
   tripPresenter.createPoint();
 });
 
