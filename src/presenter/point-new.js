@@ -17,14 +17,12 @@ export default class PointNew {
     this._handleClickRollupButtonUp = this._handleClickRollupButtonUp.bind(this);
   }
 
-  init(dataListModel) {
+  init(offersModel, destinationsModel) {
     if (this._pointEditComponent !== null) {
       return;
     }
 
-    this._dataListModel = dataListModel;
-
-    this._pointEditComponent = new PointEditView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), this._dataListModel.getDestinations());
+    this._pointEditComponent = new PointEditView(offersModel.getOffers(), destinationsModel.getDestinations());
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
     this._pointEditComponent.setRollupButtonClickHandler(this._handleClickRollupButtonUp);
@@ -42,7 +40,7 @@ export default class PointNew {
     remove(this._pointEditComponent);
     this._pointEditComponent = null;
 
-    document.removePointListener(`keydown`, this._handleEscKeyDown);
+    document.removeEventListener(`keydown`, this._handleEscKeyDown);
   }
 
   _handleFormSubmit(point) {
