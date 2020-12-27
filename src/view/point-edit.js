@@ -42,10 +42,10 @@ const createOffersTemplate = (offers) => {
 const createDestinationInfoTemplate = (destination) => {
   return destination ? `<section class="event__section  event__section--destination">
   <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-  <p class="event__destination-description">${destination.name ? destination.name : ``}</p>
+  <p class="event__destination-description">${destination.description ? destination.description : ``}</p>
 
   ${destination.photos && (destination.photos.length > 0) ? `<div class="event__photos-container">
-    <div class="event__destination.photos-tape">
+    <div class="event__photos-tape">
     ${destination.photos.map((photo) => `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`).join(``)}
     </div>
   </div>` : ``}
@@ -55,7 +55,7 @@ const createDestinationInfoTemplate = (destination) => {
 const createAvailableDestinationsTemplate = (availableDestinations) => {
   return availableDestinations.length > 0 ? `<datalist id="destination-list-1">
     ${availableDestinations.map((destination) => `
-    <option value="${destination.name}"></option>
+    <option value="${destination}"></option>
     `).join(``)}
   </datalist>` : ``;
 };
@@ -227,7 +227,7 @@ export default class PointEdit extends SmartView {
   }
 
   reset(point) {
-    this.updateData(PointEdit.parsePointToState(point, this._typesDataMap, this._offers, this._destinations));
+    this.updateData(PointEdit.parsePointToState(point, this._offers, this._destinations));
   }
 
   restoreHandlers() {
@@ -330,22 +330,17 @@ export default class PointEdit extends SmartView {
 
     this._validateAll();
 
-    let selectedDestination = evt.target.value;
+    let destination = this._destinations.get(evt.target.value);
 
-    if (!this._destinations.has(selectedDestination)) {
-      selectedDestination = this._state.destination.title;
-    }
-
-    const {destination, availableDestinations} = PointEdit._createDestinationSelection(selectedDestination, this._destinations);
-
-    if (!destination || destination.title === this._state.destination.title) {
+    if (!destination || evt.target.value === this._state.destination.name) {
       return;
     }
 
-    this.updateData({
-      destination,
-      availableDestinations
-    });
+    Object.assign(destination, {name: evt.target.value});
+
+    this.updateData(
+        {destination}
+    );
   }
 
   _offerToggleHandler(evt) {
@@ -374,11 +369,9 @@ export default class PointEdit extends SmartView {
     evt.preventDefault();
     this.updateData({
       type: evt.target.value,
-      image: this._typesDataMap.get(evt.target.value).image,
       offers: PointEdit._createOfferSelectionForType(
-          evt.target.value,
-          null,
-          this._offers
+          [],
+          this._offers.get(evt.target.value)
       )
     });
   }
@@ -400,14 +393,13 @@ export default class PointEdit extends SmartView {
 
     const offerSelectionMap = PointEdit._createOfferSelectionForType(point.offers, offersForType);
 
-    const {destination, availableDestinations} = PointEdit._createDestinationSelection(point.destination, destinations);
+    const availableDestinations = [...destinations.keys()];
 
     return Object.assign(
         {},
         point,
         {
           offers: offerSelectionMap,
-          destination,
           availableDestinations,
           deleteButtonLabel
         }
@@ -432,21 +424,6 @@ export default class PointEdit extends SmartView {
     delete point.deleteButtonLabel;
 
     return point;
-  }
-
-  static _createDestinationSelection(currentDestination, allDestinations) {
-    const availableDestinations = [];
-    let destination = {name: ``, description: ``, photos: []};
-
-    allDestinations.forEach((value, key) => {
-      if (currentDestination === key) {
-        destination = {name: key, description: value.description, photos: value.photos.slice()};
-      }
-
-      availableDestinations.push(key);
-    });
-
-    return {destination, availableDestinations};
   }
 
   static _createOfferSelectionForType(selectedOffers, allOffersForType) {

@@ -1,7 +1,7 @@
 import PointEditView from '../view/point-edit.js';
 import {remove, render, RenderPosition} from '../utils/render.js';
 import {UpdateType, UserAction} from '../utils/const.js';
-import {isEscPoint} from '../utils/common.js';
+import {isEscEvent} from '../utils/common.js';
 import {nanoid} from 'nanoid';
 
 export default class PointNew {
@@ -59,7 +59,7 @@ export default class PointNew {
   }
 
   _handleEscKeyDown(evt) {
-    isEscPoint(evt, () => {
+    isEscEvent(evt, () => {
       this.destroy();
     });
   }
