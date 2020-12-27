@@ -42,7 +42,7 @@ export default class Trip {
     this._pointsModel.attach(this._handleModelEvent);
     this._filterModel.attach(this._handleModelEvent);
 
-    // this._pointNewPresenter = new PointNewPresenter(this._pointListComponent, this._handleViewAction);
+    this._pointNewPresenter = new PointNewPresenter(this._pointListComponent, this._handleViewAction);
   }
 
   init() {

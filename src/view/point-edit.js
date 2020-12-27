@@ -1,14 +1,15 @@
 import SmartView from './smart.js';
 import {humanizeDate} from '../utils/point.js';
+import {pointTypes} from '../utils/const.js';
 import he from 'he';
-
+import {nanoid} from 'nanoid';
 import dayjs from 'dayjs';
 import flatpickr from 'flatpickr';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const EMPTY_POINT = {
-  type: ``,
+  type: pointTypes.keys().next().value,
   dateFrom: dayjs().startOf(`day`).toDate(),
   dateTo: dayjs().endOf(`day`).toDate(),
   destination: ``,
@@ -38,35 +39,35 @@ const createOffersTemplate = (offers) => {
   </section>` : ``;
 };
 
-const createDestinationInfoTemplate = ({description, photos}) => {
-  return `<section class="event__section  event__section--destination">
+const createDestinationInfoTemplate = (destination) => {
+  return destination ? `<section class="event__section  event__section--destination">
   <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-  <p class="event__destination-description">${description ? description : ``}</p>
+  <p class="event__destination-description">${destination.name ? destination.name : ``}</p>
 
-  ${photos && (photos.length > 0) ? `<div class="event__photos-container">
-    <div class="event__photos-tape">
-    ${photos.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``)}
+  ${destination.photos && (destination.photos.length > 0) ? `<div class="event__photos-container">
+    <div class="event__destination.photos-tape">
+    ${destination.photos.map((photo) => `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`).join(``)}
     </div>
   </div>` : ``}
-</section>`;
+</section>` : ``;
 };
 
 const createAvailableDestinationsTemplate = (availableDestinations) => {
-  return `<datalist id="destination-list-1">
+  return availableDestinations.length > 0 ? `<datalist id="destination-list-1">
     ${availableDestinations.map((destination) => `
-    <option value="${destination}"></option>
+    <option value="${destination.name}"></option>
     `).join(``)}
-  </datalist>`;
+  </datalist>` : ``;
 };
 
-const createTypesMenuTemplate = (eventTypesMenu) => {
+const createTypesMenuTemplate = (types) => {
   return `<div class="event__type-list">
     <fieldset class="event__type-group">
       <legend class="visually-hidden">Event type</legend>
 
-      ${Array.from(eventTypesMenu).map(([key, title]) => `<div class="event__type-item">
+      ${Array.from(types).map(([key, value]) => `<div class="event__type-item">
       <input id="event-type-${key}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${key}">
-      <label class="event__type-label  event__type-label--${key}" for="event-type-${key}-1">${title}</label>
+      <label class="event__type-label  event__type-label--${key}" for="event-type-${key}-1">${value.title}</label>
     </div>`).join(``)}
 
     </fieldset>
@@ -75,9 +76,9 @@ const createTypesMenuTemplate = (eventTypesMenu) => {
 
 const createPointEditTemplate = (state) => {
 
-  const {type, dateFrom, dateTo, offers, destination, availableDestinations, price, image, eventTypesMenu, deleteButtonLabel} = state;
+  const {type, dateFrom, dateTo, offers, destination, availableDestinations, price, deleteButtonLabel} = state;
 
-  const typesMenuTemplate = createTypesMenuTemplate(eventTypesMenu);
+  const typesMenuTemplate = createTypesMenuTemplate(pointTypes);
 
   const offersTemplate = createOffersTemplate(offers);
 
@@ -91,7 +92,7 @@ const createPointEditTemplate = (state) => {
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="${image}" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="${pointTypes.get(type).src}" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
           ${typesMenuTemplate}
@@ -101,7 +102,7 @@ const createPointEditTemplate = (state) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination ? he.encode(destination.title) : ``}" list="destination-list-1" autocomplete="off">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination ? he.encode(destination.name) : ``}" list="destination-list-1" autocomplete="off">
             ${availableDestinationsTemplate}
         </div>
 
@@ -136,12 +137,11 @@ const createPointEditTemplate = (state) => {
 };
 
 export default class PointEdit extends SmartView {
-  constructor(typesDataMap, offersDataMap, destinationsDataMap, point = EMPTY_POINT) {
+  constructor(offers, destinations, point = EMPTY_POINT) {
     super();
-    this._typesDataMap = typesDataMap;
-    this._offersDataMap = offersDataMap;
-    this._destinationsDataMap = destinationsDataMap;
-    this._state = PointEdit.parsePointToState(point, this._typesDataMap, this._offersDataMap, this._destinationsDataMap);
+    this._offers = offers;
+    this._destinations = destinations;
+    this._state = PointEdit.parsePointToState(point, this._offers, this._destinations);
     this._destinationOptions = this._buildDestinationOptions();
     this._dateFromPicker = null;
     this._dateToPicker = null;
@@ -227,7 +227,7 @@ export default class PointEdit extends SmartView {
   }
 
   reset(point) {
-    this.updateData(PointEdit.parsePointToState(point, this._typesDataMap, this._offersDataMap, this._destinationsDataMap));
+    this.updateData(PointEdit.parsePointToState(point, this._typesDataMap, this._offers, this._destinations));
   }
 
   restoreHandlers() {
@@ -332,11 +332,11 @@ export default class PointEdit extends SmartView {
 
     let selectedDestination = evt.target.value;
 
-    if (!this._destinationsDataMap.has(selectedDestination)) {
+    if (!this._destinations.has(selectedDestination)) {
       selectedDestination = this._state.destination.title;
     }
 
-    const {destination, availableDestinations} = PointEdit._createDestinationSelection(selectedDestination, this._destinationsDataMap);
+    const {destination, availableDestinations} = PointEdit._createDestinationSelection(selectedDestination, this._destinations);
 
     if (!destination || destination.title === this._state.destination.title) {
       return;
@@ -356,11 +356,9 @@ export default class PointEdit extends SmartView {
     evt.preventDefault();
 
     const offers = new Map(this._state.offers);
-    offers.forEach((value, key) => {
-      if (key === evt.target.dataset.offerKey) {
-        value.selected = !value.selected;
-      }
-    });
+
+    const offer = offers.get(evt.target.dataset.offerKey);
+    offer.selected = !offer.selected;
 
     this.updateData({
       offers
@@ -380,7 +378,7 @@ export default class PointEdit extends SmartView {
       offers: PointEdit._createOfferSelectionForType(
           evt.target.value,
           null,
-          this._offersDataMap
+          this._offers
       )
     });
   }
@@ -395,30 +393,20 @@ export default class PointEdit extends SmartView {
     }, true);
   }
 
-  static parsePointToState(point, typesDataMap, offersDataMap, destinationsDataMap) {
+  static parsePointToState(point, offers, destinations) {
     const deleteButtonLabel = (point === EMPTY_POINT) ? DeleteButtonLabel.ADD : DeleteButtonLabel.EDIT;
 
-    const [defaultType] = typesDataMap.keys();
-    const type = point.type ? point.type : defaultType;
+    const offersForType = offers.get(point.type);
 
-    const offerSelectionMap = PointEdit._createOfferSelectionForType(type, point.offers, offersDataMap);
+    const offerSelectionMap = PointEdit._createOfferSelectionForType(point.offers, offersForType);
 
-    const pointTypesMenu = new Map();
-    typesDataMap.forEach((value, key) => pointTypesMenu.set(key, value.title));
-
-    const pointTypeData = typesDataMap.get(type);
-    const {image} = pointTypeData;
-
-    const {destination, availableDestinations} = PointEdit._createDestinationSelection(point.destination, destinationsDataMap);
+    const {destination, availableDestinations} = PointEdit._createDestinationSelection(point.destination, destinations);
 
     return Object.assign(
         {},
         point,
         {
-          type,
           offers: offerSelectionMap,
-          image,
-          pointTypesMenu,
           destination,
           availableDestinations,
           deleteButtonLabel
@@ -431,30 +419,28 @@ export default class PointEdit extends SmartView {
 
     const offers = [];
 
-    state.offers.forEach((value, key) => {
+    state.offers.forEach((value) => {
       if (value.selected) {
-        offers.push(key);
+        const {title, price} = value;
+        offers.push({title, price});
       }
     });
 
     point.offers = offers;
-    point.destination = state.destination.title;
 
-    delete point.src;
-    delete point.pointTypesMenu;
     delete point.availableDestinations;
     delete point.deleteButtonLabel;
 
     return point;
   }
 
-  static _createDestinationSelection(currentDestination, destinationsDataMap) {
+  static _createDestinationSelection(currentDestination, allDestinations) {
     const availableDestinations = [];
-    let destination = {title: ``, description: ``, photos: []};
+    let destination = {name: ``, description: ``, photos: []};
 
-    destinationsDataMap.forEach((value, key) => {
+    allDestinations.forEach((value, key) => {
       if (currentDestination === key) {
-        destination = {title: key, description: value.description, photos: value.photos.slice()};
+        destination = {name: key, description: value.description, photos: value.photos.slice()};
       }
 
       availableDestinations.push(key);
@@ -463,17 +449,19 @@ export default class PointEdit extends SmartView {
     return {destination, availableDestinations};
   }
 
-  static _createOfferSelectionForType(type, selectedOffers, offersDataMap) {
+  static _createOfferSelectionForType(selectedOffers, allOffersForType) {
     const offerSelectionMap = new Map();
 
-    offersDataMap.forEach((value, key) => {
-      if (value.pointTypeKey === type) {
-        offerSelectionMap.set(key, {
-          title: value.title,
-          price: value.price,
-          selected: selectedOffers ? (selectedOffers.indexOf(key) !== -1) : false
-        });
+    allOffersForType.forEach((value) => {
+      const findOffer = selectedOffers.find((selectedOffer) => selectedOffer.title === value.title);
+
+      let isSelected = false;
+
+      if (findOffer) {
+        isSelected = true;
       }
+
+      offerSelectionMap.set(nanoid(), Object.assign({}, value, {selected: isSelected}));
     });
 
     return offerSelectionMap;

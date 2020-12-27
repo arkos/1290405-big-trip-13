@@ -35,7 +35,7 @@ export default class Point {
     const prevPointEditComponent = this._pointEditComponent;
 
     this._pointComponent = new PointView(point);
-    this._pointEditComponent = new PointEditView(this.offersModel.getOffers(), this._destinationsModel.getDestinations(), point);
+    this._pointEditComponent = new PointEditView(this._offersModel.getOffers(), this._destinationsModel.getDestinations(), point);
 
     this._pointComponent.setRollupButtonClickHandler(this._handleClickRollupButtonDown);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
