@@ -12,12 +12,13 @@ import EventPresenter from '../presenter/event.js';
 import EventNewPresenter from '../presenter/event-new.js';
 
 export default class Trip {
-  constructor(tripContainer, eventContainer, eventsModel, filterModel, dataListModel) {
+  constructor(tripContainer, eventContainer, eventsModel, filterModel, offersModel, destinationsModel) {
     this._tripContainer = tripContainer;
     this._eventContainer = eventContainer;
     this._eventsModel = eventsModel;
     this._filterModel = filterModel;
-    this._dataListModel = dataListModel;
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
 
     this._isLoading = true;
 

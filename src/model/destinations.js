@@ -21,5 +21,7 @@ export default class Destinations extends Subject {
       adaptedDestinations.set(destination.name, {
         description: destination.description, photos: [...destination.pictures]
       }));
+
+    return adaptedDestinations;
   }
 }

@@ -4,7 +4,8 @@ import TripPresenter from './presenter/trip.js';
 import FilterPresenter from './presenter/filter.js';
 import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
-import DataListModel from './model/data-list.js';
+import OffersModel from './model/offers.js';
+import DestinationsModel from './model/destinations.js';
 import Api from './api.js';
 import {UpdateType} from './utils/const.js';
 
@@ -16,9 +17,10 @@ const pointsElement = document.querySelector(`.trip-points`);
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
-const dataListModel = new DataListModel();
 const pointsModel = new PointsModel();
 const filterModel = new FilterModel();
+const offersModel = new OffersModel();
+const destinationsModel = new DestinationsModel();
 
 // Site Menu rendering
 const siteMenuTitleElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
@@ -29,7 +31,14 @@ render(menuContainer, new MenuView(), RenderPosition.AFTEREND);
 const filterPresenter = new FilterPresenter(filterContainer, filterModel);
 filterPresenter.init();
 
-const tripPresenter = new TripPresenter(tripMainElement, pointsElement, pointsModel, filterModel, dataListModel);
+const tripPresenter = new TripPresenter(
+    tripMainElement,
+    pointsElement,
+    pointsModel,
+    filterModel,
+    offersModel,
+    destinationsModel
+);
 
 // Trip rendering
 tripPresenter.init();
@@ -39,9 +48,11 @@ document.querySelector(`.trip-main__point-add-btn`).addPointListener(`click`, (e
   tripPresenter.createPoint();
 });
 
-api.getPoints()
-.then((points) => pointsModel.setPoints(UpdateType.INIT, points))
+const promises = Promise.all([api.getOffers(), api.getDestinations(), api.getPoints()]);
+promises
+.then(([offers, destinations, points]) => {
+  offersModel.setOffers(offers);
+  destinationsModel.setDestinations(destinations);
+  pointsModel.setPoints(UpdateType.INIT, points);
+})
 .catch(() => pointsModel.setPoints(UpdateType.INIT, []));
-
-api.getOffers().then((offers) => dataListModel.setOffers(offers));
-api.getDestinations().then((destinations) => dataListModel.setDestinations(destinations));

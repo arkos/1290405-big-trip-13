@@ -1,4 +1,5 @@
-import DataListModel from './model/data-list.js';
+import OffersModel from './model/offers.js';
+import DestinationsModel from './model/destinations.js';
 import PointsModel from './model/points.js';
 
 const Method = {
@@ -37,13 +38,13 @@ export default class Api {
   getOffers() {
     return this._load({url: `offers`})
     .then(Api.toJSON)
-    .then((offers) => DataListModel.adaptOffersToClient(offers));
+    .then(OffersModel.adaptToClient);
   }
 
   getDestinations() {
     return this._load({url: `destinations`})
     .then(Api.toJSON)
-    .then((destinations) => DataListModel.adaptDestinationsToClient(destinations));
+    .then(DestinationsModel.adaptToClient);
   }
 
   _load({
