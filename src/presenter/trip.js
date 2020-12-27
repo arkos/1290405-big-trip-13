@@ -9,7 +9,7 @@ import {getTripInfo, getTripPrice, sortEventDateAsc, sortEventPriceDesc, sortEve
 import {filter} from '../utils/filter.js';
 import {SortType, UserAction, UpdateType, FilterType} from '../utils/const.js';
 import EventPresenter from '../presenter/event.js';
-import EventNewPresenter from '../presenter/event-new.js';
+import EventNewPresenter from './point-new.js';
 
 export default class Trip {
   constructor(tripContainer, eventContainer, eventsModel, filterModel, offersModel, destinationsModel) {
@@ -161,13 +161,13 @@ export default class Trip {
 
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
-      case UserAction.ADD_EVENT:
+      case UserAction.ADD_POINT:
         this._eventsModel.addEvent(updateType, update);
         break;
-      case UserAction.UPDATE_EVENT:
+      case UserAction.UPDATE_POINT:
         this._eventsModel.updateEvent(updateType, update);
         break;
-      case UserAction.DELETE_EVENT:
+      case UserAction.DELETE_POINT:
         this._eventsModel.deleteEvent(updateType, update);
         break;
     }

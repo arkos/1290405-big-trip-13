@@ -101,7 +101,7 @@ export default class Event {
 
   _handleFormSubmit(event) {
     this._changeData(
-        UserAction.UPDATE_EVENT,
+        UserAction.UPDATE_POINT,
         UpdateType.MINOR,
         event
     );
@@ -110,14 +110,14 @@ export default class Event {
 
   _handleFavoriteClick() {
     this._changeData(
-        UserAction.UPDATE_EVENT,
+        UserAction.UPDATE_POINT,
         UpdateType.MINOR,
         Object.assign({}, this._event, {isFavorite: !this._event.isFavorite}));
   }
 
   _handleDeleteClick(event) {
     this._changeData(
-        UserAction.DELETE_EVENT,
+        UserAction.DELETE_POINT,
         UpdateType.MINOR,
         event
     );
