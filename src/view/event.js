@@ -23,26 +23,26 @@ const createEventOffersTemplate = (offers) => {
 
 const createEventTemplate = (state) => {
 
-  const {type, destination, startDate, finishDate, price, offers, image, isFavorite} = state;
+  const {type, destination, dateFrom, dateTo, price, offers, image, isFavorite} = state;
 
   const offersTemplate = createEventOffersTemplate(offers);
 
-  const formattedDuration = formatDuration(startDate, finishDate);
+  const formattedDuration = formatDuration(dateFrom, dateTo);
 
   const favoriteClassName = isFavorite ? `event__favorite-btn event__favorite-btn--active` : `event__favorite-btn`;
 
   return `<li class="trip-events__item">
     <div class="event">
-      <time class="event__date" datetime="${humanizeDate(startDate, `YYYY-MM-DD`)}">${humanizeDate(startDate, `MMM D`)}</time>
+      <time class="event__date" datetime="${humanizeDate(dateFrom, `YYYY-MM-DD`)}">${humanizeDate(dateFrom, `MMM D`)}</time>
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="${image}" alt="Event type icon">
       </div>
       <h3 class="event__title">${type} ${he.encode(destination)}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="${humanizeDate(startDate, `YYYY-MM-DDTHH:mm`)}">${humanizeDate(startDate, `HH:mm`)}</time>
+          <time class="event__start-time" datetime="${humanizeDate(dateFrom, `YYYY-MM-DDTHH:mm`)}">${humanizeDate(dateFrom, `HH:mm`)}</time>
           &mdash;
-          <time class="event__end-time" datetime="${humanizeDate(finishDate, `YYYY-MM-DDTHH:mm`)}">${humanizeDate(finishDate, `HH:mm`)}</time>
+          <time class="event__end-time" datetime="${humanizeDate(dateTo, `YYYY-MM-DDTHH:mm`)}">${humanizeDate(dateTo, `HH:mm`)}</time>
         </p>
         <p class="event__duration">${formattedDuration}</p>
       </div>

@@ -1,5 +1,5 @@
 import SmartView from './smart.js';
-import {humanizeDate} from '../utils/event.js';
+import {humanizeDate} from '../utils/point.js';
 import he from 'he';
 
 import dayjs from 'dayjs';
@@ -9,8 +9,8 @@ import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const EMPTY_EVENT = {
   type: ``,
-  startDate: dayjs().startOf(`day`).toDate(),
-  finishDate: dayjs().endOf(`day`).toDate(),
+  dateFrom: dayjs().startOf(`day`).toDate(),
+  dateTo: dayjs().endOf(`day`).toDate(),
   destination: ``,
   price: 0,
   offers: []
@@ -75,7 +75,7 @@ const createTypesMenuTemplate = (eventTypesMenu) => {
 
 const createEventEditTemplate = (state) => {
 
-  const {type, startDate, finishDate, offers, destination, availableDestinations, price, image, eventTypesMenu, deleteButtonLabel} = state;
+  const {type, dateFrom, dateTo, offers, destination, availableDestinations, price, image, eventTypesMenu, deleteButtonLabel} = state;
 
   const typesMenuTemplate = createTypesMenuTemplate(eventTypesMenu);
 
@@ -107,10 +107,10 @@ const createEventEditTemplate = (state) => {
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeDate(startDate, `DD/MM/YY HH:mm`)}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeDate(dateFrom, `DD/MM/YY HH:mm`)}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeDate(finishDate, `DD/MM/YY HH:mm`)}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeDate(dateTo, `DD/MM/YY HH:mm`)}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -143,8 +143,8 @@ export default class EventEdit extends SmartView {
     this._destinationsDataMap = destinationsDataMap;
     this._state = EventEdit.parseEventToState(event, this._typesDataMap, this._offersDataMap, this._destinationsDataMap);
     this._destinationOptions = this._buildDestinationOptions();
-    this._startDatePicker = null;
-    this._finishDatePicker = null;
+    this._dateFromPicker = null;
+    this._dateToPicker = null;
 
     this._clickRollupButtonHandler = this._clickRollupButtonHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
@@ -153,77 +153,77 @@ export default class EventEdit extends SmartView {
     this._offerToggleHandler = this._offerToggleHandler.bind(this);
     this._destinationInputHandler = this._destinationInputHandler.bind(this);
     this._deleteClickHandler = this._deleteClickHandler.bind(this);
-    this._startDateCloseHandler = this._startDateCloseHandler.bind(this);
-    this._finishDateCloseHandler = this._finishDateCloseHandler.bind(this);
+    this._dateFromCloseHandler = this._dateFromCloseHandler.bind(this);
+    this._dateToCloseHandler = this._dateToCloseHandler.bind(this);
 
     this._setInnerHandlers();
     this._validateAll();
-    this._setStartDatePicker();
-    this._setFinishDatePicker();
+    this._setDateFromPicker();
+    this._setDateToPicker();
   }
 
   getTemplate() {
     return createEventEditTemplate(this._state);
   }
 
-  _setStartDatePicker() {
-    if (this._startDatePicker) {
-      this._startDatePicker.destroy();
-      this._startDatePicker = null;
+  _setDateFromPicker() {
+    if (this._dateFromPicker) {
+      this._dateFromPicker.destroy();
+      this._dateFromPicker = null;
     }
 
-    this._startDatePicker = flatpickr(
+    this._dateFromPicker = flatpickr(
         this.getElement().querySelector(`input[name='event-start-time']`),
         {
           enableTime: true,
           // eslint-disable-next-line camelcase
           time_24hr: true,
           dateFormat: `d/m/y H:i`,
-          defaultDate: this._state.startDate,
-          maxDate: dayjs(this._state.finishDate).second(0).subtract(1, `m`).toDate(),
-          onClose: this._startDateCloseHandler,
+          defaultDate: this._state.dateFrom,
+          maxDate: dayjs(this._state.dateTo).second(0).subtract(1, `m`).toDate(),
+          onClose: this._dateFromCloseHandler,
         }
     );
   }
 
-  _setFinishDatePicker() {
-    if (this._finishDatePicker) {
-      this._finishDatePicker.destroy();
-      this._finishDatePicker = null;
+  _setDateToPicker() {
+    if (this._dateToPicker) {
+      this._dateToPicker.destroy();
+      this._dateToPicker = null;
     }
 
-    this._finishDatePicker = flatpickr(
+    this._dateToPicker = flatpickr(
         this.getElement().querySelector(`input[name='event-end-time']`),
         {
           enableTime: true,
           // eslint-disable-next-line camelcase
           time_24hr: true,
           dateFormat: `d/m/y H:i`,
-          defaultDate: this._state.finishDate,
-          minDate: dayjs(this._state.startDate).second(0).add(1, `m`).toDate(),
-          onClose: this._finishDateCloseHandler,
+          defaultDate: this._state.dateTo,
+          minDate: dayjs(this._state.dateFrom).second(0).add(1, `m`).toDate(),
+          onClose: this._dateToCloseHandler,
         }
     );
   }
 
-  _startDateCloseHandler([userDate]) {
+  _dateFromCloseHandler([userDate]) {
     this.updateData(
         {
-          startDate: dayjs(userDate).second(0).toDate(),
+          dateFrom: dayjs(userDate).second(0).toDate(),
         },
         true
     );
-    this._setFinishDatePicker();
+    this._setDateToPicker();
   }
 
-  _finishDateCloseHandler([userDate]) {
+  _dateToCloseHandler([userDate]) {
     this.updateData(
         {
-          finishDate: dayjs(userDate).second(0).toDate(),
+          dateTo: dayjs(userDate).second(0).toDate(),
         },
         true
     );
-    this._setStartDatePicker();
+    this._setDateFromPicker();
   }
 
   reset(event) {
@@ -236,8 +236,8 @@ export default class EventEdit extends SmartView {
     this.setRollupButtonClickHandler(this._callback.rollupButtonClick);
     this.setFormSubmitHandler(this._callback.submit);
     this.setDeleteClickHandler(this._callback.deleteClick);
-    this._setStartDatePicker();
-    this._setFinishDatePicker();
+    this._setDateFromPicker();
+    this._setDateToPicker();
     this._validateAll();
   }
 
