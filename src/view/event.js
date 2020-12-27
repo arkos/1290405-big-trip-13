@@ -66,10 +66,10 @@ const createPointTemplate = (state) => {
 };
 
 export default class Point extends AbstractView {
-  constructor(typesDataMap, offersDataMap, event) {
+  constructor(typesDataMap, offersDataMap, point) {
     super();
-    this._point = event;
-    this._state = Point._parsePointToState(event, typesDataMap, offersDataMap);
+    this._point = point;
+    this._state = Point._parsePointToState(point, typesDataMap, offersDataMap);
 
     this._clickRollupButtonHandler = this._clickRollupButtonHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
@@ -101,19 +101,19 @@ export default class Point extends AbstractView {
     this._callback.favoriteClick();
   }
 
-  static _parsePointToState(event, typesDataMap, offersDataMap) {
+  static _parsePointToState(point, typesDataMap, offersDataMap) {
     const offerSelectionMap = new Map();
 
-    event.offers.forEach((offerKey) => {
+    point.offers.forEach((offerKey) => {
       const offerInfo = offersDataMap.get(offerKey);
       offerSelectionMap.set(offerKey, {title: offerInfo.title, price: offerInfo.price});
     });
 
-    const image = typesDataMap.get(event.type).image;
+    const image = typesDataMap.get(point.type).image;
 
     return Object.assign(
         {},
-        event,
+        point,
         {offers: offerSelectionMap, image}
     );
   }

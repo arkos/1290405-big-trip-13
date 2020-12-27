@@ -1,5 +1,5 @@
-import PointView from '../view/event.js';
-import PointEditView from '../view/event-edit.js';
+import PointView from '../view/point.js';
+import PointEditView from '../view/point-edit.js';
 import {isEscEvent} from '../utils/common.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import {UserAction, UpdateType} from '../utils/const.js';
@@ -10,8 +10,8 @@ const Mode = {
 };
 
 export default class Point {
-  constructor(eventListContainer, changeData, changeMode) {
-    this._pointListContainer = eventListContainer;
+  constructor(pointListContainer, changeData, changeMode) {
+    this._pointListContainer = pointListContainer;
     this._pointComponent = null;
     this._pointEditComponent = null;
     this._changeData = changeData;
@@ -26,15 +26,15 @@ export default class Point {
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
-  init(event, dataListModel) {
-    this._point = event;
+  init(point, dataListModel) {
+    this._point = point;
     this._dataListModel = dataListModel;
 
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
 
-    this._pointComponent = new PointView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), event);
-    this._pointEditComponent = new PointEditView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), this._dataListModel.getDestinations(), event);
+    this._pointComponent = new PointView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), point);
+    this._pointEditComponent = new PointEditView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), this._dataListModel.getDestinations(), point);
 
     this._pointComponent.setRollupButtonClickHandler(this._handleClickRollupButtonDown);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
@@ -99,11 +99,11 @@ export default class Point {
     });
   }
 
-  _handleFormSubmit(event) {
+  _handleFormSubmit(point) {
     this._changeData(
         UserAction.UPDATE_POINT,
         UpdateType.MINOR,
-        event
+        point
     );
     this._switchToDisplay();
   }
@@ -115,11 +115,11 @@ export default class Point {
         Object.assign({}, this._point, {isFavorite: !this._point.isFavorite}));
   }
 
-  _handleDeleteClick(event) {
+  _handleDeleteClick(point) {
     this._changeData(
         UserAction.DELETE_POINT,
         UpdateType.MINOR,
-        event
+        point
     );
   }
 

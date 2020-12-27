@@ -46,7 +46,7 @@ export default class DataList extends Subject {
     const clientOffers = new Map();
 
     serverOffers.forEach((serverOffer) => {
-      serverOffer.offers.forEach((offer) => clientOffers.set(offer.title, {title: offer.title, price: offer.price, eventTypeKey: serverOffer.type}));
+      serverOffer.offers.forEach((offer) => clientOffers.set(offer.title, {title: offer.title, price: offer.price, pointTypeKey: serverOffer.type}));
     });
 
     return clientOffers;
