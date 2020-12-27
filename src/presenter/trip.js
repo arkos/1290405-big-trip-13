@@ -5,11 +5,11 @@ import TripPriceView from '../view/trip-price.js';
 import PointListView from '../view/point-list.js';
 import LoadingView from '../view/loading.js';
 import {remove, render, RenderPosition} from '../utils/render.js';
-import {getTripInfo, getTripPrice, sortEventDateAsc, sortEventPriceDesc, sortEventDurationDesc} from '../utils/point.js';
+import {getTripInfo, getTripPrice, sortPointDateAsc, sortPointPriceDesc, sortPointDurationDesc} from '../utils/point.js';
 import {filter} from '../utils/filter.js';
 import {SortType, UserAction, UpdateType, FilterType} from '../utils/const.js';
-import EventPresenter from '../presenter/event.js';
-import EventNewPresenter from './point-new.js';
+import PointPresenter from '../presenter/event.js';
+import PointNewPresenter from '../presenter/point-new.js';
 
 export default class Trip {
   constructor(tripContainer, eventContainer, eventsModel, filterModel, offersModel, destinationsModel) {
@@ -30,7 +30,7 @@ export default class Trip {
     this._tripPriceComponent = null;
     this._tripInfoComponent = null;
 
-    this._noEventComponent = new NoPointView();
+    this._noPointComponent = new NoPointView();
     this._eventListComponent = new PointListView();
     this._loadingComponent = new LoadingView();
 
@@ -42,33 +42,33 @@ export default class Trip {
     this._eventsModel.attach(this._handleModelEvent);
     this._filterModel.attach(this._handleModelEvent);
 
-    this._eventNewPresenter = new EventNewPresenter(this._eventListComponent, this._handleViewAction);
+    this._eventNewPresenter = new PointNewPresenter(this._eventListComponent, this._handleViewAction);
   }
 
   init() {
     this._renderTrip();
   }
 
-  createEvent() {
+  createPoint() {
     this._currentSortType = SortType.DAY;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this._eventNewPresenter.init(this._dataListModel);
   }
 
-  _getEvents() {
+  _getPoints() {
     const filterType = this._filterModel.getFilter();
-    const events = this._eventsModel.getEvents();
-    const filteredEvents = filter[filterType](events);
+    const events = this._eventsModel.getPoints();
+    const filteredPoints = filter[filterType](events);
 
     switch (this._currentSortType) {
       case SortType.DAY:
-        return filteredEvents.sort(sortEventDateAsc);
+        return filteredPoints.sort(sortPointDateAsc);
       case SortType.TIME:
-        return filteredEvents.sort(sortEventDurationDesc);
+        return filteredPoints.sort(sortPointDurationDesc);
       case SortType.PRICE:
-        return filteredEvents.sort(sortEventPriceDesc);
+        return filteredPoints.sort(sortPointPriceDesc);
       default:
-        return filteredEvents;
+        return filteredPoints;
     }
   }
 
@@ -87,20 +87,20 @@ export default class Trip {
     render(this._eventContainer, this._sortComponent, RenderPosition.BEFOREEND);
   }
 
-  _renderEvent(event) {
-    const eventPresenter = new EventPresenter(this._eventListComponent, this._handleViewAction, this._handleModeChange);
+  _renderPoint(event) {
+    const eventPresenter = new PointPresenter(this._eventListComponent, this._handleViewAction, this._handleModeChange);
     eventPresenter.init(event, this._dataListModel);
     this._eventPresenterMap.set(event.id, eventPresenter);
   }
 
-  _renderEvents(events) {
+  _renderPoints(events) {
     render(this._eventContainer, this._eventListComponent, RenderPosition.BEFOREEND);
 
-    events.forEach((event) => this._renderEvent(event));
+    events.forEach((event) => this._renderPoint(event));
   }
 
-  _renderNoEvents() {
-    render(this._eventContainer, this._noEventComponent, RenderPosition.AFTERBEGIN);
+  _renderNoPoints() {
+    render(this._eventContainer, this._noPointComponent, RenderPosition.AFTERBEGIN);
   }
 
   _renderTripInfo(events) {
@@ -118,8 +118,8 @@ export default class Trip {
       this._tripPriceComponent = null;
     }
 
-    const totalPriceForEvents = getTripPrice(events);
-    this._tripPriceComponent = new TripPriceView(totalPriceForEvents);
+    const totalPriceForPoints = getTripPrice(events);
+    this._tripPriceComponent = new TripPriceView(totalPriceForPoints);
     render(this._tripInfoComponent, this._tripPriceComponent, RenderPosition.BEFOREEND);
   }
 
@@ -129,17 +129,17 @@ export default class Trip {
       return;
     }
 
-    const events = this._getEvents();
+    const events = this._getPoints();
 
     if (events.length === 0) {
-      this._renderNoEvents();
+      this._renderNoPoints();
       return;
     }
 
     this._renderTripInfo(events);
     this._renderTripPrice(events);
     this._renderSort();
-    this._renderEvents(events);
+    this._renderPoints(events);
   }
 
   _clearTrip({resetSortType = false} = {}) {
@@ -150,7 +150,7 @@ export default class Trip {
 
     remove(this._loadingComponent);
     remove(this._sortComponent);
-    remove(this._noEventComponent);
+    remove(this._noPointComponent);
     remove(this._tripInfoComponent);
     remove(this._tripPriceComponent);
 
@@ -162,13 +162,13 @@ export default class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.ADD_POINT:
-        this._eventsModel.addEvent(updateType, update);
+        this._eventsModel.addPoint(updateType, update);
         break;
       case UserAction.UPDATE_POINT:
-        this._eventsModel.updateEvent(updateType, update);
+        this._eventsModel.updatePoint(updateType, update);
         break;
       case UserAction.DELETE_POINT:
-        this._eventsModel.deleteEvent(updateType, update);
+        this._eventsModel.deletePoint(updateType, update);
         break;
     }
   }

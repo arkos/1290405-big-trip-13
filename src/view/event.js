@@ -6,7 +6,7 @@ import he from 'he';
 
 dayjs.extend(duration);
 
-const createEventOfferTemplate = ({title, price}) => {
+const createPointOfferTemplate = ({title, price}) => {
   return `<li class="event__offer">
     <span class="event__offer-title">${title}</span>
     &plus;&euro;&nbsp;
@@ -14,18 +14,18 @@ const createEventOfferTemplate = ({title, price}) => {
   </li>`;
 };
 
-const createEventOffersTemplate = (offers) => {
+const createPointOffersTemplate = (offers) => {
   return offers.size > 0 ? `<h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-    ${Array.from(offers).map(([, offerValue]) => createEventOfferTemplate(offerValue)).join(``)}
+    ${Array.from(offers).map(([, offerValue]) => createPointOfferTemplate(offerValue)).join(``)}
   </ul>` : ``;
 };
 
-const createEventTemplate = (state) => {
+const createPointTemplate = (state) => {
 
   const {type, destination, dateFrom, dateTo, price, offers, image, isFavorite} = state;
 
-  const offersTemplate = createEventOffersTemplate(offers);
+  const offersTemplate = createPointOffersTemplate(offers);
 
   const formattedDuration = formatDuration(dateFrom, dateTo);
 
@@ -65,18 +65,18 @@ const createEventTemplate = (state) => {
   </li>`;
 };
 
-export default class Event extends AbstractView {
+export default class Point extends AbstractView {
   constructor(typesDataMap, offersDataMap, event) {
     super();
     this._event = event;
-    this._state = Event._parseEventToState(event, typesDataMap, offersDataMap);
+    this._state = Point._parsePointToState(event, typesDataMap, offersDataMap);
 
     this._clickRollupButtonHandler = this._clickRollupButtonHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
   getTemplate() {
-    return createEventTemplate(this._state);
+    return createPointTemplate(this._state);
   }
 
   setRollupButtonClickHandler(callback) {
@@ -101,7 +101,7 @@ export default class Event extends AbstractView {
     this._callback.favoriteClick();
   }
 
-  static _parseEventToState(event, typesDataMap, offersDataMap) {
+  static _parsePointToState(event, typesDataMap, offersDataMap) {
     const offerSelectionMap = new Map();
 
     event.offers.forEach((offerKey) => {

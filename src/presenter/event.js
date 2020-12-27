@@ -1,5 +1,5 @@
-import EventView from '../view/event.js';
-import EventEditView from '../view/event-edit.js';
+import PointView from '../view/event.js';
+import PointEditView from '../view/event-edit.js';
 import {isEscEvent} from '../utils/common.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import {UserAction, UpdateType} from '../utils/const.js';
@@ -9,7 +9,7 @@ const Mode = {
   EDITING: `EDITING`
 };
 
-export default class Event {
+export default class Point {
   constructor(eventListContainer, changeData, changeMode) {
     this._eventListContainer = eventListContainer;
     this._eventComponent = null;
@@ -30,11 +30,11 @@ export default class Event {
     this._event = event;
     this._dataListModel = dataListModel;
 
-    const prevEventComponent = this._eventComponent;
-    const prevEventEditComponent = this._eventEditComponent;
+    const prevPointComponent = this._eventComponent;
+    const prevPointEditComponent = this._eventEditComponent;
 
-    this._eventComponent = new EventView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), event);
-    this._eventEditComponent = new EventEditView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), this._dataListModel.getDestinations(), event);
+    this._eventComponent = new PointView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), event);
+    this._eventEditComponent = new PointEditView(this._dataListModel.getTypes(), this._dataListModel.getOffers(), this._dataListModel.getDestinations(), event);
 
     this._eventComponent.setRollupButtonClickHandler(this._handleClickRollupButtonDown);
     this._eventComponent.setFavoriteClickHandler(this._handleFavoriteClick);
@@ -42,21 +42,21 @@ export default class Event {
     this._eventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._eventEditComponent.setDeleteClickHandler(this._handleDeleteClick);
 
-    if ((prevEventComponent === null) || (prevEventEditComponent === null)) {
+    if ((prevPointComponent === null) || (prevPointEditComponent === null)) {
       render(this._eventListContainer, this._eventComponent, RenderPosition.BEFOREEND);
       return;
     }
 
     if (this._mode === Mode.DEFAULT) {
-      replace(this._eventComponent, prevEventComponent);
+      replace(this._eventComponent, prevPointComponent);
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._eventEditComponent, prevEventEditComponent);
+      replace(this._eventEditComponent, prevPointEditComponent);
     }
 
-    remove(prevEventComponent);
-    remove(prevEventEditComponent);
+    remove(prevPointComponent);
+    remove(prevPointEditComponent);
   }
 
   resetView() {

@@ -73,7 +73,7 @@ const createTypesMenuTemplate = (eventTypesMenu) => {
   </div>`;
 };
 
-const createEventEditTemplate = (state) => {
+const createPointEditTemplate = (state) => {
 
   const {type, dateFrom, dateTo, offers, destination, availableDestinations, price, image, eventTypesMenu, deleteButtonLabel} = state;
 
@@ -135,13 +135,13 @@ const createEventEditTemplate = (state) => {
   </li>`;
 };
 
-export default class EventEdit extends SmartView {
+export default class PointEdit extends SmartView {
   constructor(typesDataMap, offersDataMap, destinationsDataMap, event = EMPTY_EVENT) {
     super();
     this._typesDataMap = typesDataMap;
     this._offersDataMap = offersDataMap;
     this._destinationsDataMap = destinationsDataMap;
-    this._state = EventEdit.parseEventToState(event, this._typesDataMap, this._offersDataMap, this._destinationsDataMap);
+    this._state = PointEdit.parsePointToState(event, this._typesDataMap, this._offersDataMap, this._destinationsDataMap);
     this._destinationOptions = this._buildDestinationOptions();
     this._dateFromPicker = null;
     this._dateToPicker = null;
@@ -163,7 +163,7 @@ export default class EventEdit extends SmartView {
   }
 
   getTemplate() {
-    return createEventEditTemplate(this._state);
+    return createPointEditTemplate(this._state);
   }
 
   _setDateFromPicker() {
@@ -227,7 +227,7 @@ export default class EventEdit extends SmartView {
   }
 
   reset(event) {
-    this.updateData(EventEdit.parseEventToState(event, this._typesDataMap, this._offersDataMap, this._destinationsDataMap));
+    this.updateData(PointEdit.parsePointToState(event, this._typesDataMap, this._offersDataMap, this._destinationsDataMap));
   }
 
   restoreHandlers() {
@@ -317,12 +317,12 @@ export default class EventEdit extends SmartView {
 
   _submitHandler(evt) {
     evt.preventDefault();
-    this._callback.submit(EventEdit.parseStateToEvent(this._state));
+    this._callback.submit(PointEdit.parseStateToPoint(this._state));
   }
 
   _deleteClickHandler(evt) {
     evt.preventDefault();
-    this._callback.deleteClick(EventEdit.parseStateToEvent(this._state));
+    this._callback.deleteClick(PointEdit.parseStateToPoint(this._state));
   }
 
   _destinationInputHandler(evt) {
@@ -336,7 +336,7 @@ export default class EventEdit extends SmartView {
       selectedDestination = this._state.destination.title;
     }
 
-    const {destination, availableDestinations} = EventEdit._createDestinationSelection(selectedDestination, this._destinationsDataMap);
+    const {destination, availableDestinations} = PointEdit._createDestinationSelection(selectedDestination, this._destinationsDataMap);
 
     if (!destination || destination.title === this._state.destination.title) {
       return;
@@ -377,7 +377,7 @@ export default class EventEdit extends SmartView {
     this.updateData({
       type: evt.target.value,
       image: this._typesDataMap.get(evt.target.value).image,
-      offers: EventEdit._createOfferSelectionForType(
+      offers: PointEdit._createOfferSelectionForType(
           evt.target.value,
           null,
           this._offersDataMap
@@ -395,13 +395,13 @@ export default class EventEdit extends SmartView {
     }, true);
   }
 
-  static parseEventToState(event, typesDataMap, offersDataMap, destinationsDataMap) {
+  static parsePointToState(event, typesDataMap, offersDataMap, destinationsDataMap) {
     const deleteButtonLabel = (event === EMPTY_EVENT) ? DeleteButtonLabel.ADD : DeleteButtonLabel.EDIT;
 
     const [defaultType] = typesDataMap.keys();
     const type = event.type ? event.type : defaultType;
 
-    const offerSelectionMap = EventEdit._createOfferSelectionForType(type, event.offers, offersDataMap);
+    const offerSelectionMap = PointEdit._createOfferSelectionForType(type, event.offers, offersDataMap);
 
     const eventTypesMenu = new Map();
     typesDataMap.forEach((value, key) => eventTypesMenu.set(key, value.title));
@@ -409,7 +409,7 @@ export default class EventEdit extends SmartView {
     const eventTypeData = typesDataMap.get(type);
     const {image} = eventTypeData;
 
-    const {destination, availableDestinations} = EventEdit._createDestinationSelection(event.destination, destinationsDataMap);
+    const {destination, availableDestinations} = PointEdit._createDestinationSelection(event.destination, destinationsDataMap);
 
     return Object.assign(
         {},
@@ -426,7 +426,7 @@ export default class EventEdit extends SmartView {
     );
   }
 
-  static parseStateToEvent(state) {
+  static parseStateToPoint(state) {
     const event = Object.assign({}, state);
 
     const offers = [];
