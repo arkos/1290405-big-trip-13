@@ -1,5 +1,5 @@
 import SortView from '../view/sort.js';
-import NoEventView from '../view/no-event.js';
+import NoPointView from '../view/no-point.js';
 import TripInfoView from '../view/trip-info.js';
 import TripPriceView from '../view/trip-price.js';
 import EventListView from '../view/event-list.js';
@@ -30,7 +30,7 @@ export default class Trip {
     this._tripPriceComponent = null;
     this._tripInfoComponent = null;
 
-    this._noEventComponent = new NoEventView();
+    this._noEventComponent = new NoPointView();
     this._eventListComponent = new EventListView();
     this._loadingComponent = new LoadingView();
 
