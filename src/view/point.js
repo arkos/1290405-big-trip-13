@@ -15,7 +15,7 @@ const createPointOfferTemplate = ({title, price}) => {
 };
 
 const createPointOffersTemplate = (offers) => {
-  return offers.size > 0 ? `<h4 class="visually-hidden">Offers:</h4>
+  return offers.length > 0 ? `<h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
     ${offers.map((offer) => createPointOfferTemplate(offer)).join(``)}
   </ul>` : ``;
