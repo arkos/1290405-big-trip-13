@@ -26,7 +26,6 @@ const destinationsModel = new DestinationsModel();
 const siteMenuTitleElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
 const [menuContainer, filterContainer] = siteMenuTitleElements;
 
-render(menuContainer, new MenuView(), RenderPosition.AFTEREND);
 
 const filterPresenter = new FilterPresenter(filterContainer, filterModel);
 filterPresenter.init();
@@ -54,5 +53,9 @@ promises
   offersModel.setOffers(offers);
   destinationsModel.setDestinations(destinations);
   pointsModel.setPoints(UpdateType.INIT, points);
+  render(menuContainer, new MenuView(), RenderPosition.AFTEREND);
 })
-.catch(() => pointsModel.setPoints(UpdateType.INIT, []));
+.catch(() => {
+  pointsModel.setPoints(UpdateType.INIT, []);
+  render(menuContainer, new MenuView(), RenderPosition.AFTEREND);
+});
