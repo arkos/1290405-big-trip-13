@@ -79,13 +79,13 @@ export default class Point {
   }
 
   _switchToDisplay() {
+    this._pointEditComponent.reset(this._point);
     replace(this._pointComponent, this._pointEditComponent);
     document.removeEventListener(`keydown`, this._handleEscKeyDown);
     this._mode = Mode.DEFAULT;
   }
 
   _handleClickRollupButtonUp() {
-    this._pointEditComponent.reset(this._point);
     this._switchToDisplay();
   }
 
@@ -95,7 +95,6 @@ export default class Point {
 
   _handleEscKeyDown(evt) {
     isEscEvent(evt, () => {
-      this._pointEditComponent.reset(this._point);
       this._switchToDisplay();
     });
   }
