@@ -336,10 +336,8 @@ export default class PointEdit extends SmartView {
       return;
     }
 
-    Object.assign(destination, {name: evt.target.value});
-
     this.updateData(
-        {destination}
+        {destination: Object.assign({}, destination, {name: evt.target.value})}
     );
   }
 
