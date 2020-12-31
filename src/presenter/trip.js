@@ -12,13 +12,14 @@ import PointPresenter from '../presenter/point.js';
 import PointNewPresenter from '../presenter/point-new.js';
 
 export default class Trip {
-  constructor(tripContainer, pointContainer, pointsModel, filterModel, offersModel, destinationsModel) {
+  constructor(tripContainer, pointContainer, pointsModel, filterModel, offersModel, destinationsModel, api) {
     this._tripContainer = tripContainer;
     this._pointContainer = pointContainer;
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
     this._offersModel = offersModel;
     this._destinationsModel = destinationsModel;
+    this._api = api;
 
     this._isLoading = true;
 
@@ -165,7 +166,7 @@ export default class Trip {
         this._pointsModel.addPoint(updateType, update);
         break;
       case UserAction.UPDATE_POINT:
-        this._pointsModel.updatePoint(updateType, update);
+        this._api.updatePoint(update).then((response) => this._pointsModel.updatePoint(updateType, response));
         break;
       case UserAction.DELETE_POINT:
         this._pointsModel.deletePoint(updateType, update);

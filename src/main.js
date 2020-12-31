@@ -36,7 +36,8 @@ const tripPresenter = new TripPresenter(
     pointsModel,
     filterModel,
     offersModel,
-    destinationsModel
+    destinationsModel,
+    api
 );
 
 // Trip rendering

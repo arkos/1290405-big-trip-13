@@ -80,7 +80,7 @@ export default class Points extends Subject {
   }
 
   static adaptToServer(point) {
-    const destination = Object.assign({}, point, {pictures: point.destination.photos});
+    const destination = Object.assign({}, point.destination, {pictures: point.destination.photos});
     delete destination.photos;
 
     const adaptedPoint = Object.assign(
