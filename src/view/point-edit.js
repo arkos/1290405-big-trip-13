@@ -14,6 +14,7 @@ const EMPTY_POINT = {
   dateTo: dayjs().endOf(`day`).toDate(),
   destination: ``,
   price: 0,
+  isFavorite: false,
   offers: []
 };
 
