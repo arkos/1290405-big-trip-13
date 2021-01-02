@@ -42,13 +42,19 @@ export default class PointNew {
     document.removeEventListener(`keydown`, this._handleEscKeyDown);
   }
 
+  setSaving() {
+    this._pointEditComponent.updateData({
+      isDisabled: true,
+      isSaving: true
+    });
+  }
+
   _handleFormSubmit(point) {
     this._changeData(
         UserAction.ADD_POINT,
         UpdateType.MINOR,
         point
     );
-    this.destroy();
   }
 
   _handleDeleteClick() {
