@@ -86,7 +86,9 @@ const createPointEditTemplate = (state) => {
     availableDestinations,
     price,
     deleteButtonLabel,
-    isDisabled
+    isDisabled,
+    isSaving,
+    isDeleting
   } = state;
 
   const typesMenuTemplate = createTypesMenuTemplate(pointTypes);
@@ -133,8 +135,8 @@ const createPointEditTemplate = (state) => {
           <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}" pattern="\\d+" required autocomplete="off" ${isDisabled ? `disabled` : ``}>
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? `disabled` : ``}>Save</button>
-        <button class="event__reset-btn" type="reset" ${isDisabled ? `disabled` : ``}>${deleteButtonLabel}</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? `disabled` : ``}>${isSaving ? `Saving...` : `Save`}</button>
+        <button class="event__reset-btn" type="reset" ${isDisabled ? `disabled` : ``}>${isDeleting ? `Deleting` : deleteButtonLabel}</button>
         <button class="event__rollup-btn" type="button" ${isDisabled ? `disabled` : ``}>
           <span class="visually-hidden">Open event</span>
         </button>
