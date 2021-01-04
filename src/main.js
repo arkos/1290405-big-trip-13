@@ -7,7 +7,8 @@ import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
 import DestinationsModel from './model/destinations.js';
 import Api from './api.js';
-import {UpdateType} from './utils/const.js';
+import {MenuItem, UpdateType} from './utils/const.js';
+import Menu from './view/menu.js';
 
 const AUTHORIZATION = `Basic ab0d513b8d5045f4a72159701a847950`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
@@ -26,6 +27,21 @@ const destinationsModel = new DestinationsModel();
 const siteMenuTitleElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
 const [menuContainer, filterContainer] = siteMenuTitleElements;
 
+const siteMenuComponent = new MenuView();
+
+const handleSiteMenuClick = (menuItem) => {
+  switch (menuItem) {
+    case MenuItem.ADD_NEW_POINT:
+      break;
+    case MenuItem.TABLE:
+
+      break;
+    case MenuItem.STATISTICS:
+      break;
+  }
+};
+
+siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 
 const filterPresenter = new FilterPresenter(filterContainer, filterModel);
 filterPresenter.init();
@@ -54,9 +70,9 @@ promises
   offersModel.setOffers(offers);
   destinationsModel.setDestinations(destinations);
   pointsModel.setPoints(UpdateType.INIT, points);
-  render(menuContainer, new MenuView(), RenderPosition.AFTEREND);
+  render(menuContainer, siteMenuComponent, RenderPosition.AFTEREND);
 })
 .catch(() => {
   pointsModel.setPoints(UpdateType.INIT, []);
-  render(menuContainer, new MenuView(), RenderPosition.AFTEREND);
+  render(menuContainer, siteMenuComponent, RenderPosition.AFTEREND);
 });
