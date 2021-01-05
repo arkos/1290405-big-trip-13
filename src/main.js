@@ -23,12 +23,21 @@ const offersModel = new OffersModel();
 const destinationsModel = new DestinationsModel();
 
 // Site Menu rendering
+const pointNewButton = document.querySelector(`.trip-main__event-add-btn`);
+
+pointNewButton.addEventListener(`click`, (evt) => {
+  evt.preventDefault();
+  tripPresenter.createPoint(handlePointNewFormClose);
+  pointNewButton.disabled = true;
+});
+
 const siteMenuTitleElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
 const [menuContainer, filterContainer] = siteMenuTitleElements;
 
 const siteMenuComponent = new MenuView();
 
 const handlePointNewFormClose = () => {
+  pointNewButton.disabled = false;
   siteMenuComponent.setMenuItem(MenuItem.TABLE);
 };
 
@@ -39,6 +48,7 @@ const handleSiteMenuClick = (menuItem) => {
     case MenuItem.STATISTICS:
       break;
   }
+  siteMenuComponent.setMenuItem(menuItem);
 };
 
 siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
@@ -58,11 +68,6 @@ const tripPresenter = new TripPresenter(
 
 // Trip rendering
 tripPresenter.init();
-
-document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (evt) => {
-  evt.preventDefault();
-  tripPresenter.createPoint();
-});
 
 const promises = Promise.all([api.getOffers(), api.getDestinations(), api.getPoints()]);
 promises
