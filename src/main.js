@@ -7,7 +7,7 @@ import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
 import DestinationsModel from './model/destinations.js';
 import Api from './api.js';
-import {MenuItem, UpdateType} from './utils/const.js';
+import {MenuItem, UpdateType, FilterType} from './utils/const.js';
 
 const AUTHORIZATION = `Basic ab0d513b8d5045f4a72159701a847950`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
@@ -22,39 +22,12 @@ const filterModel = new FilterModel();
 const offersModel = new OffersModel();
 const destinationsModel = new DestinationsModel();
 
-// Site Menu rendering
-const pointNewButton = document.querySelector(`.trip-main__event-add-btn`);
-
-pointNewButton.addEventListener(`click`, (evt) => {
-  evt.preventDefault();
-  tripPresenter.createPoint(handlePointNewFormClose);
-  pointNewButton.disabled = true;
-});
-
 const siteMenuTitleElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
 const [menuContainer, filterContainer] = siteMenuTitleElements;
 
 const siteMenuComponent = new MenuView();
 
-const handlePointNewFormClose = () => {
-  pointNewButton.disabled = false;
-  siteMenuComponent.setMenuItem(MenuItem.TABLE);
-};
-
-const handleSiteMenuClick = (menuItem) => {
-  switch (menuItem) {
-    case MenuItem.TABLE:
-      break;
-    case MenuItem.STATISTICS:
-      break;
-  }
-  siteMenuComponent.setMenuItem(menuItem);
-};
-
-siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-
 const filterPresenter = new FilterPresenter(filterContainer, filterModel);
-filterPresenter.init();
 
 const tripPresenter = new TripPresenter(
     tripMainElement,
@@ -66,7 +39,38 @@ const tripPresenter = new TripPresenter(
     api
 );
 
-// Trip rendering
+const pointNewButton = document.querySelector(`.trip-main__event-add-btn`);
+
+pointNewButton.addEventListener(`click`, (evt) => {
+  evt.preventDefault();
+  tripPresenter.destroy();
+  filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+  tripPresenter.init();
+  tripPresenter.createPoint(handlePointNewFormClose);
+  pointNewButton.disabled = true;
+});
+
+const handlePointNewFormClose = () => {
+  pointNewButton.disabled = false;
+  siteMenuComponent.setMenuItem(MenuItem.TABLE);
+};
+
+const handleSiteMenuClick = (menuItem) => {
+  switch (menuItem) {
+    case MenuItem.TABLE:
+      tripPresenter.init();
+      break;
+    case MenuItem.STATISTICS:
+      tripPresenter.destroy();
+      break;
+  }
+  siteMenuComponent.setMenuItem(menuItem);
+};
+
+siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+
+filterPresenter.init();
+
 tripPresenter.init();
 
 const promises = Promise.all([api.getOffers(), api.getDestinations(), api.getPoints()]);

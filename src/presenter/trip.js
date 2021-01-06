@@ -7,7 +7,7 @@ import LoadingView from '../view/loading.js';
 import {remove, render, RenderPosition} from '../utils/render.js';
 import {getTripInfo, getTripPrice, sortPointDateAsc, sortPointPriceDesc, sortPointDurationDesc} from '../utils/point.js';
 import {filter} from '../utils/filter.js';
-import {SortType, UserAction, UpdateType, FilterType} from '../utils/const.js';
+import {SortType, UserAction, UpdateType} from '../utils/const.js';
 import PointPresenter, {State as PointPresenterViewState} from '../presenter/point.js';
 import PointNewPresenter from '../presenter/point-new.js';
 
@@ -40,20 +40,28 @@ export default class Trip {
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
 
-    this._pointsModel.attach(this._handleModelEvent);
-    this._filterModel.attach(this._handleModelEvent);
-
     this._pointNewPresenter = new PointNewPresenter(this._pointListComponent, this._handleViewAction);
   }
 
   init() {
+    render(this._pointContainer, this._pointListComponent, RenderPosition.BEFOREEND);
+
+    this._pointsModel.attach(this._handleModelEvent);
+    this._filterModel.attach(this._handleModelEvent);
+
     this._renderTrip();
   }
 
   createPoint(callback) {
-    this._currentSortType = SortType.DAY;
-    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this._pointNewPresenter.init(this._offersModel, this._destinationsModel, callback);
+  }
+
+  destroy() {
+    this._clearTrip({resetSortType: true});
+    remove(this._pointListComponent);
+
+    this._pointsModel.detach(this._handleModelEvent);
+    this._filterModel.detach(this._handleModelEvent);
   }
 
   _getPoints() {
@@ -95,8 +103,6 @@ export default class Trip {
   }
 
   _renderPoints(points) {
-    render(this._pointContainer, this._pointListComponent, RenderPosition.BEFOREEND);
-
     points.forEach((point) => this._renderPoint(point));
   }
 
