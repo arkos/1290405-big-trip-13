@@ -1,4 +1,5 @@
 import MenuView from './view/menu.js';
+import StatisticsView from './view/statistics.js';
 import {render, RenderPosition} from './utils/render.js';
 import TripPresenter from './presenter/trip.js';
 import FilterPresenter from './presenter/filter.js';
@@ -14,6 +15,7 @@ const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 
 const tripMainElement = document.querySelector(`.trip-main`);
 const pointsElement = document.querySelector(`.trip-events`);
+const pageBodyContainerElement = document.querySelector(`.page-body__page-main .page-body__container`);
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
@@ -61,7 +63,8 @@ const handleSiteMenuClick = (menuItem) => {
       tripPresenter.init();
       break;
     case MenuItem.STATISTICS:
-      tripPresenter.destroy();
+      // tripPresenter.destroy();
+
       break;
   }
   siteMenuComponent.setMenuItem(menuItem);
@@ -71,7 +74,8 @@ siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 
 filterPresenter.init();
 
-tripPresenter.init();
+// tripPresenter.init();
+render(pointsElement, new StatisticsView(pointsModel.getPoints()), RenderPosition.AFTEREND);
 
 const promises = Promise.all([api.getOffers(), api.getDestinations(), api.getPoints()]);
 promises
