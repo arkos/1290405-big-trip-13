@@ -1,6 +1,6 @@
 import MenuView from './view/menu.js';
 import StatisticsView from './view/statistics.js';
-import {render, RenderPosition} from './utils/render.js';
+import {remove, render, RenderPosition} from './utils/render.js';
 import TripPresenter from './presenter/trip.js';
 import FilterPresenter from './presenter/filter.js';
 import SummaryPresenter from './presenter/summary.js';
@@ -29,6 +29,8 @@ const [menuContainer, filterContainer] = siteMenuTitleElements;
 
 const siteMenuComponent = new MenuView();
 
+let statisticsComponent = null;
+
 const filterPresenter = new FilterPresenter(filterContainer, filterModel);
 const summaryPresenter = new SummaryPresenter(tripMainElement, pointsModel);
 summaryPresenter.init();
@@ -47,6 +49,8 @@ const pointNewButton = document.querySelector(`.trip-main__event-add-btn`);
 
 pointNewButton.addEventListener(`click`, (evt) => {
   evt.preventDefault();
+  remove(statisticsComponent);
+  siteMenuComponent.setMenuItem(MenuItem.TABLE);
   tripPresenter.destroy();
   filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
   tripPresenter.init();
@@ -56,17 +60,18 @@ pointNewButton.addEventListener(`click`, (evt) => {
 
 const handlePointNewFormClose = () => {
   pointNewButton.disabled = false;
-  siteMenuComponent.setMenuItem(MenuItem.TABLE);
 };
 
 const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
     case MenuItem.TABLE:
       tripPresenter.init();
+      remove(statisticsComponent);
       break;
     case MenuItem.STATISTICS:
-      // tripPresenter.destroy();
-
+      tripPresenter.destroy();
+      statisticsComponent = new StatisticsView(pointsModel.getPoints());
+      render(pointsElement, statisticsComponent, RenderPosition.AFTEREND);
       break;
   }
   siteMenuComponent.setMenuItem(menuItem);
@@ -84,7 +89,6 @@ promises
   destinationsModel.setDestinations(destinations);
   pointsModel.setPoints(UpdateType.INIT, points);
   render(menuContainer, siteMenuComponent, RenderPosition.AFTEREND);
-  // render(pointsElement, new StatisticsView(points), RenderPosition.AFTEREND);
 })
 .catch(() => {
   pointsModel.setPoints(UpdateType.INIT, []);

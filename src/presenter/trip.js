@@ -26,9 +26,6 @@ export default class Trip {
     this._currentSortType = SortType.DAY;
     this._sortComponent = null;
 
-    this._tripPriceComponent = null;
-    this._tripInfoComponent = null;
-
     this._noPointComponent = new NoPointView();
     this._pointListComponent = new PointListView();
     this._loadingComponent = new LoadingView();
@@ -124,7 +121,7 @@ export default class Trip {
     this._renderPoints(points);
   }
 
-  _clearTrip({resetSortType = false, destroyTripInfo = true} = {}) {
+  _clearTrip({resetSortType = false} = {}) {
     this._pointNewPresenter.destroy();
 
     this._pointPresenterMap.forEach((presenter) => presenter.destroy());
@@ -133,11 +130,6 @@ export default class Trip {
     remove(this._loadingComponent);
     remove(this._sortComponent);
     remove(this._noPointComponent);
-
-    if (destroyTripInfo) {
-      remove(this._tripInfoComponent);
-      remove(this._tripPriceComponent);
-    }
 
     if (resetSortType) {
       this._currentSortType = SortType.DAY;
