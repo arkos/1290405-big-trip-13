@@ -2,16 +2,22 @@ import {humanizeDate} from '../utils/point.js';
 import AbstractView from '../view/abstract.js';
 
 const createTripInfoTemplate = (info, isLoading) => {
+  let tripInfoTitle = ``;
+
   if (isLoading) {
-    return `<section class="trip-main__trip-info  trip-info">
-      <div class="trip-info__main">
-        <h1 class="trip-info__title">Loading trip summary...</h1>
-      </div>
-    </section>`;
+    tripInfoTitle = `Loading trip summary...`;
   }
 
-  if (info === null) {
-    return ``;
+  if (info === null && !isLoading) {
+    tripInfoTitle = `Trip doesn't contain any points`;
+  }
+
+  if (isLoading || info === null) {
+    return `<section class="trip-main__trip-info  trip-info">
+      <div class="trip-info__main">
+        <h1 class="trip-info__title">${tripInfoTitle}</h1>
+      </div>
+    </section>`;
   }
 
   const {dateFrom, dateTo, destinations} = info;
@@ -20,7 +26,7 @@ const createTripInfoTemplate = (info, isLoading) => {
     destinations.splice(1, destinations.length - 2, `...`);
   }
 
-  const tripInfoTitle = destinations.join(` &mdash; `);
+  tripInfoTitle = destinations.join(` &mdash; `);
 
   return `<section class="trip-main__trip-info  trip-info">
       <div class="trip-info__main">
