@@ -1,7 +1,6 @@
 import SmartView from '../view/smart.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {pointTypes} from '../utils/const.js';
 
 const renderMoneyChart = (moneyCtx) => {
   return new Chart(moneyCtx, {
@@ -141,10 +140,8 @@ const renderTimeChart = () => {
 
 };
 
-const createStatisticsTemplate = (state) => {
-  const {points} = state;
-
-  return `<section class="statistics statistics--hidden">
+const createStatisticsTemplate = () => {
+  return `<section class="statistics">
     <h2 class="visually-hidden">Trip statistics</h2>
 
     <div class="statistics__item statistics__item--money">
@@ -169,8 +166,6 @@ export default class Statistics extends SmartView {
       points
     };
 
-    this._dateChangeHandler = this._dateChangeHandler.bind(this);
-
     this._moneyChart = null;
     this._typeChart = null;
     this._timeChart = null;
@@ -182,11 +177,18 @@ export default class Statistics extends SmartView {
     return createStatisticsTemplate(this._state);
   }
 
-  _dateChangeHandler(dateFrom, dateTo) {
-    this.updateData({
-      dateFrom,
-      dateTo
-    });
+  removeElement() {
+    super.removeElement();
+
+    if (this._moneyChart !== null || this._typeChart !== null || this._timeChart !== null) {
+      this._moneyChart = null;
+      this._typeChart = null;
+      this._timeChart = null;
+    }
+  }
+
+  restoreHandlers() {
+    this._setCharts();
   }
 
   _setCharts() {
@@ -198,22 +200,14 @@ export default class Statistics extends SmartView {
 
     const {points} = this._state;
 
-    const moneyCtx = document.querySelector(`.statistics__chart--money`);
-    const typeCtx = document.querySelector(`.statistics__chart--transport`);
-    const timeCtx = document.querySelector(`.statistics__chart--time`);
+    const moneyCtx = this.getElement().querySelector(`.statistics__chart--money`);
+    const typeCtx = this.getElement().querySelector(`.statistics__chart--transport`);
+    const timeCtx = this.getElement().querySelector(`.statistics__chart--time`);
 
     this._moneyChart = renderMoneyChart(moneyCtx, points);
     this._typeChart = renderTypeChart(typeCtx, points);
     this._timeChart = renderTimeChart(timeCtx, points);
   }
 
-  removeElement() {
-    super.removeElement();
 
-    if (this._moneyChart !== null || this._typeChart !== null || this._timeChart !== null) {
-      this._moneyChart = null;
-      this._typeChart = null;
-      this._timeChart = null;
-    }
-  }
 }

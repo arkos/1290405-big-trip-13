@@ -15,7 +15,6 @@ const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 
 const tripMainElement = document.querySelector(`.trip-main`);
 const pointsElement = document.querySelector(`.trip-events`);
-const pageBodyContainerElement = document.querySelector(`.page-body__page-main .page-body__container`);
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
@@ -74,9 +73,6 @@ siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 
 filterPresenter.init();
 
-// tripPresenter.init();
-render(pointsElement, new StatisticsView(pointsModel.getPoints()), RenderPosition.AFTEREND);
-
 const promises = Promise.all([api.getOffers(), api.getDestinations(), api.getPoints()]);
 promises
 .then(([offers, destinations, points]) => {
@@ -84,6 +80,7 @@ promises
   destinationsModel.setDestinations(destinations);
   pointsModel.setPoints(UpdateType.INIT, points);
   render(menuContainer, siteMenuComponent, RenderPosition.AFTEREND);
+  render(pointsElement, new StatisticsView(points), RenderPosition.AFTEREND);
 })
 .catch(() => {
   pointsModel.setPoints(UpdateType.INIT, []);
