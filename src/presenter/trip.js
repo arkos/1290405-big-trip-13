@@ -145,8 +145,8 @@ export default class Trip {
       return;
     }
 
-    this._renderTripInfo(points);
-    this._renderTripPrice(points);
+    // this._renderTripInfo(points);
+    // this._renderTripPrice(points);
     this._renderSort();
     this._renderPoints(points);
   }

@@ -2,6 +2,7 @@ import TripInfoView from '../view/trip-info.js';
 import TripPriceView from '../view/trip-price.js';
 import {remove, render, RenderPosition} from '../utils/render.js';
 import {getTripInfo, getTripPrice} from '../utils/point.js';
+import {UpdateType} from '../utils/const.js';
 
 export default class Summary {
   constructor(summaryContainer, pointsModel) {
@@ -10,6 +11,7 @@ export default class Summary {
 
     this._infoComponent = null;
     this._priceComponent = null;
+    this._isLoading = true;
 
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
@@ -28,7 +30,7 @@ export default class Summary {
     }
 
     const info = getTripInfo(this._pointsModel.getPoints());
-    this._infoComponent = new TripInfoView(info);
+    this._infoComponent = new TripInfoView(info, this._isLoading);
     render(this._summaryContainer, this._infoComponent, RenderPosition.AFTERBEGIN);
   }
 
@@ -41,5 +43,14 @@ export default class Summary {
     const total = getTripPrice(this._pointsModel.getPoints());
     this._priceComponent = new TripPriceView(total);
     render(this._infoComponent, this._priceComponent, RenderPosition.BEFOREEND);
+  }
+
+  _handleModelEvent(updateType) {
+    switch (updateType) {
+      case UpdateType.INIT:
+        this._isLoading = false;
+        this._init();
+        break;
+    }
   }
 }

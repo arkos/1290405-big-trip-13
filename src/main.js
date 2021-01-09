@@ -3,6 +3,7 @@ import StatisticsView from './view/statistics.js';
 import {render, RenderPosition} from './utils/render.js';
 import TripPresenter from './presenter/trip.js';
 import FilterPresenter from './presenter/filter.js';
+import SummaryPresenter from './presenter/summary.js';
 import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
@@ -29,6 +30,7 @@ const [menuContainer, filterContainer] = siteMenuTitleElements;
 const siteMenuComponent = new MenuView();
 
 const filterPresenter = new FilterPresenter(filterContainer, filterModel);
+const summaryPresenter = new SummaryPresenter(tripMainElement, pointsModel);
 
 const tripPresenter = new TripPresenter(
     tripMainElement,
@@ -80,7 +82,7 @@ promises
   destinationsModel.setDestinations(destinations);
   pointsModel.setPoints(UpdateType.INIT, points);
   render(menuContainer, siteMenuComponent, RenderPosition.AFTEREND);
-  render(pointsElement, new StatisticsView(points), RenderPosition.AFTEREND);
+  // render(pointsElement, new StatisticsView(points), RenderPosition.AFTEREND);
 })
 .catch(() => {
   pointsModel.setPoints(UpdateType.INIT, []);
