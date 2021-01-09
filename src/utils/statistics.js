@@ -9,3 +9,4 @@ export const sumPriceByType = (points) => {
 
   return pointTypes.map((type) => sumPrice(points.filter((point) => point.type === type)));
 };
+

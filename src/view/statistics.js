@@ -4,14 +4,14 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {getPointTypes, sumPriceByType} from '../utils/statistics.js';
 
 const renderMoneyChart = (moneyCtx, points) => {
-  const types = getPointTypes(points).map((type) => type.toUpperCase());
+  const upperCaseTypes = getPointTypes(points).map((type) => type.toUpperCase());
   const prices = sumPriceByType(points);
 
   return new Chart(moneyCtx, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
-      labels: types,
+      labels: upperCaseTypes,
       datasets: [{
         data: prices,
         backgroundColor: `#ffffff`,
@@ -73,14 +73,18 @@ const renderMoneyChart = (moneyCtx, points) => {
   });
 };
 
-const renderTypeChart = (typeCtx) => {
+const renderTypeChart = (typeCtx, points) => {
+  const types = getPointTypes(points);
+  const upperCaseTypes = types.map((type) => type.toUpperCase());
+  const typeCounts = types.map((type) => points.filter((point) => point.type === type).length);
+
   return new Chart(typeCtx, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
-      labels: [`TAXI`, `BUS`, `TRAIN`, `SHIP`, `TRANSPORT`, `DRIVE`],
+      labels: upperCaseTypes,
       datasets: [{
-        data: [4, 3, 2, 1, 1, 1],
+        data: typeCounts,
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
         anchor: `start`
