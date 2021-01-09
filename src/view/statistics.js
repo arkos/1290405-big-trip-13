@@ -1,15 +1,19 @@
 import SmartView from '../view/smart.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import {getPointTypes, sumPriceByType} from '../utils/statistics.js';
 
-const renderMoneyChart = (moneyCtx) => {
+const renderMoneyChart = (moneyCtx, points) => {
+  const types = getPointTypes(points).map((type) => type.toUpperCase());
+  const prices = sumPriceByType(points);
+
   return new Chart(moneyCtx, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
-      labels: [`TAXI`, `BUS`, `TRAIN`, `SHIP`, `TRANSPORT`, `DRIVE`],
+      labels: types,
       datasets: [{
-        data: [400, 300, 200, 160, 150, 100],
+        data: prices,
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
         anchor: `start`
