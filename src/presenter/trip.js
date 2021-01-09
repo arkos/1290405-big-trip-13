@@ -1,11 +1,9 @@
 import SortView from '../view/sort.js';
 import NoPointView from '../view/no-point.js';
-import TripInfoView from '../view/trip-info.js';
-import TripPriceView from '../view/trip-price.js';
 import PointListView from '../view/point-list.js';
 import LoadingView from '../view/loading.js';
 import {remove, render, RenderPosition} from '../utils/render.js';
-import {getTripInfo, getTripPrice, sortPointDateAsc, sortPointPriceDesc, sortPointDurationDesc} from '../utils/point.js';
+import {sortPointDateAsc, sortPointPriceDesc, sortPointDurationDesc} from '../utils/point.js';
 import {filter} from '../utils/filter.js';
 import {SortType, UserAction, UpdateType} from '../utils/const.js';
 import PointPresenter, {State as PointPresenterViewState} from '../presenter/point.js';
@@ -44,8 +42,6 @@ export default class Trip {
   }
 
   init() {
-    render(this._pointContainer, this._pointListComponent, RenderPosition.BEFOREEND);
-
     this._pointsModel.attach(this._handleModelEvent);
     this._filterModel.attach(this._handleModelEvent);
 
@@ -110,28 +106,6 @@ export default class Trip {
     render(this._pointContainer, this._noPointComponent, RenderPosition.AFTERBEGIN);
   }
 
-  _renderTripInfo(points) {
-    if (this._tripInfoComponent !== null) {
-      remove(this._tripInfoComponent);
-      remove(this._tripPriceComponent);
-      this._tripInfoComponent = null;
-    }
-
-    const tripInfo = getTripInfo(points);
-    this._tripInfoComponent = new TripInfoView(tripInfo);
-    render(this._tripContainer, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
-  }
-
-  _renderTripPrice(points) {
-    if (this._tripPriceComponent !== null) {
-      this._tripPriceComponent = null;
-    }
-
-    const totalPriceForPoints = getTripPrice(points);
-    this._tripPriceComponent = new TripPriceView(totalPriceForPoints);
-    render(this._tripInfoComponent, this._tripPriceComponent, RenderPosition.BEFOREEND);
-  }
-
   _renderTrip() {
     if (this._isLoading) {
       this._renderLoading();
@@ -145,9 +119,8 @@ export default class Trip {
       return;
     }
 
-    // this._renderTripInfo(points);
-    // this._renderTripPrice(points);
     this._renderSort();
+    render(this._pointContainer, this._pointListComponent, RenderPosition.BEFOREEND);
     this._renderPoints(points);
   }
 

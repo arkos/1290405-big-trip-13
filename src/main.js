@@ -31,6 +31,7 @@ const siteMenuComponent = new MenuView();
 
 const filterPresenter = new FilterPresenter(filterContainer, filterModel);
 const summaryPresenter = new SummaryPresenter(tripMainElement, pointsModel);
+summaryPresenter.init();
 
 const tripPresenter = new TripPresenter(
     tripMainElement,
@@ -74,6 +75,7 @@ const handleSiteMenuClick = (menuItem) => {
 siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 
 filterPresenter.init();
+tripPresenter.init();
 
 const promises = Promise.all([api.getOffers(), api.getDestinations(), api.getPoints()]);
 promises

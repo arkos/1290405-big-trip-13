@@ -49,7 +49,7 @@ export default class Summary {
     switch (updateType) {
       case UpdateType.INIT:
         this._isLoading = false;
-        this._init();
+        this.init();
         break;
     }
   }

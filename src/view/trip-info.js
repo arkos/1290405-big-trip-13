@@ -1,7 +1,21 @@
 import {humanizeDate} from '../utils/point.js';
 import AbstractView from '../view/abstract.js';
 
-const createTripInfoTemplate = ({dateFrom, dateTo, destinations}, isLoading) => {
+const createTripInfoTemplate = (info, isLoading) => {
+  if (isLoading) {
+    return `<section class="trip-main__trip-info  trip-info">
+      <div class="trip-info__main">
+        <h1 class="trip-info__title">Loading trip summary...</h1>
+      </div>
+    </section>`;
+  }
+
+  if (info === null) {
+    return ``;
+  }
+
+  const {dateFrom, dateTo, destinations} = info;
+
   if (destinations.length > 3) {
     destinations.splice(1, destinations.length - 2, `...`);
   }
@@ -10,11 +24,11 @@ const createTripInfoTemplate = ({dateFrom, dateTo, destinations}, isLoading) => 
 
   return `<section class="trip-main__trip-info  trip-info">
       <div class="trip-info__main">
-        <h1 class="trip-info__title">${isLoading ? `Loading trip summary...` : tripInfoTitle}</h1>
+        <h1 class="trip-info__title">${tripInfoTitle}</h1>
 
-        ${isLoading ? `` : `<p class="trip-info__dates">${humanizeDate(dateFrom, `MMM DD`)}&nbsp;&mdash;&nbsp;${humanizeDate(dateTo, `DD`)}</p>
+        <p class="trip-info__dates">${humanizeDate(dateFrom, `MMM DD`)}&nbsp;&mdash;&nbsp;${humanizeDate(dateTo, `DD`)}</p>
       </div>
-    </section>`}`;
+  </section>`;
 };
 
 export default class TripInfo extends AbstractView {
