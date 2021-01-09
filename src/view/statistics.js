@@ -1,11 +1,12 @@
 import SmartView from '../view/smart.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {getPointTypes, sumPriceByType} from '../utils/statistics.js';
+import {getPointTypes, sumPriceByType, countDaysByPointType} from '../utils/statistics.js';
 
 const renderMoneyChart = (moneyCtx, points) => {
-  const upperCaseTypes = getPointTypes(points).map((type) => type.toUpperCase());
-  const prices = sumPriceByType(points);
+  const types = getPointTypes(points);
+  const upperCaseTypes = types.map((type) => type.toUpperCase());
+  const prices = types.map((type) => sumPriceByType(points, type));
 
   return new Chart(moneyCtx, {
     plugins: [ChartDataLabels],
@@ -144,8 +145,75 @@ const renderTypeChart = (typeCtx, points) => {
   });
 };
 
-const renderTimeChart = () => {
+const renderTimeChart = (moneyCtx, points) => {
+  const types = getPointTypes(points);
+  const upperCaseTypes = types.map((type) => type.toUpperCase());
+  const daysByType = types.map((type) => countDaysByPointType(points, type));
 
+  return new Chart(moneyCtx, {
+    plugins: [ChartDataLabels],
+    type: `horizontalBar`,
+    data: {
+      labels: upperCaseTypes,
+      datasets: [{
+        data: daysByType,
+        backgroundColor: `#ffffff`,
+        hoverBackgroundColor: `#ffffff`,
+        anchor: `start`
+      }]
+    },
+    options: {
+      plugins: {
+        datalabels: {
+          font: {
+            size: 13
+          },
+          color: `#000000`,
+          anchor: `end`,
+          align: `start`,
+          formatter: (val) => `${val}D`
+        }
+      },
+      title: {
+        display: true,
+        text: `TIME-SPEND`,
+        fontColor: `#000000`,
+        fontSize: 23,
+        position: `left`
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            fontColor: `#000000`,
+            padding: 5,
+            fontSize: 13,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+          barThickness: 44,
+        }],
+        xAxes: [{
+          ticks: {
+            display: false,
+            beginAtZero: true,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+          minBarLength: 50
+        }],
+      },
+      legend: {
+        display: false
+      },
+      tooltips: {
+        enabled: false,
+      }
+    }
+  });
 };
 
 const createStatisticsTemplate = () => {
