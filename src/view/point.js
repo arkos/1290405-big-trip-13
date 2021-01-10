@@ -1,12 +1,12 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import {humanizeDate, formatDuration} from '../utils/event.js';
+import {pointTypes} from '../utils/const.js';
+import {humanizeDate, formatDuration} from '../utils/point.js';
 import AbstractView from './abstract.js';
-import he from 'he';
 
 dayjs.extend(duration);
 
-const createEventOfferTemplate = ({title, price}) => {
+const createPointOfferTemplate = ({title, price}) => {
   return `<li class="event__offer">
     <span class="event__offer-title">${title}</span>
     &plus;&euro;&nbsp;
@@ -14,35 +14,37 @@ const createEventOfferTemplate = ({title, price}) => {
   </li>`;
 };
 
-const createEventOffersTemplate = (offers) => {
-  return offers.size > 0 ? `<h4 class="visually-hidden">Offers:</h4>
+const createPointOffersTemplate = (offers) => {
+  return offers.length > 0 ? `<h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-    ${Array.from(offers).map(([, offerValue]) => createEventOfferTemplate(offerValue)).join(``)}
+    ${offers.map((offer) => createPointOfferTemplate(offer)).join(``)}
   </ul>` : ``;
 };
 
-const createEventTemplate = (state) => {
+const createPointTemplate = (point) => {
 
-  const {type, destination, startDate, finishDate, price, offers, image, isFavorite} = state;
+  const {type, dateFrom, dateTo, destination, price, isFavorite, offers} = point;
 
-  const offersTemplate = createEventOffersTemplate(offers);
+  const offersTemplate = createPointOffersTemplate(offers);
 
-  const formattedDuration = formatDuration(startDate, finishDate);
+  const formattedDuration = formatDuration(dateFrom, dateTo);
+
+  const typeIcon = pointTypes.get(type).src;
 
   const favoriteClassName = isFavorite ? `event__favorite-btn event__favorite-btn--active` : `event__favorite-btn`;
 
   return `<li class="trip-events__item">
     <div class="event">
-      <time class="event__date" datetime="${humanizeDate(startDate, `YYYY-MM-DD`)}">${humanizeDate(startDate, `MMM D`)}</time>
+      <time class="event__date" datetime="${humanizeDate(dateFrom, `YYYY-MM-DD`)}">${humanizeDate(dateFrom, `MMM D`)}</time>
       <div class="event__type">
-        <img class="event__type-icon" width="42" height="42" src="${image}" alt="Event type icon">
+        <img class="event__type-icon" width="42" height="42" src="${typeIcon}" alt="Event type icon">
       </div>
-      <h3 class="event__title">${type} ${he.encode(destination)}</h3>
+      <h3 class="event__title">${type} ${destination.name}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="${humanizeDate(startDate, `YYYY-MM-DDTHH:mm`)}">${humanizeDate(startDate, `HH:mm`)}</time>
+          <time class="event__start-time" datetime="${humanizeDate(dateFrom, `YYYY-MM-DDTHH:mm`)}">${humanizeDate(dateFrom, `HH:mm`)}</time>
           &mdash;
-          <time class="event__end-time" datetime="${humanizeDate(finishDate, `YYYY-MM-DDTHH:mm`)}">${humanizeDate(finishDate, `HH:mm`)}</time>
+          <time class="event__end-time" datetime="${humanizeDate(dateTo, `YYYY-MM-DDTHH:mm`)}">${humanizeDate(dateTo, `HH:mm`)}</time>
         </p>
         <p class="event__duration">${formattedDuration}</p>
       </div>
@@ -65,18 +67,17 @@ const createEventTemplate = (state) => {
   </li>`;
 };
 
-export default class Event extends AbstractView {
-  constructor(typesDataMap, offersDataMap, event) {
+export default class Point extends AbstractView {
+  constructor(point) {
     super();
-    this._event = event;
-    this._state = Event._parseEventToState(event, typesDataMap, offersDataMap);
+    this._point = point;
 
     this._clickRollupButtonHandler = this._clickRollupButtonHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
   getTemplate() {
-    return createEventTemplate(this._state);
+    return createPointTemplate(this._point);
   }
 
   setRollupButtonClickHandler(callback) {
@@ -99,22 +100,5 @@ export default class Event extends AbstractView {
   _favoriteClickHandler(evt) {
     evt.preventDefault();
     this._callback.favoriteClick();
-  }
-
-  static _parseEventToState(event, typesDataMap, offersDataMap) {
-    const offerSelectionMap = new Map();
-
-    event.offers.forEach((offerKey) => {
-      const offerInfo = offersDataMap.get(offerKey);
-      offerSelectionMap.set(offerKey, {title: offerInfo.title, price: offerInfo.price});
-    });
-
-    const image = typesDataMap.get(event.type).image;
-
-    return Object.assign(
-        {},
-        event,
-        {offers: offerSelectionMap, image}
-    );
   }
 }

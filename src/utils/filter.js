@@ -1,8 +1,8 @@
 import {FilterType} from './const.js';
-import {isPastDate, isFutureDate} from '../utils/event.js';
+import {isPastDate, isFutureDate} from './point.js';
 
 export const filter = {
-  [FilterType.EVERYTHING]: (events) => events.slice(),
-  [FilterType.FUTURE]: (events) => events.filter((event) => isFutureDate(event.startDate)),
-  [FilterType.PAST]: (events) => events.filter((event) => isPastDate(event.finishDate))
+  [FilterType.EVERYTHING]: (points) => points.slice(),
+  [FilterType.FUTURE]: (points) => points.filter((point) => isFutureDate(point.dateFrom)),
+  [FilterType.PAST]: (points) => points.filter((point) => isPastDate(point.dateTo))
 };
