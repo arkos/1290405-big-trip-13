@@ -14,6 +14,7 @@ const EMPTY_POINT = {
   dateTo: dayjs().endOf(`day`).toDate(),
   destination: ``,
   price: 0,
+  isFavorite: false,
   offers: []
 };
 
@@ -22,13 +23,13 @@ const DeleteButtonLabel = {
   EDIT: `Delete`
 };
 
-const createOffersTemplate = (offers) => {
+const createOffersTemplate = (offers, isDisabled) => {
   return offers && (offers.size > 0) ? `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
     <div class="event__available-offers">
       ${Array.from(offers).map(([key, value]) => `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${key}-1" type="checkbox" data-offer-key="${key}" name="event-offer-${key}" ${value.selected ? `checked` : ``}>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${key}-1" type="checkbox" data-offer-key="${key}" name="event-offer-${key}" ${value.selected ? `checked` : ``} ${isDisabled ? `disabled` : ``}>
         <label class="event__offer-label" for="event-offer-${key}-1">
           <span class="event__offer-title">${value.title}</span>
           &plus;&euro;&nbsp;
@@ -76,11 +77,23 @@ const createTypesMenuTemplate = (types) => {
 
 const createPointEditTemplate = (state) => {
 
-  const {type, dateFrom, dateTo, offers, destination, availableDestinations, price, deleteButtonLabel} = state;
+  const {
+    type,
+    dateFrom,
+    dateTo,
+    offers,
+    destination,
+    availableDestinations,
+    price,
+    deleteButtonLabel,
+    isDisabled,
+    isSaving,
+    isDeleting
+  } = state;
 
   const typesMenuTemplate = createTypesMenuTemplate(pointTypes);
 
-  const offersTemplate = createOffersTemplate(offers);
+  const offersTemplate = createOffersTemplate(offers, isDisabled);
 
   const destinationInfoTemplate = createDestinationInfoTemplate(destination);
 
@@ -94,7 +107,7 @@ const createPointEditTemplate = (state) => {
             <span class="visually-hidden">Choose event type</span>
             <img class="event__type-icon" width="17" height="17" src="${pointTypes.get(type).src}" alt="Event type icon">
           </label>
-          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? `disabled` : ``}>
           ${typesMenuTemplate}
         </div>
 
@@ -102,16 +115,16 @@ const createPointEditTemplate = (state) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination ? he.encode(destination.name) : ``}" list="destination-list-1" autocomplete="off">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination ? he.encode(destination.name) : ``}" list="destination-list-1" autocomplete="off" ${isDisabled ? `disabled` : ``}>
             ${availableDestinationsTemplate}
         </div>
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeDate(dateFrom, `DD/MM/YY HH:mm`)}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeDate(dateFrom, `DD/MM/YY HH:mm`)}" ${isDisabled ? `disabled` : ``}>
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeDate(dateTo, `DD/MM/YY HH:mm`)}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeDate(dateTo, `DD/MM/YY HH:mm`)}" ${isDisabled ? `disabled` : ``}>
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -119,12 +132,12 @@ const createPointEditTemplate = (state) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}" pattern="\\d+" required autocomplete="off">
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}" pattern="\\d+" required autocomplete="off" ${isDisabled ? `disabled` : ``}>
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">${deleteButtonLabel}</button>
-        <button class="event__rollup-btn" type="button">
+        <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? `disabled` : ``}>${isSaving ? `Saving...` : `Save`}</button>
+        <button class="event__reset-btn" type="reset" ${isDisabled ? `disabled` : ``}>${isDeleting ? `Deleting...` : deleteButtonLabel}</button>
+        <button class="event__rollup-btn" type="button" ${isDisabled ? `disabled` : ``}>
           <span class="visually-hidden">Open event</span>
         </button>
       </header>
@@ -399,7 +412,10 @@ export default class PointEdit extends SmartView {
         {
           offers: offerSelectionMap,
           availableDestinations,
-          deleteButtonLabel
+          deleteButtonLabel,
+          isDisabled: false,
+          isSaving: false,
+          isDeleting: false
         }
     );
   }
@@ -420,6 +436,9 @@ export default class PointEdit extends SmartView {
 
     delete point.availableDestinations;
     delete point.deleteButtonLabel;
+    delete point.isDisabled;
+    delete point.isSaving;
+    delete point.isDeleting;
 
     return point;
   }
