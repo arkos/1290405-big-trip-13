@@ -8,7 +8,7 @@ import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
 import DestinationsModel from './model/destinations.js';
-import Api from './api.js';
+import Api from './api/api.js';
 import {MenuItem, UpdateType, FilterType} from './utils/const.js';
 
 const AUTHORIZATION = `Basic ab0d513b8d5045f4a72159701a847950`;
