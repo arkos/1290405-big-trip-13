@@ -94,3 +94,7 @@ promises
   pointsModel.setPoints(UpdateType.INIT, []);
   render(menuContainer, siteMenuComponent, RenderPosition.AFTEREND);
 });
+
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`);
+});
