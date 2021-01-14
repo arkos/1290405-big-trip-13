@@ -1,6 +1,8 @@
 import MenuView from './view/menu.js';
 import StatisticsView from './view/statistics.js';
 import {remove, render, RenderPosition} from './utils/render.js';
+import {isOnline} from './utils/common.js';
+import {toast} from './utils/toast/toast.js';
 import TripPresenter from './presenter/trip.js';
 import FilterPresenter from './presenter/filter.js';
 import SummaryPresenter from './presenter/summary.js';
