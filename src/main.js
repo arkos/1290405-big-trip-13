@@ -11,15 +11,24 @@ import FilterModel from './model/filter.js';
 import OffersModel from './model/offers.js';
 import DestinationsModel from './model/destinations.js';
 import Api from './api/api.js';
+import Store from './api/store.js';
+import Provider from './api/provider.js';
 import {MenuItem, UpdateType, FilterType} from './utils/const.js';
 
 const AUTHORIZATION = `Basic ab0d513b8d5045f4a72159701a847950`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 
+const STORE_PREFIX = `bigtrip-localstorage`;
+const STORE_VER = `v13`;
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
+
 const tripMainElement = document.querySelector(`.trip-main`);
 const pointsElement = document.querySelector(`.trip-events`);
 
 const api = new Api(END_POINT, AUTHORIZATION);
+
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
 
 const pointsModel = new PointsModel();
 const filterModel = new FilterModel();
@@ -44,7 +53,7 @@ const tripPresenter = new TripPresenter(
     filterModel,
     offersModel,
     destinationsModel,
-    api
+    apiWithProvider
 );
 
 const pointNewButton = document.querySelector(`.trip-main__event-add-btn`);
@@ -56,6 +65,10 @@ pointNewButton.addEventListener(`click`, (evt) => {
   tripPresenter.destroy();
   filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
   tripPresenter.init();
+  if (!isOnline()) {
+    toast(`You can't create a new point while offline`);
+    return;
+  }
   tripPresenter.createPoint(handlePointNewFormClose);
   pointNewButton.disabled = true;
 });
@@ -84,7 +97,7 @@ siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 filterPresenter.init();
 tripPresenter.init();
 
-const promises = Promise.all([api.getOffers(), api.getDestinations(), api.getPoints()]);
+const promises = Promise.all([apiWithProvider.getOffers(), apiWithProvider.getDestinations(), apiWithProvider.getPoints()]);
 promises
 .then(([offers, destinations, points]) => {
   offersModel.setOffers(offers);
@@ -99,4 +112,13 @@ promises
 
 window.addEventListener(`load`, () => {
   navigator.serviceWorker.register(`/sw.js`);
+});
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+  apiWithProvider.sync();
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
 });
