@@ -3,6 +3,7 @@ import StatisticsView from './view/statistics.js';
 import {remove, render, RenderPosition} from './utils/render.js';
 import {isOnline} from './utils/common.js';
 import {toast} from './utils/toast/toast.js';
+import {showOffline, showOnline} from './utils/offline/offline.js';
 import TripPresenter from './presenter/trip.js';
 import FilterPresenter from './presenter/filter.js';
 import SummaryPresenter from './presenter/summary.js';
@@ -15,20 +16,31 @@ import Store from './api/store.js';
 import Provider from './api/provider.js';
 import {MenuItem, UpdateType, FilterType} from './utils/const.js';
 
-const AUTHORIZATION = `Basic ab0d513b8d5045f4a72159701a847950`;
+const AUTHORIZATION = `Basic 2f098202b0b843938d4b54ff38478c6c`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 
-const STORE_PREFIX = `bigtrip-localstorage`;
-const STORE_VER = `v13`;
-const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
+const STORE_POINTS_PREFIX = `bigtrip-localstorage-points`;
+const STORE_POINTS_VER = `v13`;
+const STORE_POINTS_NAME = `${STORE_POINTS_PREFIX}-${STORE_POINTS_VER}`;
+
+const STORE_OFFERS_PREFIX = `bigtrip-localstorage-offers`;
+const STORE_OFFERS_VER = `v13`;
+const STORE_OFFERS_NAME = `${STORE_OFFERS_PREFIX}-${STORE_OFFERS_VER}`;
+
+const STORE_DESTINATIONS_PREFIX = `bigtrip-localstorage-destinations`;
+const STORE_DESTINATIONS_VER = `v13`;
+const STORE_DESTINATIONS_NAME = `${STORE_DESTINATIONS_PREFIX}-${STORE_DESTINATIONS_VER}`;
 
 const tripMainElement = document.querySelector(`.trip-main`);
 const pointsElement = document.querySelector(`.trip-events`);
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
-const store = new Store(STORE_NAME, window.localStorage);
-const apiWithProvider = new Provider(api, store);
+const storePoints = new Store(STORE_POINTS_NAME, window.localStorage);
+const storeOffers = new Store(STORE_OFFERS_NAME, window.localStorage);
+const storeDestinations = new Store(STORE_DESTINATIONS_NAME, window.localStorage);
+
+const apiWithProvider = new Provider(api, storePoints, storeOffers, storeDestinations);
 
 const pointsModel = new PointsModel();
 const filterModel = new FilterModel();
@@ -116,9 +128,11 @@ window.addEventListener(`load`, () => {
 
 window.addEventListener(`online`, () => {
   document.title = document.title.replace(` [offline]`, ``);
+  showOnline();
   apiWithProvider.sync();
 });
 
 window.addEventListener(`offline`, () => {
   document.title += ` [offline]`;
+  showOffline();
 });

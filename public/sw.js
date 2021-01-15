@@ -31,7 +31,8 @@ self.addEventListener(`install`, (evt) => {
         `./img/icons/transport.png`,
         `./img/header-bg.png`,
         `./img/header-bg@2x.png`,
-        `./img/logo.png`
+        `./img/logo.png`,
+        `./sw.js`
       ]);
     })
   );
