@@ -51,6 +51,10 @@ export default class Summary {
         this._isLoading = false;
         this.init();
         break;
+      case UpdateType.MAJOR:
+      case UpdateType.MINOR:
+        this.init();
+        break;
     }
   }
 }
