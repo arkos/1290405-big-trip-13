@@ -54,7 +54,7 @@ const siteMenuComponent = new MenuView();
 
 let statisticsComponent = null;
 
-const filterPresenter = new FilterPresenter(filterContainer, filterModel);
+const filterPresenter = new FilterPresenter(filterContainer, filterModel, pointsModel);
 const summaryPresenter = new SummaryPresenter(tripMainElement, pointsModel);
 summaryPresenter.init();
 
