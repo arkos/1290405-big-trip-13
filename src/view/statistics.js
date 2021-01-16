@@ -1,7 +1,8 @@
 import SmartView from '../view/smart.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {getPointTypes, sumPriceByType, countDaysByPointType} from '../utils/statistics.js';
+import {getPointTypes, sumPriceByType, countDurationByPointType} from '../utils/statistics.js';
+import {formatDurationMs} from '../utils/point.js';
 
 const renderMoneyChart = (moneyCtx, points) => {
   const types = getPointTypes(points);
@@ -148,7 +149,7 @@ const renderTypeChart = (typeCtx, points) => {
 const renderTimeChart = (moneyCtx, points) => {
   const types = getPointTypes(points);
   const upperCaseTypes = types.map((type) => type.toUpperCase());
-  const daysByType = types.map((type) => countDaysByPointType(points, type));
+  const durationsByType = types.map((type) => countDurationByPointType(points, type));
 
   return new Chart(moneyCtx, {
     plugins: [ChartDataLabels],
@@ -156,7 +157,7 @@ const renderTimeChart = (moneyCtx, points) => {
     data: {
       labels: upperCaseTypes,
       datasets: [{
-        data: daysByType,
+        data: durationsByType,
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
         anchor: `start`
@@ -171,7 +172,7 @@ const renderTimeChart = (moneyCtx, points) => {
           color: `#000000`,
           anchor: `end`,
           align: `start`,
-          formatter: (val) => `${val}D`
+          formatter: (val) => `${formatDurationMs(val)}`
         }
       },
       title: {

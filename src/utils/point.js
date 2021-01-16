@@ -69,11 +69,17 @@ export const isFutureDate = (date) => {
 };
 
 export const formatDuration = (dateFrom, dateTo) => {
-  const durationBetweenDates = dayjs.duration(dayjs(dateTo).diff(dayjs(dateFrom)));
+  const durationInMs = dayjs.duration(dayjs(dateTo).diff(dayjs(dateFrom)));
 
-  const days = durationBetweenDates.days();
-  const hours = durationBetweenDates.hours();
-  const minutes = durationBetweenDates.minutes();
+  return formatDurationMs(durationInMs.asMilliseconds());
+};
+
+export const formatDurationMs = (ms) => {
+  const durationToFormat = dayjs.duration(ms);
+
+  const days = durationToFormat.days();
+  const hours = durationToFormat.hours();
+  const minutes = durationToFormat.minutes();
 
   let template;
 
