@@ -29,3 +29,7 @@ export const isEscEvent = (evt, action) => {
     action();
   }
 };
+
+export const isOnline = () => {
+  return window.navigator.onLine;
+};

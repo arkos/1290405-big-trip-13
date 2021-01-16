@@ -1,6 +1,8 @@
 import PointEditView from '../view/point-edit.js';
 import {remove, render, RenderPosition} from '../utils/render.js';
 import {UpdateType, UserAction} from '../utils/const.js';
+import {isOnline} from '../utils/common.js';
+import {toast} from '../utils/toast/toast.js';
 import {isEscEvent} from '../utils/common.js';
 
 export default class PointNew {
@@ -69,6 +71,11 @@ export default class PointNew {
   }
 
   _handleFormSubmit(point) {
+    if (!isOnline()) {
+      toast(`You can't save while offline`);
+      return;
+    }
+
     this._changeData(
         UserAction.ADD_POINT,
         UpdateType.MINOR,
