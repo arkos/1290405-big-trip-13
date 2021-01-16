@@ -23,6 +23,11 @@ export const FilterType = {
   PAST: `past`
 };
 
+export const MenuItem = {
+  TABLE: `table`,
+  STATISTICS: `statistics`
+};
+
 export const pointTypes = new Map(
     [
       [
