@@ -69,6 +69,7 @@ const tripPresenter = new TripPresenter(
 );
 
 const pointNewButton = document.querySelector(`.trip-main__event-add-btn`);
+pointNewButton.disabled = true;
 
 pointNewButton.addEventListener(`click`, (evt) => {
   evt.preventDefault();
@@ -115,10 +116,12 @@ promises
   offersModel.setOffers(offers);
   destinationsModel.setDestinations(destinations);
   pointsModel.setPoints(UpdateType.INIT, points);
+  pointNewButton.disabled = false;
   render(menuContainer, siteMenuComponent, RenderPosition.AFTEREND);
 })
 .catch(() => {
   pointsModel.setPoints(UpdateType.INIT, []);
+  pointNewButton.disabled = false;
   render(menuContainer, siteMenuComponent, RenderPosition.AFTEREND);
 });
 
