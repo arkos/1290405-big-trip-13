@@ -20,9 +20,9 @@ const getPointDurationInMs = (point) => {
 const sumPointDurationsInMs = (points) => points.reduce((totalMs, point) =>
   totalMs + getPointDurationInMs(point), 0);
 
-export const countDaysByPointType = (points, type) => {
+export const countDurationByPointType = (points, type) => {
   const totalDurationInMs = sumPointDurationsInMs(points.filter((point) => point.type === type));
-  return dayjs.duration(totalDurationInMs).days();
+  return totalDurationInMs;
 };
 
 

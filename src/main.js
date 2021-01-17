@@ -16,7 +16,7 @@ import Store from './api/store.js';
 import Provider from './api/provider.js';
 import {MenuItem, UpdateType, FilterType} from './utils/const.js';
 
-const AUTHORIZATION = `Basic 2f098202b0b843938d4b54ff38478c6c`;
+const AUTHORIZATION = `Basic ab0d513b8d5045f4a72159701a847950`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 
 const STORE_POINTS_PREFIX = `bigtrip-localstorage-points`;
@@ -54,7 +54,7 @@ const siteMenuComponent = new MenuView();
 
 let statisticsComponent = null;
 
-const filterPresenter = new FilterPresenter(filterContainer, filterModel);
+const filterPresenter = new FilterPresenter(filterContainer, filterModel, pointsModel);
 const summaryPresenter = new SummaryPresenter(tripMainElement, pointsModel);
 summaryPresenter.init();
 
@@ -69,6 +69,7 @@ const tripPresenter = new TripPresenter(
 );
 
 const pointNewButton = document.querySelector(`.trip-main__event-add-btn`);
+pointNewButton.disabled = true;
 
 pointNewButton.addEventListener(`click`, (evt) => {
   evt.preventDefault();
@@ -115,10 +116,12 @@ promises
   offersModel.setOffers(offers);
   destinationsModel.setDestinations(destinations);
   pointsModel.setPoints(UpdateType.INIT, points);
+  pointNewButton.disabled = false;
   render(menuContainer, siteMenuComponent, RenderPosition.AFTEREND);
 })
 .catch(() => {
   pointsModel.setPoints(UpdateType.INIT, []);
+  pointNewButton.disabled = false;
   render(menuContainer, siteMenuComponent, RenderPosition.AFTEREND);
 });
 
