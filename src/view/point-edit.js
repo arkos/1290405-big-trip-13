@@ -179,6 +179,45 @@ export default class PointEdit extends SmartView {
     return createPointEditTemplate(this._state);
   }
 
+  reset(point) {
+    this.updateData(PointEdit.parsePointToState(point, this._offers, this._destinations));
+  }
+
+  restoreHandlers() {
+    this._destinationOptions = this._buildDestinationOptions();
+    this._setInnerHandlers();
+    this.setRollupButtonClickHandler(this._callback.rollupButtonClick);
+    this.setFormSubmitHandler(this._callback.submit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
+    this._setDateFromPicker();
+    this._setDateToPicker();
+    this._validateAll();
+  }
+
+  setRollupButtonClickHandler(callback) {
+    this._callback.rollupButtonClick = callback;
+
+    this.getElement()
+      .querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, this._clickRollupButtonHandler);
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.submit = callback;
+
+    this.getElement()
+      .querySelector(`form`)
+      .addEventListener(`submit`, this._submitHandler);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+
+    this.getElement()
+      .querySelector(`.event__reset-btn`)
+      .addEventListener(`click`, this._deleteClickHandler);
+  }
+
   _setDateFromPicker() {
     if (this._dateFromPicker) {
       this._dateFromPicker.destroy();
@@ -219,68 +258,9 @@ export default class PointEdit extends SmartView {
     );
   }
 
-  _dateFromCloseHandler([userDate]) {
-    this.updateData(
-        {
-          dateFrom: dayjs(userDate).second(0).toDate(),
-        },
-        true
-    );
-    this._setDateToPicker();
-  }
-
-  _dateToCloseHandler([userDate]) {
-    this.updateData(
-        {
-          dateTo: dayjs(userDate).second(0).toDate(),
-        },
-        true
-    );
-    this._setDateFromPicker();
-  }
-
-  reset(point) {
-    this.updateData(PointEdit.parsePointToState(point, this._offers, this._destinations));
-  }
-
-  restoreHandlers() {
-    this._destinationOptions = this._buildDestinationOptions();
-    this._setInnerHandlers();
-    this.setRollupButtonClickHandler(this._callback.rollupButtonClick);
-    this.setFormSubmitHandler(this._callback.submit);
-    this.setDeleteClickHandler(this._callback.deleteClick);
-    this._setDateFromPicker();
-    this._setDateToPicker();
-    this._validateAll();
-  }
-
-  setRollupButtonClickHandler(callback) {
-    this._callback.rollupButtonClick = callback;
-
-    this.getElement()
-      .querySelector(`.event__rollup-btn`)
-      .addEventListener(`click`, this._clickRollupButtonHandler);
-  }
-
-  setFormSubmitHandler(callback) {
-    this._callback.submit = callback;
-
-    this.getElement()
-      .querySelector(`form`)
-      .addEventListener(`submit`, this._submitHandler);
-  }
-
-  setDeleteClickHandler(callback) {
-    this._callback.deleteClick = callback;
-
-    this.getElement()
-      .querySelector(`.event__reset-btn`)
-      .addEventListener(`click`, this._deleteClickHandler);
-  }
-
   _buildDestinationOptions() {
-    const destinations = this.getElement().querySelector(`#destination-list-1`);
-    const options = Array.from(destinations.options).map((option) => option.value);
+    const destinationListElement = this.getElement().querySelector(`#destination-list-1`);
+    const options = Array.from(destinationListElement.options).map((option) => option.value);
     return new Set(options);
   }
 
@@ -299,9 +279,9 @@ export default class PointEdit extends SmartView {
     this._validateDestination();
     const isValid = this.getElement().querySelector(`.event--edit`).checkValidity();
 
-    const saveButton = this.getElement().querySelector(`.event__save-btn`);
+    const saveButtonElement = this.getElement().querySelector(`.event__save-btn`);
 
-    saveButton.disabled = !isValid;
+    saveButtonElement.disabled = !isValid;
 
     return isValid;
   }
@@ -314,13 +294,33 @@ export default class PointEdit extends SmartView {
     const priceElement = this.getElement().querySelector(`.event__input--price`);
     priceElement.addEventListener(`input`, this._priceInputHandler);
 
-    const offersRendered = this.getElement().querySelector(`.event__available-offers`);
-    if (offersRendered) {
-      offersRendered.addEventListener(`change`, this._offerToggleHandler);
+    const offerElement = this.getElement().querySelector(`.event__available-offers`);
+    if (offerElement) {
+      offerElement.addEventListener(`change`, this._offerToggleHandler);
     }
 
     const destinationElement = this.getElement().querySelector(`.event__input--destination`);
     destinationElement.addEventListener(`input`, this._destinationInputHandler);
+  }
+
+  _dateFromCloseHandler([userDate]) {
+    this.updateData(
+        {
+          dateFrom: dayjs(userDate).second(0).toDate(),
+        },
+        true
+    );
+    this._setDateToPicker();
+  }
+
+  _dateToCloseHandler([userDate]) {
+    this.updateData(
+        {
+          dateTo: dayjs(userDate).second(0).toDate(),
+        },
+        true
+    );
+    this._setDateFromPicker();
   }
 
   _clickRollupButtonHandler(evt) {
