@@ -179,6 +179,45 @@ export default class PointEdit extends SmartView {
     return createPointEditTemplate(this._state);
   }
 
+  reset(point) {
+    this.updateData(PointEdit.parsePointToState(point, this._offers, this._destinations));
+  }
+
+  restoreHandlers() {
+    this._destinationOptions = this._buildDestinationOptions();
+    this._setInnerHandlers();
+    this.setRollupButtonClickHandler(this._callback.rollupButtonClick);
+    this.setFormSubmitHandler(this._callback.submit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
+    this._setDateFromPicker();
+    this._setDateToPicker();
+    this._validateAll();
+  }
+
+  setRollupButtonClickHandler(callback) {
+    this._callback.rollupButtonClick = callback;
+
+    this.getElement()
+      .querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, this._clickRollupButtonHandler);
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.submit = callback;
+
+    this.getElement()
+      .querySelector(`form`)
+      .addEventListener(`submit`, this._submitHandler);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+
+    this.getElement()
+      .querySelector(`.event__reset-btn`)
+      .addEventListener(`click`, this._deleteClickHandler);
+  }
+
   _setDateFromPicker() {
     if (this._dateFromPicker) {
       this._dateFromPicker.destroy();
@@ -217,65 +256,6 @@ export default class PointEdit extends SmartView {
           onClose: this._dateToCloseHandler,
         }
     );
-  }
-
-  _dateFromCloseHandler([userDate]) {
-    this.updateData(
-        {
-          dateFrom: dayjs(userDate).second(0).toDate(),
-        },
-        true
-    );
-    this._setDateToPicker();
-  }
-
-  _dateToCloseHandler([userDate]) {
-    this.updateData(
-        {
-          dateTo: dayjs(userDate).second(0).toDate(),
-        },
-        true
-    );
-    this._setDateFromPicker();
-  }
-
-  reset(point) {
-    this.updateData(PointEdit.parsePointToState(point, this._offers, this._destinations));
-  }
-
-  restoreHandlers() {
-    this._destinationOptions = this._buildDestinationOptions();
-    this._setInnerHandlers();
-    this.setRollupButtonClickHandler(this._callback.rollupButtonClick);
-    this.setFormSubmitHandler(this._callback.submit);
-    this.setDeleteClickHandler(this._callback.deleteClick);
-    this._setDateFromPicker();
-    this._setDateToPicker();
-    this._validateAll();
-  }
-
-  setRollupButtonClickHandler(callback) {
-    this._callback.rollupButtonClick = callback;
-
-    this.getElement()
-      .querySelector(`.event__rollup-btn`)
-      .addEventListener(`click`, this._clickRollupButtonHandler);
-  }
-
-  setFormSubmitHandler(callback) {
-    this._callback.submit = callback;
-
-    this.getElement()
-      .querySelector(`form`)
-      .addEventListener(`submit`, this._submitHandler);
-  }
-
-  setDeleteClickHandler(callback) {
-    this._callback.deleteClick = callback;
-
-    this.getElement()
-      .querySelector(`.event__reset-btn`)
-      .addEventListener(`click`, this._deleteClickHandler);
   }
 
   _buildDestinationOptions() {
@@ -321,6 +301,26 @@ export default class PointEdit extends SmartView {
 
     const destinationElement = this.getElement().querySelector(`.event__input--destination`);
     destinationElement.addEventListener(`input`, this._destinationInputHandler);
+  }
+
+  _dateFromCloseHandler([userDate]) {
+    this.updateData(
+        {
+          dateFrom: dayjs(userDate).second(0).toDate(),
+        },
+        true
+    );
+    this._setDateToPicker();
+  }
+
+  _dateToCloseHandler([userDate]) {
+    this.updateData(
+        {
+          dateTo: dayjs(userDate).second(0).toDate(),
+        },
+        true
+    );
+    this._setDateFromPicker();
   }
 
   _clickRollupButtonHandler(evt) {

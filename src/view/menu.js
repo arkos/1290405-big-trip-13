@@ -23,11 +23,6 @@ export default class Menu extends AbstractView {
     this.getElement().addEventListener(`click`, this._menuClickHandler);
   }
 
-  _menuClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.menuClick(evt.target.dataset.key);
-  }
-
   setMenuItem(menuItem) {
     const items = this.getElement().querySelectorAll(`.trip-tabs__btn`);
 
@@ -44,4 +39,8 @@ export default class Menu extends AbstractView {
     });
   }
 
+  _menuClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.menuClick(evt.target.dataset.key);
+  }
 }
