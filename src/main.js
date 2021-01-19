@@ -34,6 +34,13 @@ const STORE_DESTINATIONS_NAME = `${STORE_DESTINATIONS_PREFIX}-${STORE_DESTINATIO
 const tripMainElement = document.querySelector(`.trip-main`);
 const pointsElement = document.querySelector(`.trip-events`);
 
+const siteMenuTitleElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
+const [menuContainer, filterContainer] = siteMenuTitleElements;
+
+const pointNewButton = document.querySelector(`.trip-main__event-add-btn`);
+
+let statisticsComponent = null;
+
 const api = new Api(END_POINT, AUTHORIZATION);
 
 const storePoints = new Store(STORE_POINTS_NAME, window.localStorage);
@@ -47,16 +54,10 @@ const filterModel = new FilterModel();
 const offersModel = new OffersModel();
 const destinationsModel = new DestinationsModel();
 
-const siteMenuTitleElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
-const [menuContainer, filterContainer] = siteMenuTitleElements;
-
 const siteMenuComponent = new MenuView();
-
-let statisticsComponent = null;
 
 const filterPresenter = new FilterPresenter(filterContainer, filterModel, pointsModel);
 const summaryPresenter = new SummaryPresenter(tripMainElement, pointsModel);
-summaryPresenter.init();
 
 const tripPresenter = new TripPresenter(
     tripMainElement,
@@ -67,9 +68,6 @@ const tripPresenter = new TripPresenter(
     destinationsModel,
     apiWithProvider
 );
-
-const pointNewButton = document.querySelector(`.trip-main__event-add-btn`);
-pointNewButton.disabled = true;
 
 pointNewButton.addEventListener(`click`, (evt) => {
   evt.preventDefault();
@@ -105,25 +103,27 @@ const handleSiteMenuClick = (menuItem) => {
   siteMenuComponent.setMenuItem(menuItem);
 };
 
+pointNewButton.disabled = true;
+
 siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 
+summaryPresenter.init();
 filterPresenter.init();
 tripPresenter.init();
 
-const promises = Promise.all([apiWithProvider.getOffers(), apiWithProvider.getDestinations(), apiWithProvider.getPoints()]);
-promises
-.then(([offers, destinations, points]) => {
-  offersModel.setOffers(offers);
-  destinationsModel.setDestinations(destinations);
-  pointsModel.setPoints(UpdateType.INIT, points);
-  pointNewButton.disabled = false;
-  render(menuContainer, siteMenuComponent, RenderPosition.AFTEREND);
-})
-.catch(() => {
-  pointsModel.setPoints(UpdateType.INIT, []);
-  pointNewButton.disabled = false;
-  render(menuContainer, siteMenuComponent, RenderPosition.AFTEREND);
-});
+Promise.all([apiWithProvider.getOffers(), apiWithProvider.getDestinations(), apiWithProvider.getPoints()])
+  .then(([offers, destinations, points]) => {
+    offersModel.setOffers(offers);
+    destinationsModel.setDestinations(destinations);
+    pointsModel.setPoints(UpdateType.INIT, points);
+    pointNewButton.disabled = false;
+    render(menuContainer, siteMenuComponent, RenderPosition.AFTEREND);
+  })
+  .catch(() => {
+    pointsModel.setPoints(UpdateType.INIT, []);
+    pointNewButton.disabled = false;
+    render(menuContainer, siteMenuComponent, RenderPosition.AFTEREND);
+  });
 
 window.addEventListener(`load`, () => {
   navigator.serviceWorker.register(`./sw.js`);
