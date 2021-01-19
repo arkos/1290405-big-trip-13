@@ -78,7 +78,8 @@ const handleFetch = (evt) => {
         .then((cache) => cache.put(request, clonedResponse));
 
         return response;
-      });
+      })
+      .catch(() => {});
     })
   );
 };

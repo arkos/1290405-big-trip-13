@@ -23,19 +23,14 @@ export default class Menu extends AbstractView {
     this.getElement().addEventListener(`click`, this._menuClickHandler);
   }
 
-  _menuClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.menuClick(evt.target.dataset.key);
-  }
-
   setMenuItem(menuItem) {
-    const items = this.getElement().querySelectorAll(`.trip-tabs__btn`);
+    const menuElements = this.getElement().querySelectorAll(`.trip-tabs__btn`);
 
-    if (items === null) {
+    if (menuElements === null) {
       return;
     }
 
-    items.forEach((item) => {
+    menuElements.forEach((item) => {
       if (item.dataset.key === menuItem) {
         item.classList.add(`trip-tabs__btn--active`);
       } else {
@@ -44,4 +39,8 @@ export default class Menu extends AbstractView {
     });
   }
 
+  _menuClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.menuClick(evt.target.dataset.key);
+  }
 }
