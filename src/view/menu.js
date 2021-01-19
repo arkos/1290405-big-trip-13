@@ -24,13 +24,13 @@ export default class Menu extends AbstractView {
   }
 
   setMenuItem(menuItem) {
-    const items = this.getElement().querySelectorAll(`.trip-tabs__btn`);
+    const menuElements = this.getElement().querySelectorAll(`.trip-tabs__btn`);
 
-    if (items === null) {
+    if (menuElements === null) {
       return;
     }
 
-    items.forEach((item) => {
+    menuElements.forEach((item) => {
       if (item.dataset.key === menuItem) {
         item.classList.add(`trip-tabs__btn--active`);
       } else {

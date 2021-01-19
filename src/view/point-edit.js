@@ -259,8 +259,8 @@ export default class PointEdit extends SmartView {
   }
 
   _buildDestinationOptions() {
-    const destinations = this.getElement().querySelector(`#destination-list-1`);
-    const options = Array.from(destinations.options).map((option) => option.value);
+    const destinationListElement = this.getElement().querySelector(`#destination-list-1`);
+    const options = Array.from(destinationListElement.options).map((option) => option.value);
     return new Set(options);
   }
 
@@ -279,9 +279,9 @@ export default class PointEdit extends SmartView {
     this._validateDestination();
     const isValid = this.getElement().querySelector(`.event--edit`).checkValidity();
 
-    const saveButton = this.getElement().querySelector(`.event__save-btn`);
+    const saveButtonElement = this.getElement().querySelector(`.event__save-btn`);
 
-    saveButton.disabled = !isValid;
+    saveButtonElement.disabled = !isValid;
 
     return isValid;
   }
@@ -294,9 +294,9 @@ export default class PointEdit extends SmartView {
     const priceElement = this.getElement().querySelector(`.event__input--price`);
     priceElement.addEventListener(`input`, this._priceInputHandler);
 
-    const offersRendered = this.getElement().querySelector(`.event__available-offers`);
-    if (offersRendered) {
-      offersRendered.addEventListener(`change`, this._offerToggleHandler);
+    const offerElement = this.getElement().querySelector(`.event__available-offers`);
+    if (offerElement) {
+      offerElement.addEventListener(`change`, this._offerToggleHandler);
     }
 
     const destinationElement = this.getElement().querySelector(`.event__input--destination`);

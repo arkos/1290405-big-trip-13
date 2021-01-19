@@ -35,9 +35,9 @@ const tripMainElement = document.querySelector(`.trip-main`);
 const pointsElement = document.querySelector(`.trip-events`);
 
 const siteMenuTitleElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
-const [menuContainer, filterContainer] = siteMenuTitleElements;
+const [menuContainerElement, filterContainerElement] = siteMenuTitleElements;
 
-const pointNewButton = document.querySelector(`.trip-main__event-add-btn`);
+const pointNewButtonElement = document.querySelector(`.trip-main__event-add-btn`);
 
 let statisticsComponent = null;
 
@@ -56,7 +56,7 @@ const destinationsModel = new DestinationsModel();
 
 const siteMenuComponent = new MenuView();
 
-const filterPresenter = new FilterPresenter(filterContainer, filterModel, pointsModel);
+const filterPresenter = new FilterPresenter(filterContainerElement, filterModel, pointsModel);
 const summaryPresenter = new SummaryPresenter(tripMainElement, pointsModel);
 
 const tripPresenter = new TripPresenter(
@@ -69,7 +69,7 @@ const tripPresenter = new TripPresenter(
     apiWithProvider
 );
 
-pointNewButton.addEventListener(`click`, (evt) => {
+pointNewButtonElement.addEventListener(`click`, (evt) => {
   evt.preventDefault();
   remove(statisticsComponent);
   siteMenuComponent.setMenuItem(MenuItem.TABLE);
@@ -81,11 +81,11 @@ pointNewButton.addEventListener(`click`, (evt) => {
     return;
   }
   tripPresenter.createPoint(handlePointNewFormClose);
-  pointNewButton.disabled = true;
+  pointNewButtonElement.disabled = true;
 });
 
 const handlePointNewFormClose = () => {
-  pointNewButton.disabled = false;
+  pointNewButtonElement.disabled = false;
 };
 
 const handleSiteMenuClick = (menuItem) => {
@@ -103,7 +103,7 @@ const handleSiteMenuClick = (menuItem) => {
   siteMenuComponent.setMenuItem(menuItem);
 };
 
-pointNewButton.disabled = true;
+pointNewButtonElement.disabled = true;
 
 siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 
@@ -116,13 +116,13 @@ Promise.all([apiWithProvider.getOffers(), apiWithProvider.getDestinations(), api
     offersModel.setOffers(offers);
     destinationsModel.setDestinations(destinations);
     pointsModel.setPoints(UpdateType.INIT, points);
-    pointNewButton.disabled = false;
-    render(menuContainer, siteMenuComponent, RenderPosition.AFTEREND);
+    pointNewButtonElement.disabled = false;
+    render(menuContainerElement, siteMenuComponent, RenderPosition.AFTEREND);
   })
   .catch(() => {
     pointsModel.setPoints(UpdateType.INIT, []);
-    pointNewButton.disabled = false;
-    render(menuContainer, siteMenuComponent, RenderPosition.AFTEREND);
+    pointNewButtonElement.disabled = false;
+    render(menuContainerElement, siteMenuComponent, RenderPosition.AFTEREND);
   });
 
 window.addEventListener(`load`, () => {
