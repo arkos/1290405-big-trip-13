@@ -343,7 +343,7 @@ export default class PointEdit extends SmartView {
 
     this._validateAll();
 
-    let destination = this._destinations.get(evt.target.value);
+    const destination = this._destinations.get(evt.target.value);
 
     if (!destination || evt.target.value === this._state.destination.name) {
       return;
