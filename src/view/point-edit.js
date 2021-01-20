@@ -227,13 +227,12 @@ export default class PointEdit extends SmartView {
     this._dateFromPicker = flatpickr(
         this.getElement().querySelector(`input[name='event-start-time']`),
         {
-          enableTime: true,
-          // eslint-disable-next-line camelcase
-          time_24hr: true,
-          dateFormat: `d/m/y H:i`,
-          defaultDate: this._state.dateFrom,
-          maxDate: dayjs(this._state.dateTo).second(0).subtract(1, `m`).toDate(),
-          onClose: this._dateFromCloseHandler,
+          "enableTime": true,
+          "time_24hr": true,
+          "dateFormat": `d/m/y H:i`,
+          "defaultDate": this._state.dateFrom,
+          "maxDate": dayjs(this._state.dateTo).second(0).subtract(1, `m`).toDate(),
+          "onClose": this._dateFromCloseHandler,
         }
     );
   }
@@ -247,13 +246,12 @@ export default class PointEdit extends SmartView {
     this._dateToPicker = flatpickr(
         this.getElement().querySelector(`input[name='event-end-time']`),
         {
-          enableTime: true,
-          // eslint-disable-next-line camelcase
-          time_24hr: true,
-          dateFormat: `d/m/y H:i`,
-          defaultDate: this._state.dateTo,
-          minDate: dayjs(this._state.dateFrom).second(0).add(1, `m`).toDate(),
-          onClose: this._dateToCloseHandler,
+          "enableTime": true,
+          "time_24hr": true,
+          "dateFormat": `d/m/y H:i`,
+          "defaultDate": this._state.dateTo,
+          "minDate": dayjs(this._state.dateFrom).second(0).add(1, `m`).toDate(),
+          "onClose": this._dateToCloseHandler,
         }
     );
   }
@@ -343,7 +341,7 @@ export default class PointEdit extends SmartView {
 
     this._validateAll();
 
-    let destination = this._destinations.get(evt.target.value);
+    const destination = this._destinations.get(evt.target.value);
 
     if (!destination || evt.target.value === this._state.destination.name) {
       return;
