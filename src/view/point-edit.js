@@ -61,13 +61,13 @@ const createAvailableDestinationsTemplate = (availableDestinations) => {
   </datalist>` : ``;
 };
 
-const createTypesMenuTemplate = (types) => {
+const createTypesMenuTemplate = (types, currentType) => {
   return `<div class="event__type-list">
     <fieldset class="event__type-group">
       <legend class="visually-hidden">Event type</legend>
 
       ${Array.from(types).map(([key, value]) => `<div class="event__type-item">
-      <input id="event-type-${key}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${key}">
+      <input id="event-type-${key}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${key}" ${key === currentType ? `checked` : ``}>
       <label class="event__type-label  event__type-label--${key}" for="event-type-${key}-1">${value.title}</label>
     </div>`).join(``)}
 
@@ -91,7 +91,7 @@ const createPointEditTemplate = (state) => {
     isDeleting
   } = state;
 
-  const typesMenuTemplate = createTypesMenuTemplate(pointTypes);
+  const typesMenuTemplate = createTypesMenuTemplate(pointTypes, type);
 
   const offersTemplate = createOffersTemplate(offers, isDisabled);
 
