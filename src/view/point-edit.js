@@ -179,6 +179,20 @@ export default class PointEdit extends SmartView {
     return createPointEditTemplate(this._state);
   }
 
+  removeElement() {
+    super.removeElement();
+
+    if (this._dateFromPicker) {
+      this._dateFromPicker.destroy();
+      this._dateFromPicker = null;
+    }
+
+    if (this._dateToPicker) {
+      this._dateToPicker.destroy();
+      this._dateToPicker = null;
+    }
+  }
+
   reset(point) {
     this.updateData(PointEdit.parsePointToState(point, this._offers, this._destinations));
   }
