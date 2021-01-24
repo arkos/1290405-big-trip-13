@@ -16,7 +16,7 @@ import Store from './api/store.js';
 import Provider from './api/provider.js';
 import {MenuItem, UpdateType, FilterType} from './utils/const.js';
 
-const AUTHORIZATION = `Basic ab0d513b8d5045f4a72159701a847950`;
+const AUTHORIZATION = `Basic 073f2bd49c7548f08da34f016fc10691`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 
 const STORE_POINTS_PREFIX = `bigtrip-localstorage-points`;
